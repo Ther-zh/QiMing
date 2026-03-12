@@ -1,0 +1,17 @@
+# 导盲系统依赖库
+
+# 核心依赖
+numpy>=1.24.0
+opencv-python>=4.8.0
+PyYAML>=6.0
+psutil>=5.9.0
+
+# 模型依赖
+ultralytics>=8.0.0  # YOLOv8
+funasr>=1.0.0  # 语音识别
+# vllm  # 大语言模型推理（可选）
+# torch>=2.0.0  # PyTorch（可选）
+
+# 其他依赖
+Pillow>=9.0.0  # 图像处理
+# pyaudio  # 音频采集（可选）

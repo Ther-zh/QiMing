@@ -1,0 +1,48 @@
+2026-03-12 02:32:15,458 - blind_guide_system - INFO - 使用Mock TTS引擎
+2026-03-12 02:32:15,458 - blind_guide_system - INFO - 导盲系统启动中...
+2026-03-12 02:32:15,459 - blind_guide_system - INFO - 资源管理器已启动
+2026-03-12 02:32:15,460 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-12 02:32:15,460 - blind_guide_system - INFO - 摄像头 camera1 使用随机图像模拟
+2026-03-12 02:32:15,461 - blind_guide_system - INFO - 摄像头 camera2 使用随机图像模拟
+2026-03-12 02:32:15,461 - blind_guide_system - INFO - 摄像头 camera2 模拟已启动
+2026-03-12 02:32:15,547 - blind_guide_system - INFO - 摄像头 camera3 模拟已启动
+2026-03-12 02:32:15,547 - blind_guide_system - INFO - 摄像头 camera3 使用随机图像模拟
+2026-03-12 02:32:15,548 - blind_guide_system - INFO - 摄像头 camera4 模拟已启动
+2026-03-12 02:32:15,548 - blind_guide_system - INFO - 摄像头 camera4 使用随机图像模拟
+2026-03-12 02:32:15,549 - blind_guide_system - INFO - 摄像头 camera5 使用随机图像模拟
+2026-03-12 02:32:15,549 - blind_guide_system - INFO - 摄像头 camera5 模拟已启动
+2026-03-12 02:32:15,551 - blind_guide_system - INFO - 帧同步模块已启动
+2026-03-12 02:32:15,552 - blind_guide_system - INFO - 实时安全调度引擎已启动
+2026-03-12 02:32:15,646 - blind_guide_system - INFO - 复杂场景智能调度引擎已启动
+2026-03-12 02:32:15,649 - blind_guide_system - INFO - 语音播报调度器已启动
+2026-03-12 02:32:15,649 - blind_guide_system - INFO - 调试查看器已启动
+2026-03-12 02:32:15,651 - blind_guide_system - INFO - 导盲系统启动完成
+2026-03-12 02:32:24,571 - blind_guide_system - INFO - 收到停止信号，正在停止系统...
+2026-03-12 02:32:24,571 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-12 02:32:24,647 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-12 02:32:24,963 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-12 02:32:25,056 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-12 02:32:25,057 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-12 02:32:25,069 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-12 02:32:25,287 - blind_guide_system - INFO - 摄像头 camera2 模拟已停止
+2026-03-12 02:32:25,287 - blind_guide_system - INFO - 摄像头 camera3 模拟已停止
+2026-03-12 02:32:25,287 - blind_guide_system - INFO - 摄像头 camera4 模拟已停止
+2026-03-12 02:32:25,287 - blind_guide_system - INFO - 摄像头 camera5 模拟已停止
+2026-03-12 02:32:32,650 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-12 02:32:33,651 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-12 02:32:33,652 - blind_guide_system - INFO - 调试查看器已停止
+2026-03-12 02:32:33,652 - blind_guide_system - INFO - TTS引擎资源已释放
+2026-03-12 02:32:33,652 - blind_guide_system - INFO - 导盲系统已停止
+2026-03-12 02:32:33,652 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-12 02:32:33,652 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-12 02:32:33,652 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-12 02:32:33,652 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 摄像头 camera2 模拟已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 摄像头 camera3 模拟已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 摄像头 camera4 模拟已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 摄像头 camera5 模拟已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 调试查看器已停止
+2026-03-12 02:32:33,653 - blind_guide_system - INFO - 导盲系统已停止

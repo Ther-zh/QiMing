@@ -1,0 +1,88 @@
+# 导盲系统主配置文件
+
+# 系统配置
+system:
+  mode: "simulation"  # simulation 或 real
+  debug: true
+  fps: 5  # 主摄推理帧率
+  max_frame_buffer: 3  # 环形缓冲区大小
+
+# 摄像头配置
+cameras:
+  camera1:
+    id: 0
+    name: "front"
+    resolution: [640, 480]
+    fps: 5
+    is_main: true
+  camera2:
+    id: 1
+    name: "left"
+    resolution: [640, 480]
+    fps: 3
+  camera3:
+    id: 2
+    name: "right"
+    resolution: [640, 480]
+    fps: 3
+  camera4:
+    id: 3
+    name: "back"
+    resolution: [640, 480]
+    fps: 2
+  camera5:
+    id: 4
+    name: "top"
+    resolution: [640, 480]
+    fps: 2
+
+# 模型配置
+models:
+  yolo:
+    type: "mock"  # mock 或 real
+    model_path: "/root/MHSEE/MHSEE/model/yolov8l-world.pt"
+    conf_threshold: 0.15
+  vda:
+    type: "mock"  # mock 或 real
+    model_path: "/root/MHSEE/vda/Video-Depth-Anything"
+  asr:
+    type: "mock"  # mock 或 real
+    model_path: "damo/speech_paraformer-small-asr_nat-zh-cn-16k-common-vocab8404-onnx"
+  llm:
+    type: "real"  # mock 或 real
+    model_path: "/root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ"
+
+# 目标跟踪配置
+tracking:
+  min_hits: 3
+  max_age: 10
+  iou_threshold: 0.4
+
+# 危险评估配置
+risk:
+  high_risk_threshold: 80
+  medium_risk_threshold: 50
+  complexity_threshold: 60
+  alert_cooldown: 3  # 同类型告警冷却时间（秒）
+  min_consecutive_frames: 2  # 触发告警的连续帧数
+
+# 资源管理配置
+resources:
+  cpu_threshold: 80
+  memory_threshold: 80
+  gpu_memory_threshold: 90
+
+# 执行输出配置
+execution:
+  tts_type: "mock"  # mock 或 real
+  broadcast_queue_size: 10
+
+# 模拟配置
+simulation:
+  video_paths:
+    camera1: "simulation/videos/front.mp4"
+    camera2: "simulation/videos/left.mp4"
+    camera3: "simulation/videos/right.mp4"
+    camera4: "simulation/videos/back.mp4"
+    camera5: "simulation/videos/top.mp4"
+  audio_path: "simulation/audio/test.wav"
