@@ -32,7 +32,7 @@ class Qwen35VLLM:
             "max_model_len": max_model_len,
             "tensor_parallel_size": tensor_parallel_size,
             "trust_remote_code": True,
-            "gpu_memory_utilization": 0.9, # 稍微提高显存利用率
+            "gpu_memory_utilization": 0.3, # 限制显存占用到约6GB
         }
         
         # 更新用户传入的参数

@@ -1,6 +1,6 @@
 import threading
 import time
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional, Tuple, List
 import numpy as np
 from collections import deque
 
@@ -45,12 +45,12 @@ class FrameSync:
         with self.lock:
             self.frame_buffer.append((frame, timestamp, camera_id))
     
-    def add_yolo_result(self, result: Dict[str, Any], timestamp: float):
+    def add_yolo_result(self, result: List[Dict[str, Any]], timestamp: float):
         """
         添加YOLO检测结果
         
         Args:
-            result: YOLO检测结果
+            result: YOLO检测结果列表
             timestamp: 时间戳
         """
         with self.lock:

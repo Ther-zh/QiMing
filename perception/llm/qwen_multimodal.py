@@ -21,7 +21,9 @@ class QwenMultimodal:
         加载Qwen模型
         """
         try:
-            from qwen_vllm_wrapper import Qwen35VLLM
+            import sys
+            sys.path.append('/root/MHSEE')
+            from LLM.qwen35 import Qwen35VLLM
             self.model = Qwen35VLLM(
                 model_path=self.model_path,
                 max_model_len=8192

@@ -1,0 +1,70 @@
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - 使用Mock TTS引擎
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - 导盲系统启动中...
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - 系统模式: simulation
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - YOLO模型: /root/MHSEE/perception/yolo/model/yolov8n.pt
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - VDA模型: /root/MHSEE/vda/Video-Depth-Anything
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - ASR模型: /root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - LLM模型: /root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ
+2026-03-14 19:22:23,722 - blind_guide_system - INFO - 视频路径: video/video.mp4
+2026-03-14 19:22:23,734 - blind_guide_system - INFO - 视频写入器已初始化，输出路径: output_video.avi
+2026-03-14 19:22:23,734 - blind_guide_system - INFO - 结果文件已初始化，输出路径: system_results.txt
+2026-03-14 19:22:23,734 - blind_guide_system - INFO - 资源管理器已启动
+2026-03-14 19:22:23,735 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-14 19:22:23,735 - blind_guide_system - INFO - 帧同步模块已启动
+2026-03-14 19:22:23,735 - blind_guide_system - INFO - 实时安全调度引擎已启动
+2026-03-14 19:22:23,735 - blind_guide_system - INFO - 复杂场景智能调度引擎已启动
+2026-03-14 19:22:23,735 - blind_guide_system - INFO - 语音播报调度器已启动
+2026-03-14 19:22:23,735 - blind_guide_system - WARNING - 没有图形界面，禁用调试查看器
+2026-03-14 19:22:23,736 - blind_guide_system - INFO - 导盲系统启动完成
+2026-03-14 19:22:23,756 - blind_guide_system - INFO - 摄像头 camera1 使用视频文件: video/video.mp4
+2026-03-14 19:22:23,936 - blind_guide_system - INFO - [Main] 迭代 1/20
+2026-03-14 19:22:23,953 - blind_guide_system - INFO - 从视频中提取音频数据，长度: 1037282 样本，采样率: 16000Hz
+2026-03-14 19:22:24,136 - blind_guide_system - INFO - [Main] 迭代 2/20
+2026-03-14 19:22:24,337 - blind_guide_system - INFO - [Main] 迭代 3/20
+2026-03-14 19:22:24,948 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:25,023 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 19:22:25,144 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:25,345 - blind_guide_system - INFO - [Main] 迭代 4/20
+2026-03-14 19:22:25,545 - blind_guide_system - INFO - [Main] 迭代 5/20
+2026-03-14 19:22:25,578 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:25,783 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:25,984 - blind_guide_system - INFO - [Main] 迭代 6/20
+2026-03-14 19:22:26,184 - blind_guide_system - INFO - [Main] 迭代 7/20
+2026-03-14 19:22:26,204 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:26,375 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:26,576 - blind_guide_system - INFO - [Main] 迭代 8/20
+2026-03-14 19:22:26,776 - blind_guide_system - INFO - [Main] 迭代 9/20
+2026-03-14 19:22:26,794 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:26,983 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:27,185 - blind_guide_system - INFO - [Main] 迭代 10/20
+2026-03-14 19:22:27,385 - blind_guide_system - INFO - [Main] 迭代 11/20
+2026-03-14 19:22:27,401 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:27,581 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:27,782 - blind_guide_system - INFO - [Main] 迭代 12/20
+2026-03-14 19:22:27,982 - blind_guide_system - INFO - [Main] 迭代 13/20
+2026-03-14 19:22:28,000 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:28,178 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:28,379 - blind_guide_system - INFO - [Main] 迭代 14/20
+2026-03-14 19:22:28,579 - blind_guide_system - INFO - [Main] 迭代 15/20
+2026-03-14 19:22:28,597 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:28,763 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:28,964 - blind_guide_system - INFO - [Main] 迭代 16/20
+2026-03-14 19:22:29,165 - blind_guide_system - INFO - [Main] 迭代 17/20
+2026-03-14 19:22:29,188 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:29,355 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:29,556 - blind_guide_system - INFO - [Main] 迭代 18/20
+2026-03-14 19:22:29,756 - blind_guide_system - INFO - [Main] 迭代 19/20
+2026-03-14 19:22:29,775 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 19:22:29,941 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 19:22:30,142 - blind_guide_system - INFO - [Main] 迭代 20/20
+2026-03-14 19:22:30,142 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-14 19:22:30,163 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-14 19:22:30,260 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-14 19:22:30,339 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-14 19:22:30,339 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-14 19:22:30,346 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-14 19:22:30,430 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-14 19:22:30,431 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-14 19:22:30,431 - blind_guide_system - INFO - 结果文件已关闭
+2026-03-14 19:22:30,477 - blind_guide_system - INFO - TTS引擎资源已释放
+2026-03-14 19:22:30,478 - blind_guide_system - INFO - 导盲系统已停止

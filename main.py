@@ -2,7 +2,9 @@ import time
 import threading
 import signal
 import sys
-from typing import Dict, Any
+import cv2
+import numpy as np
+from typing import Dict, Any, List
 
 # 导入工具模块
 from utils.logger import logger
@@ -75,6 +77,20 @@ class BlindGuideSystem:
         
         # 系统状态
         self.running = False
+        
+        # 视频写入器
+        self.video_writer = None
+        
+        # 结果记录文件
+        self.result_file = None
+        
+        # 帧计数器和采样频率
+        self.frame_count = 0
+        self.sample_interval = 2  # 每2帧采样一次
+        
+        # 存储ASR和LLM结果
+        self.asr_results = []
+        self.llm_results = []
     
     def _init_yolo(self):
         """
@@ -122,6 +138,20 @@ class BlindGuideSystem:
         """
         logger.info("导盲系统启动中...")
         
+        # 打印配置信息
+        logger.info(f"系统模式: {self.config.get('system', {}).get('mode')}")
+        logger.info(f"YOLO模型: {self.config.get('models', {}).get('yolo', {}).get('model_path')}")
+        logger.info(f"VDA模型: {self.config.get('models', {}).get('vda', {}).get('model_path')}")
+        logger.info(f"ASR模型: {self.config.get('models', {}).get('asr', {}).get('model_path')}")
+        logger.info(f"LLM模型: {self.config.get('models', {}).get('llm', {}).get('model_path')}")
+        logger.info(f"视频路径: {self.config.get('simulation', {}).get('video_paths', {}).get('camera1')}")
+        
+        # 初始化视频写入器
+        self._init_video_writer()
+        
+        # 初始化结果文件
+        self._init_result_file()
+        
         # 启动资源管理器
         self.resource_manager.start()
         
@@ -168,6 +198,44 @@ class BlindGuideSystem:
         # 启动主循环
         self._main_loop()
     
+    def _init_video_writer(self):
+        """
+        初始化视频写入器
+        """
+        try:
+            # 获取视频路径
+            video_path = self.config.get("simulation", {}).get("video_paths", {}).get("camera1")
+            if video_path:
+                # 获取视频信息
+                cap = cv2.VideoCapture(video_path)
+                width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                fps = cap.get(cv2.CAP_PROP_FPS)
+                cap.release()
+                
+                # 初始化视频写入器
+                output_path = "output_video.avi"
+                fourcc = cv2.VideoWriter_fourcc(*'XVID')
+                self.video_writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+                logger.info(f"视频写入器已初始化，输出路径: {output_path}")
+        except Exception as e:
+            logger.warning(f"初始化视频写入器失败: {e}")
+            self.video_writer = None
+    
+    def _init_result_file(self):
+        """
+        初始化结果文件
+        """
+        try:
+            self.result_file = open("system_results.txt", "w", encoding="utf-8")
+            self.result_file.write("# 导盲系统测试结果\n\n")
+            self.result_file.write(f"测试时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            self.result_file.write(f"视频路径: {self.config.get('simulation', {}).get('video_paths', {}).get('camera1')}\n\n")
+            logger.info("结果文件已初始化，输出路径: system_results.txt")
+        except Exception as e:
+            logger.warning(f"初始化结果文件失败: {e}")
+            self.result_file = None
+    
     def stop(self):
         """
         停止系统
@@ -191,6 +259,31 @@ class BlindGuideSystem:
         except Exception as e:
             logger.warning(f"停止调试查看器失败: {e}")
         
+        # 关闭视频写入器
+        if self.video_writer:
+            try:
+                self.video_writer.release()
+                logger.info("视频写入器已关闭")
+            except Exception as e:
+                logger.warning(f"关闭视频写入器失败: {e}")
+        
+        # 关闭结果文件
+        if self.result_file:
+            try:
+                # 写入ASR和LLM结果
+                self.result_file.write("\n# ASR识别结果\n")
+                for i, result in enumerate(self.asr_results):
+                    self.result_file.write(f"{i+1}. {result}\n")
+                
+                self.result_file.write("\n# LLM回复结果\n")
+                for i, result in enumerate(self.llm_results):
+                    self.result_file.write(f"{i+1}. {result}\n")
+                
+                self.result_file.close()
+                logger.info("结果文件已关闭")
+            except Exception as e:
+                logger.warning(f"关闭结果文件失败: {e}")
+        
         # 释放模型资源
         if hasattr(self, 'yolo'):
             self.yolo.release()
@@ -205,11 +298,44 @@ class BlindGuideSystem:
         
         logger.info("导盲系统已停止")
     
+    def _draw_targets(self, frame, tracked_targets):
+        """
+        在帧上绘制目标信息
+        
+        Args:
+            frame: 输入帧
+            tracked_targets: 跟踪目标列表
+        """
+        for target in tracked_targets:
+            # 绘制边界框
+            x1, y1, x2, y2 = target.get('bbox', [0, 0, 0, 0])
+            class_name = target.get('class_name', 'unknown')
+            distance = target.get('distance', 0)
+            speed = target.get('speed', 0)
+            
+            # 计算边界框中心
+            center_x = int((x1 + x2) / 2)
+            center_y = int((y1 + y2) / 2)
+            
+            # 绘制边界框
+            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+            
+            # 绘制目标信息
+            info_text = f"{class_name} - 距离: {distance:.1f}m - 速度: {speed:.1f}m/s"
+            cv2.putText(frame, info_text, (int(x1), int(y1) - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        return frame
+    
     def _main_loop(self):
         """
         主循环
         """
-        while self.running:
+        # 添加一个计数器，让系统运行一段时间后自动停止
+        iteration_count = 0
+        max_iterations = 20  # 运行20次迭代后停止
+        
+        while self.running and iteration_count < max_iterations:
             try:
                 # 更新资源管理器心跳
                 self.resource_manager.update_heartbeat("main")
@@ -222,86 +348,149 @@ class BlindGuideSystem:
                 if main_camera in frames:
                     frame, timestamp = frames[main_camera]
                     if frame is not None:
-                        # 添加帧到同步模块
-                        self.frame_sync.add_frame(frame, timestamp, 0)
+                        # 帧计数器
+                        self.frame_count += 1
                         
-                        # 执行YOLO检测
-                        yolo_results = self.yolo.inference(frame)
-                        self.frame_sync.add_yolo_result(yolo_results, timestamp)
+                        # 获取真实音频数据
+                        audio_data, audio_timestamp = self.camera_simulator.get_audio("camera1")
+                        if audio_data is not None:
+                            # 执行ASR识别
+                            logger.info(f"[Main] 处理音频数据，长度: {len(audio_data)}")
+                            wake_detected, asr_text = self.asr.inference(audio_data)
+                            logger.info(f"[ASR] 识别结果: {asr_text}")
+                        else:
+                            # 如果没有音频数据，使用空数据
+                            import numpy as np
+                            audio_data = np.array([])
+                            wake_detected, asr_text = self.asr.inference(audio_data)
+                            logger.info(f"[ASR] 识别结果 (无音频): {asr_text}")
                         
-                        # 执行VDA深度估计
-                        depth_map = self.vda.inference(frame)
-                        self.frame_sync.add_vda_result(depth_map, timestamp)
+                        # 记录ASR结果
+                        if asr_text:
+                            self.asr_results.append(asr_text)
+                            logger.info(f"[Main] 已记录ASR结果: {asr_text}")
                         
-                        # 获取同步数据
-                        sync_data = self.frame_sync.get_sync_data()
-                        if sync_data:
-                            sync_frame, sync_yolo, sync_depth, sync_timestamp, sync_camera_id = sync_data
+                        # 帧采样
+                        if self.frame_count % self.sample_interval == 0:
+                            # 添加帧到同步模块
+                            self.frame_sync.add_frame(frame, timestamp, 0)
                             
-                            # 计算目标距离
-                            targets_with_distance = self.depth_fusion.calculate_target_distances(sync_yolo, sync_depth)
+                            # 执行YOLO检测
+                            yolo_results = self.yolo.inference(frame)
+                            self.frame_sync.add_yolo_result(yolo_results, timestamp)
                             
-                            # 跟踪目标并计算速度
-                            tracked_targets = self.target_tracker.track_targets(targets_with_distance, sync_timestamp)
+                            # 执行VDA深度估计
+                            depth_map = self.vda.inference(frame)
+                            self.frame_sync.add_vda_result(depth_map, timestamp)
                             
-                            # 封装元数据
-                            metadata = self.metadata_wrapper.wrap_metadata(
-                                sync_frame,
-                                tracked_targets,
-                                sync_timestamp,
-                                sync_camera_id
-                            )
-                            
-                            # 处理实时安全调度
-                            self.realtime_scheduler.process_metadata(metadata)
-                            
-                            # 检查是否有告警
-                            alert = self.realtime_scheduler.get_alert()
-                            if alert:
-                                # 添加到语音播报队列
-                                self.broadcast_scheduler.add_message(
-                                    alert.get("message"),
-                                    priority=1 if alert.get("level") == "level1" else 2,
-                                    alert_type=alert.get("level")
-                                )
-                            
-                            # 检查是否触发复杂场景
-                            if self.realtime_scheduler.is_complex_scene_triggered():
-                                # 处理复杂场景
-                                response = self.complex_scene_scheduler.process_complex_scene(
-                                    sync_frame,
-                                    metadata,
-                                    "请分析当前场景并提供导航建议"
-                                )
-                                if response:
-                                    self.broadcast_scheduler.add_message(
-                                        response,
-                                        priority=3,
-                                        alert_type="complex_scene"
-                                    )
-                                # 重置触发信号
-                                self.realtime_scheduler.reset_complex_scene_trigger()
-                            
-                            # 更新调试画面
-                            if self.config.get("system", {}).get("debug", False):
-                                # 确定危险等级
-                                risk_level = "level4"  # 默认安全
-                                if alert:
-                                    risk_level = alert.get("level")
+                            # 获取同步数据
+                            sync_data = self.frame_sync.get_sync_data()
+                            if sync_data:
+                                sync_frame, sync_yolo, sync_depth, sync_timestamp, sync_camera_id = sync_data
                                 
-                                self.debug_viewer.update_frame(
+                                # 计算目标距离
+                                targets_with_distance = self.depth_fusion.calculate_target_distances(sync_yolo, sync_depth)
+                                
+                                # 跟踪目标并计算速度
+                                tracked_targets = self.target_tracker.track_targets(targets_with_distance, sync_timestamp)
+                                
+                                # 封装元数据
+                                metadata = self.metadata_wrapper.wrap_metadata(
                                     sync_frame,
                                     tracked_targets,
-                                    sync_depth,
-                                    risk_level
+                                    sync_timestamp,
+                                    sync_camera_id
                                 )
-                
-                # 控制帧率
-                time.sleep(0.2)  # 5FPS
-                
+                                
+                                # 处理实时安全调度
+                                self.realtime_scheduler.process_metadata(metadata)
+                                
+                                # 检查是否有告警
+                                alert = self.realtime_scheduler.get_alert()
+                                if alert:
+                                    # 添加到语音播报队列
+                                    self.broadcast_scheduler.add_message(
+                                        alert.get("message"),
+                                        priority=1 if alert.get("level") == "level1" else 2,
+                                        alert_type=alert.get("level")
+                                    )
+                                
+                                # 检查是否触发复杂场景
+                                if self.realtime_scheduler.is_complex_scene_triggered():
+                                    # 处理复杂场景
+                                    response = self.complex_scene_scheduler.process_complex_scene(
+                                        sync_frame,
+                                        metadata,
+                                        "请分析当前场景并提供导航建议"
+                                    )
+                                    if response:
+                                        self.broadcast_scheduler.add_message(
+                                            response,
+                                            priority=3,
+                                            alert_type="complex_scene"
+                                        )
+                                        # 记录LLM结果
+                                        self.llm_results.append(response)
+                                    # 重置触发信号
+                                    self.realtime_scheduler.reset_complex_scene_trigger()
+                                
+                                # 更新调试画面
+                                if self.config.get("system", {}).get("debug", False):
+                                    # 确定危险等级
+                                    risk_level = "level4"  # 默认安全
+                                    if alert:
+                                        risk_level = alert.get("level")
+                                    
+                                    self.debug_viewer.update_frame(
+                                        sync_frame,
+                                        tracked_targets,
+                                        sync_depth,
+                                        risk_level
+                                    )
+                                
+                                # 如果检测到唤醒词，调用LLM处理
+                                if wake_detected:
+                                    logger.info(f"[Main] 检测到唤醒词，调用LLM处理...")
+                                    # 将NumPy数组转换为PIL Image
+                                    from PIL import Image
+                                    sync_image = Image.fromarray(sync_frame)
+                                    # 调用复杂场景调度器处理
+                                    response = self.complex_scene_scheduler.handle_wake_word(
+                                        asr_text,
+                                        sync_image,
+                                        metadata
+                                    )
+                                    if response:
+                                        logger.info(f"[LLM] 回复: {response}")
+                                        # 添加到语音播报队列
+                                        self.broadcast_scheduler.add_message(
+                                            response,
+                                            priority=3,
+                                            alert_type="wake_word"
+                                        )
+                                        # 记录LLM结果
+                                        self.llm_results.append(response)
+                                        logger.info(f"[Main] 已记录LLM结果: {response}")
+                                
+                                # 绘制目标信息
+                                output_frame = self._draw_targets(sync_frame.copy(), tracked_targets)
+                                
+                                # 写入视频文件
+                                if self.video_writer:
+                                    self.video_writer.write(output_frame)
+                    
+                    # 控制帧率
+                    time.sleep(0.2)  # 5FPS
+                    
+                    # 增加迭代计数器
+                    iteration_count += 1
+                    logger.info(f"[Main] 迭代 {iteration_count}/{max_iterations}")
+                    
             except Exception as e:
                 logger.error(f"主循环出错: {e}")
                 time.sleep(0.5)
+        
+
     
     def signal_handler(self, sig, frame):
         """

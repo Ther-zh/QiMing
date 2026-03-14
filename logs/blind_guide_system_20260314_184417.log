@@ -1,0 +1,174 @@
+2026-03-14 18:44:25,975 - blind_guide_system - INFO - 使用Mock TTS引擎
+2026-03-14 18:44:25,975 - blind_guide_system - INFO - 导盲系统启动中...
+2026-03-14 18:44:25,975 - blind_guide_system - INFO - 系统模式: simulation
+2026-03-14 18:44:25,975 - blind_guide_system - INFO - YOLO模型: /root/MHSEE/perception/yolo/model/yolov8n.pt
+2026-03-14 18:44:25,976 - blind_guide_system - INFO - VDA模型: /root/MHSEE/vda/Video-Depth-Anything
+2026-03-14 18:44:25,976 - blind_guide_system - INFO - ASR模型: /root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall
+2026-03-14 18:44:25,976 - blind_guide_system - INFO - LLM模型: /root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ
+2026-03-14 18:44:25,976 - blind_guide_system - INFO - 视频路径: video/video.mp4
+2026-03-14 18:44:25,986 - blind_guide_system - INFO - 视频写入器已初始化，输出路径: output_video.avi
+2026-03-14 18:44:25,987 - blind_guide_system - INFO - 结果文件已初始化，输出路径: system_results.txt
+2026-03-14 18:44:25,987 - blind_guide_system - INFO - 资源管理器已启动
+2026-03-14 18:44:25,987 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-14 18:44:25,987 - blind_guide_system - INFO - 帧同步模块已启动
+2026-03-14 18:44:25,988 - blind_guide_system - INFO - 实时安全调度引擎已启动
+2026-03-14 18:44:25,988 - blind_guide_system - INFO - 复杂场景智能调度引擎已启动
+2026-03-14 18:44:25,988 - blind_guide_system - INFO - 语音播报调度器已启动
+2026-03-14 18:44:25,988 - blind_guide_system - WARNING - 没有图形界面，禁用调试查看器
+2026-03-14 18:44:25,988 - blind_guide_system - INFO - 导盲系统启动完成
+2026-03-14 18:44:26,012 - blind_guide_system - INFO - 摄像头 camera1 使用视频文件: video/video.mp4
+2026-03-14 18:44:26,016 - blind_guide_system - INFO - 使用模拟音频数据，长度: 160000 样本，采样率: 16000Hz
+2026-03-14 18:44:26,188 - blind_guide_system - INFO - [Main] 迭代 1/20
+2026-03-14 18:44:26,389 - blind_guide_system - INFO - [Main] 迭代 2/20
+2026-03-14 18:44:26,956 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:27,127 - blind_guide_system - INFO - [ASR] 识别结果: 导航到最近的公交车站
+2026-03-14 18:44:27,127 - blind_guide_system - INFO - [Main] 已记录ASR结果: 导航到最近的公交车站
+2026-03-14 18:44:27,127 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:27,230 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:27,232 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:27,232 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:27,232 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:27,232 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:27,232 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:27,232 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 18:44:27,232 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:27,279 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 18:44:27,310 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 18:44:27,434 - blind_guide_system - INFO - [Main] 迭代 3/20
+2026-03-14 18:44:27,635 - blind_guide_system - INFO - [Main] 迭代 4/20
+2026-03-14 18:44:27,662 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:27,818 - blind_guide_system - INFO - [ASR] 识别结果: 小明同学，前方路况如何
+2026-03-14 18:44:27,818 - blind_guide_system - INFO - [Main] 已记录ASR结果: 小明同学，前方路况如何
+2026-03-14 18:44:27,818 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:27,920 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:27,921 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:27,922 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:27,922 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:27,922 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:27,922 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:27,922 - blind_guide_system - DEBUG - 告警类型 wake_word 处于冷却期，跳过播报
+2026-03-14 18:44:27,922 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:28,123 - blind_guide_system - INFO - [Main] 迭代 5/20
+2026-03-14 18:44:28,324 - blind_guide_system - INFO - [Main] 迭代 6/20
+2026-03-14 18:44:28,349 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:28,500 - blind_guide_system - INFO - [ASR] 识别结果: 小明同学，前方路况如何
+2026-03-14 18:44:28,500 - blind_guide_system - INFO - [Main] 已记录ASR结果: 小明同学，前方路况如何
+2026-03-14 18:44:28,500 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:28,603 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:28,605 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:28,605 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:28,605 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:28,605 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:28,605 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:28,605 - blind_guide_system - DEBUG - 告警类型 wake_word 处于冷却期，跳过播报
+2026-03-14 18:44:28,606 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:28,807 - blind_guide_system - INFO - [Main] 迭代 7/20
+2026-03-14 18:44:29,008 - blind_guide_system - INFO - [Main] 迭代 8/20
+2026-03-14 18:44:29,027 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:29,182 - blind_guide_system - INFO - [ASR] 识别结果: 导航到最近的公交车站
+2026-03-14 18:44:29,182 - blind_guide_system - INFO - [Main] 已记录ASR结果: 导航到最近的公交车站
+2026-03-14 18:44:29,182 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:29,285 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:29,287 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:29,287 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:29,287 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:29,287 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:29,288 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:29,288 - blind_guide_system - DEBUG - 告警类型 wake_word 处于冷却期，跳过播报
+2026-03-14 18:44:29,288 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:29,490 - blind_guide_system - INFO - [Main] 迭代 9/20
+2026-03-14 18:44:29,690 - blind_guide_system - INFO - [Main] 迭代 10/20
+2026-03-14 18:44:29,715 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:29,866 - blind_guide_system - INFO - [ASR] 识别结果: 你好，导盲系统
+2026-03-14 18:44:29,866 - blind_guide_system - INFO - [Main] 已记录ASR结果: 你好，导盲系统
+2026-03-14 18:44:29,866 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:29,968 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:29,970 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:29,970 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:29,970 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:29,971 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:29,971 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:29,971 - blind_guide_system - DEBUG - 告警类型 wake_word 处于冷却期，跳过播报
+2026-03-14 18:44:29,971 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:30,172 - blind_guide_system - INFO - [Main] 迭代 11/20
+2026-03-14 18:44:30,373 - blind_guide_system - INFO - [Main] 迭代 12/20
+2026-03-14 18:44:30,398 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:30,550 - blind_guide_system - INFO - [ASR] 识别结果: 你好，我想过马路
+2026-03-14 18:44:30,550 - blind_guide_system - INFO - [Main] 已记录ASR结果: 你好，我想过马路
+2026-03-14 18:44:30,550 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:30,652 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:30,653 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 18:44:30,655 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:30,655 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:30,655 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:30,655 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:30,655 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:30,656 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 18:44:30,656 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:30,722 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 18:44:30,857 - blind_guide_system - INFO - [Main] 迭代 13/20
+2026-03-14 18:44:31,058 - blind_guide_system - INFO - [Main] 迭代 14/20
+2026-03-14 18:44:31,081 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:31,235 - blind_guide_system - INFO - [ASR] 识别结果: 导航到最近的公交车站
+2026-03-14 18:44:31,236 - blind_guide_system - INFO - [Main] 已记录ASR结果: 导航到最近的公交车站
+2026-03-14 18:44:31,236 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:31,337 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:31,338 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:31,338 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:31,338 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:31,338 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:31,338 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:31,338 - blind_guide_system - DEBUG - 告警类型 wake_word 处于冷却期，跳过播报
+2026-03-14 18:44:31,338 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:31,539 - blind_guide_system - INFO - [Main] 迭代 15/20
+2026-03-14 18:44:31,740 - blind_guide_system - INFO - [Main] 迭代 16/20
+2026-03-14 18:44:31,764 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:31,918 - blind_guide_system - INFO - [ASR] 识别结果: 你好，我想过马路
+2026-03-14 18:44:31,918 - blind_guide_system - INFO - [Main] 已记录ASR结果: 你好，我想过马路
+2026-03-14 18:44:31,918 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:32,020 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:32,023 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:32,023 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:32,023 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:32,023 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:32,023 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:32,023 - blind_guide_system - DEBUG - 告警类型 wake_word 处于冷却期，跳过播报
+2026-03-14 18:44:32,023 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:32,225 - blind_guide_system - INFO - [Main] 迭代 17/20
+2026-03-14 18:44:32,426 - blind_guide_system - INFO - [Main] 迭代 18/20
+2026-03-14 18:44:32,449 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 533
+2026-03-14 18:44:32,604 - blind_guide_system - INFO - [ASR] 识别结果: 导盲系统，我需要帮助
+2026-03-14 18:44:32,604 - blind_guide_system - INFO - [Main] 已记录ASR结果: 导盲系统，我需要帮助
+2026-03-14 18:44:32,604 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 18:44:32,706 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 18:44:32,707 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 18:44:32,707 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:32,707 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 18:44:32,707 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 18:44:32,707 - blind_guide_system - INFO - [LLM] 回复: 前方道路安全，可以正常通行
+2026-03-14 18:44:32,707 - blind_guide_system - DEBUG - 告警类型 wake_word 处于冷却期，跳过播报
+2026-03-14 18:44:32,707 - blind_guide_system - INFO - [Main] 已记录LLM结果: 前方道路安全，可以正常通行
+2026-03-14 18:44:32,908 - blind_guide_system - INFO - [Main] 迭代 19/20
+2026-03-14 18:44:33,108 - blind_guide_system - INFO - [Main] 迭代 20/20
+2026-03-14 18:44:33,108 - blind_guide_system - INFO - [Main] 执行stop方法...
+2026-03-14 18:44:33,108 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-14 18:44:33,136 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-14 18:44:33,512 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-14 18:44:33,624 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-14 18:44:33,624 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-14 18:44:33,664 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-14 18:44:33,858 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-14 18:44:33,858 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-14 18:44:33,859 - blind_guide_system - INFO - 结果文件已关闭
+2026-03-14 18:44:33,894 - blind_guide_system - INFO - TTS引擎资源已释放
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 导盲系统已停止
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-14 18:44:33,895 - blind_guide_system - WARNING - 关闭结果文件失败: I/O operation on closed file.
+2026-03-14 18:44:33,895 - blind_guide_system - INFO - 导盲系统已停止

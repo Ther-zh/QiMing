@@ -1,0 +1,4 @@
+2026-03-14 16:59:53,078 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-14 16:59:53,104 - blind_guide_system - INFO - 摄像头 camera1 使用视频文件: video/video.mp4
+2026-03-14 16:59:53,117 - blind_guide_system - INFO - 使用模拟音频数据，长度: 160000 样本，采样率: 16000Hz
+2026-03-14 17:00:03,104 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止

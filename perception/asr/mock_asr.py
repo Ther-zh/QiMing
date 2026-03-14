@@ -26,12 +26,18 @@ class MockFunASRRecognizer:
         """
         current_time = time.time()
         
-        # 每隔10秒模拟一次唤醒词检测
+        # 每隔5秒模拟一次唤醒词检测，增加测试频率
         wake_detected = False
-        if current_time - self.last_wake_time > 10:
+        if current_time - self.last_wake_time > 5:
             wake_detected = True
             self.last_wake_time = current_time
-            asr_text = "你好，导盲系统"
+            # 随机选择一个唤醒词
+            wake_words = ["你好", "导盲", "导航", "小明", "小明同学"]
+            import random
+            selected_wake = random.choice(wake_words)
+            asr_text = f"{selected_wake}，请问前方路况如何？"
+            print(f"[Mock ASR] 检测到唤醒词: {selected_wake}")
+            print(f"[Mock ASR] 语音识别结果: {asr_text}")
         else:
             # 模拟普通语音识别结果
             mock_responses = [
@@ -42,6 +48,7 @@ class MockFunASRRecognizer:
             ]
             import random
             asr_text = random.choice(mock_responses)
+            print(f"[Mock ASR] 语音识别结果: {asr_text}")
         
         return wake_detected, asr_text
     

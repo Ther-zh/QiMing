@@ -1,0 +1,240 @@
+2026-03-14 14:33:20,864 - blind_guide_system - INFO - 使用Mock TTS引擎
+2026-03-14 14:33:20,865 - blind_guide_system - INFO - 导盲系统启动中...
+2026-03-14 14:33:20,865 - blind_guide_system - INFO - 资源管理器已启动
+2026-03-14 14:33:20,865 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-14 14:33:20,865 - blind_guide_system - INFO - 帧同步模块已启动
+2026-03-14 14:33:20,866 - blind_guide_system - INFO - 实时安全调度引擎已启动
+2026-03-14 14:33:20,866 - blind_guide_system - INFO - 复杂场景智能调度引擎已启动
+2026-03-14 14:33:20,866 - blind_guide_system - INFO - 语音播报调度器已启动
+2026-03-14 14:33:20,866 - blind_guide_system - WARNING - 没有图形界面，禁用调试查看器
+2026-03-14 14:33:20,866 - blind_guide_system - INFO - 导盲系统启动完成
+2026-03-14 14:33:20,890 - blind_guide_system - INFO - 摄像头 camera1 使用视频文件: video/video.mp4
+2026-03-14 14:33:22,936 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:33:22,936 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:33:22,936 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:22,936 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:33:22,937 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 14:33:22,937 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:33:22,937 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:33:22,937 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:33:22,992 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:33:25,257 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:27,653 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:33:27,654 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:27,654 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 14:33:27,654 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:33:27,655 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:33:27,655 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:33:27,655 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:33:27,655 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:33:27,662 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:33:30,021 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:32,365 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:33,173 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:33:33,174 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:33:33,174 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:33:33,174 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:33:33,175 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:33:33,175 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:33:33,248 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:33:34,705 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:37,016 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:38,619 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:33:38,619 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:33:38,619 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:33:38,620 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:33:38,620 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:33:38,620 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:33:38,631 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:33:39,372 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:41,709 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:44,052 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:33:44,053 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:44,053 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 14:33:44,053 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:33:44,053 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:33:44,054 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:33:44,054 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:33:44,054 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:33:44,126 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:33:46,380 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:48,693 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:49,511 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:33:49,513 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:33:49,513 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:33:49,513 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:33:49,513 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:33:49,514 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:33:49,613 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:33:51,033 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:53,345 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:54,958 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:33:54,959 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:33:54,959 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:33:54,959 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:33:54,959 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:33:54,959 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:33:54,982 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:33:55,711 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:33:58,037 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:00,400 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:00,401 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:00,402 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 14:34:00,402 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:00,402 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:00,402 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:00,402 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:00,402 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:00,470 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:02,711 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:05,034 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:05,853 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:05,854 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:05,854 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:05,854 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:05,855 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:05,855 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:05,869 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:07,351 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:09,683 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:11,317 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:11,318 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:11,318 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:11,318 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:11,319 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:11,319 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:11,361 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:12,055 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:14,394 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:16,778 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:17,134 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:17,134 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:17,134 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:17,134 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:17,134 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:17,134 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:17,162 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:17,963 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:19,101 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:20,203 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:22,149 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:22,149 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:22,150 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:22,150 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:22,150 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:22,150 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:22,245 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:24,924 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:26,072 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:27,158 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:27,160 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:27,160 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:27,160 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:27,160 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:27,160 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:27,174 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:27,249 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:29,500 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:31,833 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:32,628 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:32,628 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:32,629 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:32,629 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:32,629 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:32,629 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:32,634 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:34,160 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:36,474 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:38,027 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:38,028 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:38,029 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:38,029 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:38,029 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:38,029 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:38,053 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:38,792 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:41,115 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:43,458 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:43,459 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:43,459 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:43,459 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:43,459 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 14:34:43,459 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:43,459 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:43,459 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:43,531 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:45,780 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:48,120 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:48,898 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:48,899 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:48,899 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:48,899 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:48,899 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:48,899 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:48,918 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:50,441 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:52,768 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:54,335 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:34:54,336 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:34:54,336 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:34:54,336 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:34:54,336 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:34:54,337 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:34:54,401 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:34:55,104 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:34:57,429 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:00,188 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:35:00,189 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:35:00,189 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:35:00,189 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:35:00,189 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:35:00,189 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:35:00,200 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:35:00,981 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:02,150 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:03,269 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:04,371 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:05,830 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:35:05,831 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:35:05,831 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:35:05,831 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:35:05,831 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:35:05,831 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:35:05,913 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:35:06,698 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:08,995 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:11,278 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:35:11,280 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:35:11,280 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:35:11,280 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:35:11,280 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:35:11,280 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:35:11,288 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:11,296 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:35:13,621 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:15,924 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 14:35:16,657 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 14:35:16,658 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 14:35:16,658 - blind_guide_system - INFO - LLM回复: 前方道路安全，可以正常通行
+2026-03-14 14:35:16,658 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 14:35:16,658 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 14:35:16,658 - blind_guide_system - DEBUG - 添加播报消息: 前方道路安全，可以正常通行, 优先级: 3
+2026-03-14 14:35:16,680 - blind_guide_system - INFO - 播报: 前方道路安全，可以正常通行
+2026-03-14 14:35:17,333 - blind_guide_system - INFO - 收到停止信号，正在停止系统...
+2026-03-14 14:35:17,333 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-14 14:35:17,398 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-14 14:35:17,764 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-14 14:35:17,877 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-14 14:35:17,878 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-14 14:35:17,943 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-14 14:35:18,115 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-14 14:35:18,115 - blind_guide_system - INFO - TTS引擎资源已释放
+2026-03-14 14:35:18,116 - blind_guide_system - INFO - 导盲系统已停止
+2026-03-14 14:35:18,116 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-14 14:35:18,116 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-14 14:35:18,116 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-14 14:35:18,116 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-14 14:35:18,116 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-14 14:35:18,117 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-14 14:35:18,117 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-14 14:35:18,117 - blind_guide_system - INFO - 导盲系统已停止
