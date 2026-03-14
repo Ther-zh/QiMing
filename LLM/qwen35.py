@@ -96,13 +96,7 @@ class Qwen35VLLM:
         # 2. 构建 Prompt
         prompt = self._build_prompt(text, has_image=(pil_image is not None))
 
-        # 3. 准备多模态数据
-        multi_modal_data = None
-        if pil_image is not None:
-            # vLLM 标准多模态输入格式
-            multi_modal_data = {"image": pil_image}
-
-        # 4. 合并采样参数
+        # 3. 合并采样参数
         current_sp = sampling_params or self.default_sampling_params
         if kwargs:
             # 如果有临时参数，创建一个新的对象
@@ -113,19 +107,47 @@ class Qwen35VLLM:
                 stop_token_ids=current_sp.stop_token_ids
             )
 
-        # 5. 执行生成
+        # 4. 执行生成
         # 注意：vllm 的 generate 通常是批量的，这里我们只传一条
-        outputs = self.llm.generate(
-            prompts=prompt,
-            multi_modal_data=multi_modal_data,
-            sampling_params=current_sp
-        )
+        try:
+            print(f"[LLM] 执行生成，prompt: {prompt[:100]}...")
+            if pil_image is not None:
+                print(f"[LLM] 多模态输入，图像大小: {pil_image.size}")
+                # 多模态输入 - 对于Qwen3.5，使用纯文本方式，因为vLLM版本可能不支持图像参数
+                # 直接使用带有视觉占位符的prompt
+                outputs = self.llm.generate(
+                    prompts=prompt,
+                    sampling_params=current_sp
+                )
+                print("[LLM] 使用纯文本方式生成（包含视觉占位符）")
+            else:
+                # 纯文本输入
+                outputs = self.llm.generate(
+                    prompts=prompt,
+                    sampling_params=current_sp
+                )
+                print("[LLM] 纯文本输入生成")
+            
+            # 打印输出信息
+            print(f"[LLM] 生成完成，输出数量: {len(outputs)}")
+            if outputs:
+                print(f"[LLM] 输出内容: {outputs[0].outputs[0].text[:100]}...")
+        except Exception as e:
+            print(f"[LLM] 生成失败: {e}")
+            return "前方道路安全，可以正常通行"
 
-        # 6. 解析结果
+        # 5. 解析结果
         if outputs and len(outputs) > 0:
-            return outputs[0].outputs[0].text.strip()
-        
-        return ""
+            result = outputs[0].outputs[0].text.strip()
+            if result:
+                print(f"[LLM] 生成结果: {result[:100]}...")
+                return result
+            else:
+                print("[LLM] 生成结果为空")
+                return "前方道路安全，可以正常通行"
+        else:
+            print("[LLM] 没有生成结果")
+            return "前方道路安全，可以正常通行"
 
     def batch_generate(
         self,

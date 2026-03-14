@@ -139,30 +139,47 @@ class ComplexSceneScheduler:
         Returns:
             生成的prompt
         """
-        # 基础prompt
-        base_prompt = "你是一个导盲系统，需要根据当前环境情况提供安全的导航建议。"
+        # Instruct模式prompt
+        prompt = "你是一个专业的导盲系统助手，致力于为视障人士提供安全、准确、清晰的导航指导。\n"
+        prompt += "请根据以下环境信息和用户问题，直接提供详细、准确的导航建议。\n\n"
         
-        # 添加环境信息
+        # 环境信息
+        prompt += "## 环境信息\n"
         targets = metadata.get("targets", [])
         if targets:
-            base_prompt += "当前环境中的目标有："
-            for target in targets:
-                category = target.get("category")
+            prompt += "检测到的目标：\n"
+            for i, target in enumerate(targets, 1):
+                category = target.get("category", "未知")
                 distance = target.get("distance", 0)
-                direction = target.get("direction")
-                base_prompt += f"{direction}方向{distance:.1f}米处的{category}，"
-            base_prompt = base_prompt.rstrip("，") + "。"
-        
-        # 根据唤醒词添加具体问题
-        if "路况" in wake_word:
-            base_prompt += "请详细描述当前路况并提供导航建议。"
-        elif "过马路" in wake_word:
-            base_prompt += "现在可以安全过马路吗？如果可以，应该如何通过？"
-        elif "导航" in wake_word:
-            base_prompt += "请提供当前位置的导航建议。"
-        elif "障碍物" in wake_word:
-            base_prompt += "前方有障碍物吗？如果有，应该如何避让？"
+                direction = target.get("direction", "前方")
+                speed = target.get("speed", 0)
+                prompt += f"{i}. {direction}方向{distance:.1f}米处的{category}"
+                if speed > 0:
+                    prompt += f"（移动速度：{speed:.1f}m/s）"
+                prompt += "\n"
         else:
-            base_prompt += "请提供当前环境的安全状况和导航建议。"
+            prompt += "检测到的目标：无\n"
         
-        return base_prompt
+        # 用户问题
+        prompt += "\n## 用户问题\n"
+        prompt += f"{wake_word}\n\n"
+        
+        # 输出要求
+        prompt += "## 输出要求\n"
+        prompt += "1. 直接提供导航建议，不要包含思考过程\n"
+        prompt += "2. 语言简洁明了，避免使用复杂句子\n"
+        prompt += "3. 信息准确，基于当前环境数据\n"
+        prompt += "4. 优先考虑用户安全\n"
+        prompt += "5. 提供具体的导航建议，包括方向、距离和注意事项\n"
+        prompt += "6. 如果有多个目标，按优先级排序（距离最近的优先）\n"
+        prompt += "7. 对于移动目标，特别提醒用户注意\n\n"
+        
+        # 示例
+        prompt += "## 示例\n"
+        prompt += "输入：环境：前方5米处有一个行人，左侧3米处有一辆汽车；用户：我想过马路\n"
+        prompt += "输出：当前前方5米处有一个行人，左侧3米处有一辆汽车。目前车辆距离较近，建议等待车辆通过后再过马路。当车辆通过后，确认左右方向安全，然后以正常步速穿过马路。\n\n"
+        
+        # 开始回复
+        prompt += "请直接输出导航建议："
+        
+        return prompt

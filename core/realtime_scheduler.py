@@ -6,6 +6,7 @@ from collections import deque
 from utils.logger import logger
 from utils.data_formatter import DataFormatter
 from utils.config_loader import config_loader
+from core.risk_evaluator import RiskEvaluator
 
 class RealtimeScheduler:
     def __init__(self):
@@ -18,6 +19,9 @@ class RealtimeScheduler:
         self.complex_scene_trigger = threading.Event()
         self.last_alert_time = {}  # 记录每种告警的最后触发时间
         self.consecutive_alerts = {}  # 记录连续告警的帧数
+        
+        # 初始化风险评价器
+        self.risk_evaluator = RiskEvaluator()
         
         # 启动调度线程
         self.scheduler_thread = threading.Thread(
@@ -60,29 +64,30 @@ class RealtimeScheduler:
             metadata: 环境感知元数据
         """
         timestamp = metadata.get("timestamp")
-        targets = metadata.get("targets", [])
         
-        # 计算全局危险分
-        max_risk_score = 0.0
-        high_risk_target = None
+        # 使用新的风险评价器
+        risk_result = self.risk_evaluator.evaluate_risk(metadata)
         
-        for target in targets:
-            risk_score = self._calculate_risk_score(target)
-            if risk_score > max_risk_score:
-                max_risk_score = risk_score
-                high_risk_target = target
-        
-        # 计算场景复杂度分
-        scene_score = self._calculate_scene_complexity(targets)
+        # 检查特殊场景
+        special_scene_result = self.risk_evaluator.evaluate_special_scene(metadata)
+        if special_scene_result:
+            risk_result = special_scene_result
         
         # 评估危险等级
-        alert = self._evaluate_risk_level(max_risk_score, scene_score, high_risk_target, timestamp)
+        alert = self._evaluate_risk_level(
+            risk_result['risk_score'],
+            0,  # 场景复杂度已在新评价器中考虑
+            risk_result.get('target_info'),
+            timestamp,
+            risk_result.get('risk_level'),
+            risk_result.get('message')
+        )
         
         if alert:
             self.alert_queue.append(alert)
         
-        # 如果场景复杂度超过阈值，触发复杂场景引擎
-        if scene_score >= self.config.get("risk", {}).get("complexity_threshold", 60):
+        # 如果风险等级较高，触发复杂场景引擎
+        if risk_result['risk_score'] >= 60:
             self.complex_scene_trigger.set()
     
     def _calculate_risk_score(self, target: Dict[str, Any]) -> float:
@@ -166,30 +171,31 @@ class RealtimeScheduler:
         
         return scene_score
     
-    def _evaluate_risk_level(self, risk_score: float, scene_score: float, target: Dict[str, Any], timestamp: float) -> Optional[Dict[str, Any]]:
+    def _evaluate_risk_level(self, risk_score: float, scene_score: float, target: Dict[str, Any], timestamp: float, level: str = None, message: str = None) -> Optional[Dict[str, Any]]:
         """
         评估危险等级并生成告警
         """
         risk_config = self.config.get("risk", {})
-        high_threshold = risk_config.get("high_risk_threshold", 80)
-        medium_threshold = risk_config.get("medium_risk_threshold", 50)
         min_consecutive = risk_config.get("min_consecutive_frames", 2)
         alert_cooldown = risk_config.get("alert_cooldown", 3)
         
-        # 确定告警级别
-        if risk_score >= high_threshold:
-            level = "level1"
-            message = "危险！请立即避让！"
-        elif risk_score >= medium_threshold:
-            level = "level2"
-            message = "注意！前方有危险！"
-        elif risk_score >= 30:
-            level = "level3"
-            message = "请注意前方情况"
-        else:
-            level = "level4"
-            message = "道路安全"
-            return None  # 安全状态不生成告警
+        # 如果没有提供级别和消息，根据风险分数确定
+        if not level or not message:
+            if risk_score >= 80:
+                level = "level1"
+                message = "危险！请立即避让！"
+                # 高危险级别不需要连续帧检查，立即触发
+                min_consecutive = 1
+            elif risk_score >= 50:
+                level = "level2"
+                message = "注意！前方有危险！"
+            elif risk_score >= 30:
+                level = "level3"
+                message = "请注意前方情况"
+            else:
+                level = "level4"
+                message = "道路安全"
+                return None  # 安全状态不生成告警
         
         # 检查连续告警帧数
         self.consecutive_alerts[level] = self.consecutive_alerts.get(level, 0) + 1
@@ -204,12 +210,18 @@ class RealtimeScheduler:
             self.last_alert_time[level] = timestamp
             self.consecutive_alerts[level] = 0  # 重置连续计数
             
-            return DataFormatter.format_alert(
+            alert = DataFormatter.format_alert(
                 level=level,
                 message=message,
                 timestamp=timestamp,
                 target_info=target
             )
+            
+            # 对于高危险级别，立即处理
+            if level == "level1":
+                logger.warning(f"[高危险] {message} - 距离: {target.get('distance', 0):.1f}m - 速度: {target.get('speed', 0):.1f}m/s")
+            
+            return alert
         
         return None
     

@@ -1,0 +1,179 @@
+2026-03-14 22:28:56,924 - blind_guide_system - INFO - 使用Mock TTS引擎
+2026-03-14 22:28:56,925 - blind_guide_system - INFO - 导盲系统启动中...
+2026-03-14 22:28:56,925 - blind_guide_system - INFO - 系统模式: simulation
+2026-03-14 22:28:56,925 - blind_guide_system - INFO - YOLO模型: /root/MHSEE/perception/yolo/model/yolov8n.pt
+2026-03-14 22:28:56,925 - blind_guide_system - INFO - VDA模型: /root/MHSEE/vda/Video-Depth-Anything
+2026-03-14 22:28:56,925 - blind_guide_system - INFO - ASR模型: /root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall
+2026-03-14 22:28:56,925 - blind_guide_system - INFO - LLM模型: /root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ
+2026-03-14 22:28:56,925 - blind_guide_system - INFO - 视频路径: video/video.mp4
+2026-03-14 22:28:56,946 - blind_guide_system - INFO - 视频写入器已初始化，输出路径: output_video.avi
+2026-03-14 22:28:56,947 - blind_guide_system - INFO - 结果文件已初始化，输出路径: system_results.txt
+2026-03-14 22:28:56,947 - blind_guide_system - INFO - 资源管理器已启动
+2026-03-14 22:28:56,948 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-14 22:28:56,948 - blind_guide_system - INFO - 帧同步模块已启动
+2026-03-14 22:28:56,948 - blind_guide_system - INFO - 实时安全调度引擎已启动
+2026-03-14 22:28:56,948 - blind_guide_system - INFO - 复杂场景智能调度引擎已启动
+2026-03-14 22:28:56,949 - blind_guide_system - INFO - 语音播报调度器已启动
+2026-03-14 22:28:56,949 - blind_guide_system - WARNING - 没有图形界面，禁用调试查看器
+2026-03-14 22:28:56,949 - blind_guide_system - INFO - 导盲系统启动完成
+2026-03-14 22:28:56,971 - blind_guide_system - INFO - 摄像头 camera1 使用视频文件: video/video.mp4
+2026-03-14 22:28:57,149 - blind_guide_system - INFO - [Main] 迭代 1/20
+2026-03-14 22:28:57,206 - blind_guide_system - INFO - 从视频中提取音频数据，长度: 1037282 样本，采样率: 16000Hz
+2026-03-14 22:28:57,350 - blind_guide_system - INFO - [Main] 迭代 2/20
+2026-03-14 22:28:57,350 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:28:57,351 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:28:57,552 - blind_guide_system - INFO - [Main] 迭代 3/20
+2026-03-14 22:28:57,552 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:28:57,553 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:28:58,153 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:28:58,801 - blind_guide_system - INFO - [Main] 迭代 4/20
+2026-03-14 22:28:58,802 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:28:58,802 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:28:59,003 - blind_guide_system - INFO - [Main] 迭代 5/20
+2026-03-14 22:28:59,003 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:28:59,004 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:28:59,234 - blind_guide_system - INFO - [Main] 迭代 6/20
+2026-03-14 22:28:59,235 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:28:59,235 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:28:59,436 - blind_guide_system - INFO - [Main] 迭代 7/20
+2026-03-14 22:28:59,437 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:28:59,975 - blind_guide_system - INFO - [ASR] 识别结果: 小明同学
+2026-03-14 22:28:59,975 - blind_guide_system - INFO - [Main] 已记录ASR结果: 小明同学
+2026-03-14 22:28:59,992 - blind_guide_system - INFO - [Main] 检测到唤醒词，调用LLM处理...
+2026-03-14 22:29:00,095 - blind_guide_system - INFO - 资源 llm 申请成功
+2026-03-14 22:29:00,360 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:00,360 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:01,463 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:01,464 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:02,567 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:02,567 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:03,670 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:03,671 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:04,774 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:04,774 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:05,877 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:05,877 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:06,981 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:06,981 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:08,084 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:08,084 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:09,188 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:09,188 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:10,291 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:10,292 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:11,395 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:11,395 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:12,498 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:12,498 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:13,601 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:13,602 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:14,706 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:14,706 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:15,809 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:15,809 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:16,913 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:16,913 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:18,016 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:18,017 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:19,120 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:19,120 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:20,224 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:20,224 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:21,327 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:21,328 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:22,431 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:22,431 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:23,535 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:23,535 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:24,638 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:24,638 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:25,741 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:25,742 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:26,845 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:26,845 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:27,948 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:27,949 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:29,051 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:29,051 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:30,153 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:30,154 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:31,257 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:31,257 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:32,361 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:32,361 - blind_guide_system - DEBUG - 资源 llm 正在使用中
+2026-03-14 22:29:33,289 - blind_guide_system - INFO - LLM模型加载完成
+2026-03-14 22:29:33,290 - blind_guide_system - INFO - LLM模型已释放
+2026-03-14 22:29:33,290 - blind_guide_system - INFO - 资源 llm 已释放
+2026-03-14 22:29:33,291 - blind_guide_system - ERROR - 主循环出错: LLM.generate() got an unexpected keyword argument 'multi_modal_data'
+2026-03-14 22:29:33,464 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-14 22:29:34,497 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:34,497 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:29:34,698 - blind_guide_system - INFO - [Main] 迭代 8/20
+2026-03-14 22:29:34,699 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:34,699 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:29:34,925 - blind_guide_system - INFO - [Main] 迭代 9/20
+2026-03-14 22:29:34,926 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:34,926 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:29:35,127 - blind_guide_system - INFO - [Main] 迭代 10/20
+2026-03-14 22:29:35,127 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:35,128 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:29:35,354 - blind_guide_system - INFO - [Main] 迭代 11/20
+2026-03-14 22:29:35,354 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:35,355 - blind_guide_system - INFO - [ASR] 识别结果: 
+2026-03-14 22:29:35,555 - blind_guide_system - INFO - [Main] 迭代 12/20
+2026-03-14 22:29:35,556 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:35,806 - blind_guide_system - INFO - [ASR] 识别结果: 现在回复
+2026-03-14 22:29:35,806 - blind_guide_system - INFO - [Main] 已记录ASR结果: 现在回复
+2026-03-14 22:29:36,023 - blind_guide_system - INFO - [Main] 迭代 13/20
+2026-03-14 22:29:36,023 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:36,295 - blind_guide_system - INFO - [ASR] 识别结果: 现在回复
+2026-03-14 22:29:36,295 - blind_guide_system - INFO - [Main] 已记录ASR结果: 现在回复
+2026-03-14 22:29:36,495 - blind_guide_system - INFO - [Main] 迭代 14/20
+2026-03-14 22:29:36,496 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:36,771 - blind_guide_system - INFO - [ASR] 识别结果: 现在回复
+2026-03-14 22:29:36,772 - blind_guide_system - INFO - [Main] 已记录ASR结果: 现在回复
+2026-03-14 22:29:36,989 - blind_guide_system - INFO - [Main] 迭代 15/20
+2026-03-14 22:29:36,989 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:37,267 - blind_guide_system - INFO - [ASR] 识别结果: 在回复没土过
+2026-03-14 22:29:37,267 - blind_guide_system - INFO - [Main] 已记录ASR结果: 在回复没土过
+2026-03-14 22:29:37,467 - blind_guide_system - INFO - [Main] 迭代 16/20
+2026-03-14 22:29:37,468 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:37,744 - blind_guide_system - INFO - [ASR] 识别结果: 没主不
+2026-03-14 22:29:37,744 - blind_guide_system - INFO - [Main] 已记录ASR结果: 没主不
+2026-03-14 22:29:37,759 - blind_guide_system - DEBUG - 目标 1 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 2 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 3 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 4 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 5 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 6 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 7 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 8 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 9 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 10 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 11 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 12 已过期，已清理
+2026-03-14 22:29:37,760 - blind_guide_system - DEBUG - 目标 13 已过期，已清理
+2026-03-14 22:29:37,961 - blind_guide_system - INFO - [Main] 迭代 17/20
+2026-03-14 22:29:37,962 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:38,240 - blind_guide_system - INFO - [ASR] 识别结果: 没土过不器
+2026-03-14 22:29:38,240 - blind_guide_system - INFO - [Main] 已记录ASR结果: 没土过不器
+2026-03-14 22:29:38,440 - blind_guide_system - INFO - [Main] 迭代 18/20
+2026-03-14 22:29:38,441 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:38,720 - blind_guide_system - INFO - [ASR] 识别结果: 领土播五五千
+2026-03-14 22:29:38,720 - blind_guide_system - INFO - [Main] 已记录ASR结果: 领土播五五千
+2026-03-14 22:29:38,936 - blind_guide_system - INFO - [Main] 迭代 19/20
+2026-03-14 22:29:38,936 - blind_guide_system - INFO - [Main] 处理音频数据，长度: 3200
+2026-03-14 22:29:39,212 - blind_guide_system - INFO - [ASR] 识别结果: 民土过五千
+2026-03-14 22:29:39,212 - blind_guide_system - INFO - [Main] 已记录ASR结果: 民土过五千
+2026-03-14 22:29:39,412 - blind_guide_system - INFO - [Main] 迭代 20/20
+2026-03-14 22:29:39,413 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-14 22:29:39,442 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-14 22:29:39,556 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-14 22:29:39,633 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-14 22:29:39,634 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-14 22:29:39,729 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-14 22:29:40,033 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-14 22:29:40,034 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-14 22:29:40,035 - blind_guide_system - INFO - 结果文件已关闭
+2026-03-14 22:29:40,738 - blind_guide_system - INFO - TTS引擎资源已释放
+2026-03-14 22:29:40,739 - blind_guide_system - INFO - 导盲系统已停止

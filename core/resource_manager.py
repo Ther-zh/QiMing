@@ -41,17 +41,25 @@ class ResourceManager:
             self.monitor_thread.join()
         logger.info("资源管理器已停止")
     
-    def request_resources(self, resource_type: str) -> bool:
+    def request_resources(self, resource_type: str, priority: int = 0) -> bool:
         """
         申请资源
         
         Args:
             resource_type: 资源类型
+            priority: 优先级，值越高优先级越高
             
         Returns:
             是否申请成功
         """
         with self.lock:
+            # 对于危险警报等紧急任务，即使资源被占用也允许申请
+            if priority > 5:
+                logger.info(f"高优先级任务 {resource_type} 强制申请资源")
+                # 对于最高优先级的危险警报，直接返回成功
+                if priority > 8:
+                    return True
+            
             # 检查资源是否可用
             if not self.resources[resource_type]:
                 # 检查系统资源
@@ -60,11 +68,22 @@ class ResourceManager:
                     logger.info(f"资源 {resource_type} 申请成功")
                     return True
                 else:
-                    logger.warning(f"系统资源不足，无法申请 {resource_type}")
-                    return False
+                    # 对于高优先级任务，即使系统资源不足也允许申请
+                    if priority > 3:
+                        logger.warning(f"系统资源不足，但高优先级任务 {resource_type} 强制申请资源")
+                        self.resources[resource_type] = True
+                        return True
+                    else:
+                        logger.warning(f"系统资源不足，无法申请 {resource_type}")
+                        return False
             else:
-                logger.warning(f"资源 {resource_type} 已被占用")
-                return False
+                # 对于高优先级任务，尝试抢占资源
+                if priority > 5:
+                    logger.info(f"高优先级任务 {resource_type} 抢占资源")
+                    return True
+                else:
+                    logger.warning(f"资源 {resource_type} 已被占用")
+                    return False
     
     def release_resources(self, resource_type: str):
         """

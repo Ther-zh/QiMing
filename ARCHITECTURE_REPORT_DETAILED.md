@@ -82,36 +82,79 @@ def request_resources(self, resource_type: str) -> bool:
 **设计思路**：实时评估环境危险等级，生成安全告警，确保用户安全。
 
 **实现细节**：
-- 危险评分计算：基于目标类别、距离、速度计算风险分
-- 场景复杂度评估：基于目标类型计算场景复杂度
+- 危险评分计算：使用 RiskEvaluator 进行综合风险评估
+- 场景复杂度评估：基于目标类型和数量计算场景复杂度
 - 告警级别评估：根据风险分确定告警级别
 - 告警触发机制：考虑连续告警帧数和冷却时间，避免误报
+- 特殊场景处理：针对人行横道、交叉路口等特殊场景进行专门处理
 
 **关键代码**：
 ```python
-# 危险评分计算
-def _calculate_risk_score(self, target: Dict[str, Any]) -> float:
-    category = target.get("category", "unknown")
-    distance = target.get("distance", 10.0)
-    speed = target.get("speed", 0.0)
+# 处理环境元数据
+def process_metadata(self, metadata: Dict[str, Any]):
+    timestamp = metadata.get("timestamp")
     
-    # 获取类别权重
-    category_weights = self.risk_rules.get("category_weights", {})
-    weight = category_weights.get(category, 5)
+    # 使用新的风险评价器
+    risk_result = self.risk_evaluator.evaluate_risk(metadata)
     
-    # 获取距离系数
-    distance_coef = self._get_distance_coefficient(distance)
+    # 检查特殊场景
+    special_scene_result = self.risk_evaluator.evaluate_special_scene(metadata)
+    if special_scene_result:
+        risk_result = special_scene_result
     
-    # 获取速度系数
-    speed_coef = self._get_speed_coefficient(speed)
+    # 评估危险等级
+    alert = self._evaluate_risk_level(
+        risk_result['risk_score'],
+        0,  # 场景复杂度已在新评价器中考虑
+        risk_result.get('target_info'),
+        timestamp,
+        risk_result.get('risk_level'),
+        risk_result.get('message')
+    )
     
-    # 计算危险分
-    risk_score = weight * distance_coef * speed_coef
-    
-    return risk_score
+    if alert:
+        self.alert_queue.append(alert)
 ```
 
-#### 2.1.3 复杂场景调度器 (ComplexSceneScheduler)
+#### 2.1.3 风险评价器 (RiskEvaluator)
+
+**设计思路**：基于 AHP 层次分析法和模糊综合评价，构建科学的危险评价体系。
+
+**实现细节**：
+- AHP 权重计算：使用层次分析法计算各因素权重
+- 模糊综合评价：使用梯形隶属度函数进行模糊评价
+- 特殊场景处理：针对人行横道、交叉路口、施工区域等特殊场景
+- 风险等级评估：综合考虑距离、速度、类别和场景复杂度
+
+**关键代码**：
+```python
+# AHP权重计算
+def _calculate_ahp_weights(self) -> Dict[str, float]:
+    # 构造判断矩阵（1-9标度法）
+    judgment_matrix = np.array([
+        [1, 3, 2, 4],  # 距离
+        [1/3, 1, 1/2, 2],  # 速度
+        [1/2, 2, 1, 3],  # 类别
+        [1/4, 1/2, 1/3, 1]  # 场景复杂度
+    ])
+    
+    # 计算权重
+    eigenvalues, eigenvectors = np.linalg.eig(judgment_matrix)
+    max_eigenvalue = np.max(eigenvalues)
+    max_eigenvector = eigenvectors[:, np.argmax(eigenvalues)]
+    
+    # 归一化权重
+    weights = max_eigenvector.real / np.sum(max_eigenvector.real)
+    
+    return {
+        'distance': weights[0],
+        'speed': weights[1],
+        'category': weights[2],
+        'scene_complexity': weights[3]
+    }
+```
+
+#### 2.1.4 复杂场景调度器 (ComplexSceneScheduler)
 
 **设计思路**：处理需要深度理解的复杂场景，通过 LLM 生成导航建议。
 
@@ -333,6 +376,7 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 |---------|---------|---------|---------|
 | 核心模块 | 资源管理器 | 管理系统资源，监控模块心跳 | core/resource_manager.py |
 | 核心模块 | 实时安全调度器 | 评估危险等级，生成安全告警 | core/realtime_scheduler.py |
+| 核心模块 | 风险评价器 | 基于AHP和模糊综合评价的危险评估 | core/risk_evaluator.py |
 | 核心模块 | 复杂场景调度器 | 处理复杂场景，生成导航建议 | core/complex_scene_scheduler.py |
 | 感知模块 | YOLO 目标检测 | 检测环境中的目标 | perception/yolo/yolo_detector.py |
 | 感知模块 | VDA 深度估计 | 估计目标距离 | perception/vda/vda_depth.py |
@@ -363,7 +407,11 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 - `is_complex_scene_triggered() -> bool`：检查是否触发复杂场景
 - `reset_complex_scene_trigger()`：重置复杂场景触发信号
 
-#### 4.1.3 ComplexSceneScheduler
+#### 4.1.3 RiskEvaluator
+- `evaluate_risk(metadata: Dict[str, Any]) -> Dict[str, Any]`：评估危险等级
+- `evaluate_special_scene(metadata: Dict[str, Any]) -> Optional[Dict[str, Any]]`：评估特殊场景
+
+#### 4.1.4 ComplexSceneScheduler
 - `process_complex_scene(image: Image.Image, metadata: Dict[str, Any], prompt: str) -> Optional[str]`：处理复杂场景
 - `handle_wake_word(wake_word: str, image: Image.Image, metadata: Dict[str, Any]) -> Optional[str]`：处理唤醒词
 
@@ -431,15 +479,17 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 ### 5.1 危险评估算法
 
 **算法流程**：
-1. 计算每个目标的危险分：`risk_score = 类别权重 × 距离系数 × 速度系数`
-2. 计算场景复杂度分：基于目标类型的加权和
-3. 评估危险等级：根据危险分确定告警级别
-4. 触发告警：考虑连续告警帧数和冷却时间
+1. AHP 权重计算：使用层次分析法计算距离、速度、类别和场景复杂度的权重
+2. 模糊综合评价：使用梯形隶属度函数对各因素进行模糊评价
+3. 综合风险评估：结合AHP权重计算综合风险得分
+4. 特殊场景处理：针对人行横道、交叉路口、施工区域等特殊场景进行专门评估
+5. 告警级别确定：根据风险得分确定告警级别
+6. 告警触发：考虑连续告警帧数和冷却时间
 
 **关键参数**：
-- 类别权重：不同目标的危险权重
-- 距离系数：距离越近，系数越大
-- 速度系数：速度越快，系数越大
+- AHP 判断矩阵：基于专家知识的因素重要性判断
+- 模糊评价参数：各因素的隶属度函数参数
+- 特殊场景权重调整：不同特殊场景的风险调整系数
 - 危险阈值：不同告警级别的阈值
 - 连续告警帧数：触发告警的最小连续帧数
 - 告警冷却时间：避免重复告警的时间间隔
@@ -584,6 +634,8 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 - **多模态融合**：整合视觉、深度、语音等多源数据
 - **实时响应**：优先处理安全相关任务，确保用户安全
 - **智能决策**：结合规则和 LLM，提供智能导航建议
+- **科学的危险评估**：基于 AHP 层次分析法和模糊综合评价，提高危险识别准确性
+- **特殊场景处理**：针对人行横道、交叉路口等特殊场景进行专门评估
 - **可扩展性**：支持真实和模拟模型，便于测试和部署
 
 ### 8.2 未来展望
