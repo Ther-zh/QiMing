@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System
+.DS_Store
+Thumbs.db
+
+# Output
+output/
+
+# Models
+*.pt
+*.pth
+*.onnx
+
+# Configuration
+config/*.yaml
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Audio/Video files
+*.mp4
+*.avi
+*.wav
+
+# Other
+*.zip
+*.tar.gz
+*.tar
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Useless files
+useless/
+
+# FunASR audio
+funasr/
+
+# AutoDL tmp files
+autodl-tmp/
+
+# Git
+.git/
+
+# Third-party code
+perception/vda/Video-Depth-Anything/
+perception/yolo/model/
+
