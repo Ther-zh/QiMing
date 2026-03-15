@@ -2,6 +2,9 @@ import logging
 import os
 from datetime import datetime
 
+# 导入配置加载器
+from utils.config_loader import config_loader
+
 class Logger:
     def __init__(self, name: str, log_dir: str = "logs"):
         """
@@ -30,7 +33,18 @@ class Logger:
             
             # 创建console handler
             console_handler = logging.StreamHandler()
-            console_handler.setLevel(logging.INFO)
+            
+            # 根据配置设置控制台日志级别
+            try:
+                config = config_loader.get_config()
+                verbose = config.get("system", {}).get("verbose", True)
+                if verbose:
+                    console_handler.setLevel(logging.DEBUG)
+                else:
+                    console_handler.setLevel(logging.INFO)
+            except Exception:
+                # 配置加载失败时默认详细输出
+                console_handler.setLevel(logging.DEBUG)
             
             # 创建formatter
             formatter = logging.Formatter(
@@ -44,6 +58,19 @@ class Logger:
             # 添加handler
             self.logger.addHandler(file_handler)
             self.logger.addHandler(console_handler)
+    
+    def verbose_info(self, message: str):
+        """
+        输出详细信息，仅在verbose模式下显示
+        """
+        try:
+            config = config_loader.get_config()
+            verbose = config.get("system", {}).get("verbose", True)
+            if verbose:
+                self.logger.info(message)
+        except Exception:
+            # 配置加载失败时默认显示
+            self.logger.info(message)
     
     def debug(self, message: str):
         """

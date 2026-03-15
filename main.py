@@ -36,8 +36,8 @@ from execution.broadcast_scheduler import BroadcastScheduler
 from execution.tts_engine import TTSEngine
 
 # 导入模拟模块
-from simulation.camera_simulator import CameraSimulator
 from simulation.debug_viewer import DebugViewer
+from hardware.input_device_factory import InputDeviceFactory
 
 class BlindGuideSystem:
     def __init__(self):
@@ -51,8 +51,8 @@ class BlindGuideSystem:
         # 初始化资源管理器
         self.resource_manager = ResourceManager()
         
-        # 初始化模拟模块
-        self.camera_simulator = CameraSimulator()
+        # 初始化输入设备
+        self.input_device = InputDeviceFactory.create_input_device()
         self.debug_viewer = DebugViewer()
         
         # 初始化感知模块
@@ -143,11 +143,13 @@ class BlindGuideSystem:
         
         # 打印配置信息
         logger.info(f"系统模式: {self.config.get('system', {}).get('mode')}")
+        logger.info(f"输入模式: {self.config.get('system', {}).get('input_mode', 'simulated')}")
         logger.info(f"YOLO模型: {self.config.get('models', {}).get('yolo', {}).get('model_path')}")
         logger.info(f"VDA模型: {self.config.get('models', {}).get('vda', {}).get('model_path')}")
         logger.info(f"ASR模型: {self.config.get('models', {}).get('asr', {}).get('model_path')}")
         logger.info(f"LLM模型: {self.config.get('models', {}).get('llm', {}).get('model_path')}")
-        logger.info(f"视频路径: {self.config.get('simulation', {}).get('video_paths', {}).get('camera1')}")
+        if self.config.get('system', {}).get('input_mode') == 'simulated':
+            logger.info(f"视频路径: {self.config.get('simulation', {}).get('video_paths', {}).get('camera1')}")
         
         # 初始化视频写入器
         self._init_video_writer()
@@ -158,8 +160,8 @@ class BlindGuideSystem:
         # 启动资源管理器
         self.resource_manager.start()
         
-        # 启动摄像头模拟
-        self.camera_simulator.start()
+        # 启动输入设备
+        self.input_device.start()
         
         # 启动帧同步
         self.frame_sync.start()
@@ -253,11 +255,17 @@ class BlindGuideSystem:
         初始化结果文件
         """
         try:
+            # 确保output目录存在
+            import os
+            os.makedirs("output", exist_ok=True)
+            
             self.result_file = open("output/system_results.txt", "w", encoding="utf-8")
             self.result_file.write("# 导盲系统测试结果\n\n")
             self.result_file.write(f"测试时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
             self.result_file.write(f"视频路径: {self.config.get('simulation', {}).get('video_paths', {}).get('camera1')}\n\n")
+            self.result_file.flush()  # 立即写入
             logger.info("结果文件已初始化，输出路径: output/system_results.txt")
+            logger.info(f"结果文件对象: {self.result_file}")
         except Exception as e:
             logger.warning(f"初始化结果文件失败: {e}")
             self.result_file = None
@@ -275,7 +283,7 @@ class BlindGuideSystem:
         self.complex_scene_scheduler.stop()
         self.realtime_scheduler.stop()
         self.frame_sync.stop()
-        self.camera_simulator.stop()
+        self.input_device.stop()
         self.resource_manager.stop()
         
         # 停止调试查看器
@@ -296,19 +304,27 @@ class BlindGuideSystem:
         # 关闭结果文件
         if self.result_file:
             try:
+                logger.info(f"准备写入结果文件，ASR结果数量: {len(self.asr_results)}, LLM结果数量: {len(self.llm_results)}")
+                logger.info(f"结果文件对象: {self.result_file}")
+                
                 # 写入ASR和LLM结果
                 self.result_file.write("\n# ASR识别结果\n")
                 for i, result in enumerate(self.asr_results):
+                    logger.info(f"写入ASR结果 {i+1}: {result}")
                     self.result_file.write(f"{i+1}. {result}\n")
                 
                 self.result_file.write("\n# LLM回复结果\n")
                 for i, result in enumerate(self.llm_results):
+                    logger.info(f"写入LLM结果 {i+1}: {result}")
                     self.result_file.write(f"{i+1}. {result}\n")
                 
+                self.result_file.flush()  # 立即写入
                 self.result_file.close()
                 logger.info("结果文件已关闭")
             except Exception as e:
                 logger.warning(f"关闭结果文件失败: {e}")
+                import traceback
+                traceback.print_exc()
         
         # 释放模型资源
         if hasattr(self, 'yolo'):
@@ -366,15 +382,16 @@ class BlindGuideSystem:
                 elapsed_time = current_time - self.last_process_time
                 target_interval = 1.0 / self.processing_fps
                 
-                # 检查视频是否播放完毕
+                # 检查视频是否播放完毕（仅模拟模式）
                 main_camera = "camera1"  # 主摄
-                if self.camera_simulator.is_video_ended(main_camera):
-                    logger.info("视频播放完毕，停止系统")
-                    video_ended = True
-                    continue
+                if self.config.get('system', {}).get('input_mode') == 'simulated':
+                    if self.input_device.is_ended(main_camera):
+                        logger.info("视频播放完毕，停止系统")
+                        video_ended = True
+                        continue
                 
                 # 获取摄像头帧
-                frames = self.camera_simulator.get_all_frames()
+                frames = self.input_device.get_all_frames()
                 
                 # 处理主摄画面
                 if main_camera in frames:
@@ -383,19 +400,19 @@ class BlindGuideSystem:
                         # 帧计数器
                         self.frame_count += 1
                         
-                        # 获取真实音频数据
-                        audio_data, audio_timestamp = self.camera_simulator.get_audio("camera1")
+                        # 获取音频数据
+                        audio_data, audio_timestamp = self.input_device.get_audio("camera1")
                         if audio_data is not None:
                             # 执行ASR识别
-                            logger.debug(f"[Main] 处理音频数据，长度: {len(audio_data)}")
+                            logger.verbose_info(f"[Main] 处理音频数据，长度: {len(audio_data)}")
                             wake_detected, asr_text = self.asr.inference(audio_data)
-                            logger.debug(f"[ASR] 识别结果: {asr_text}")
+                            logger.verbose_info(f"[ASR] 识别结果: {asr_text}")
                         else:
                             # 如果没有音频数据，使用空数据
                             import numpy as np
                             audio_data = np.array([])
                             wake_detected, asr_text = self.asr.inference(audio_data)
-                            logger.debug(f"[ASR] 识别结果 (无音频): {asr_text}")
+                            logger.verbose_info(f"[ASR] 识别结果 (无音频): {asr_text}")
                         
                         # 记录ASR结果
                         if asr_text:
@@ -585,9 +602,8 @@ def main():
         system.start()
     except KeyboardInterrupt:
         logger.info("用户中断，正在停止系统...")
-    finally:
-        # 停止系统
         system.stop()
+    # 不再在finally中调用stop()，因为start()方法内部会在视频结束时调用stop()
 
 if __name__ == "__main__":
     main()
