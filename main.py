@@ -216,11 +216,11 @@ class BlindGuideSystem:
                 self.video_fps = cap.get(cv2.CAP_PROP_FPS)
                 cap.release()
                 
-                # 计算处理帧率和采样间隔
-                self.processing_fps = min(5, self.video_fps)  # 最大处理帧率为5FPS
-                self.sample_interval = max(1, int(self.video_fps / self.processing_fps))  # 动态计算采样间隔
+                # 固定每25帧处理一次
+                self.sample_interval = 25
+                self.processing_fps = self.video_fps / self.sample_interval
                 
-                logger.info(f"视频帧率: {self.video_fps}, 处理帧率: {self.processing_fps}, 采样间隔: {self.sample_interval}")
+                logger.info(f"视频帧率: {self.video_fps}, 处理帧率: {self.processing_fps:.2f}, 采样间隔: {self.sample_interval}")
                 
                 # 初始化视频写入器，使用更兼容的设置
                 output_path = "output/output_video.avi"
@@ -228,14 +228,18 @@ class BlindGuideSystem:
                 fourcc_options = ['MJPG', 'XVID', 'DIVX']
                 self.video_writer = None
                 
+                # 使用摄像头配置中的分辨率
+                cam_width, cam_height = self.config.get("cameras", {}).get("camera1", {}).get("resolution", [640, 480])
+                logger.info(f"使用摄像头分辨率: {cam_width}x{cam_height}")
+                
                 for fourcc_code in fourcc_options:
                     try:
                         fourcc = cv2.VideoWriter_fourcc(*fourcc_code)
                         # 确保目录存在
                         import os
                         os.makedirs(os.path.dirname(output_path) if os.path.dirname(output_path) else '.', exist_ok=True)
-                        self.video_writer = cv2.VideoWriter(output_path, fourcc, self.processing_fps, (width, height))
-                        logger.info(f"视频写入器已初始化，输出路径: {output_path}, 编码器: {fourcc_code}, 帧率: {self.processing_fps}")
+                        self.video_writer = cv2.VideoWriter(output_path, fourcc, self.processing_fps, (cam_width, cam_height))
+                        logger.info(f"视频写入器已初始化，输出路径: {output_path}, 编码器: {fourcc_code}, 帧率: {self.processing_fps:.2f}, 分辨率: {cam_width}x{cam_height}")
                         break
                     except Exception as e:
                         logger.warning(f"尝试编码器 {fourcc_code} 失败: {e}")
@@ -353,18 +357,26 @@ class BlindGuideSystem:
         """
         主循环
         """
-        while self.running:
+        video_ended = False
+        
+        while self.running and not video_ended:
             try:
                 # 动态计算处理时间
                 current_time = time.time()
                 elapsed_time = current_time - self.last_process_time
                 target_interval = 1.0 / self.processing_fps
                 
+                # 检查视频是否播放完毕
+                main_camera = "camera1"  # 主摄
+                if self.camera_simulator.is_video_ended(main_camera):
+                    logger.info("视频播放完毕，停止系统")
+                    video_ended = True
+                    continue
+                
                 # 获取摄像头帧
                 frames = self.camera_simulator.get_all_frames()
                 
                 # 处理主摄画面
-                main_camera = "camera1"  # 主摄
                 if main_camera in frames:
                     frame, timestamp = frames[main_camera]
                     if frame is not None:
@@ -520,6 +532,10 @@ class BlindGuideSystem:
                                 finally:
                                     # 释放资源
                                     self.resource_manager.release_resources("inference")
+                    else:
+                        # 没有帧数据，摄像头可能还在初始化，继续等待
+                        logger.debug("摄像头还在初始化，继续等待...")
+                        time.sleep(0.1)
                     
                     # 动态控制帧率
                     processing_time = time.time() - current_time
@@ -537,6 +553,11 @@ class BlindGuideSystem:
                 # 出错时也要更新心跳
                 self.resource_manager.update_heartbeat("main")
                 time.sleep(0.5)
+        
+        # 视频播放完毕，停止系统
+        if video_ended:
+            logger.info("视频处理完成，停止系统")
+            self.stop()
         
 
     

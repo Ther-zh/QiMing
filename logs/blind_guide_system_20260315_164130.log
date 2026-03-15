@@ -1,0 +1,1627 @@
+2026-03-15 16:42:23,296 - blind_guide_system - INFO - AHP一致性检验通过，CR=0.011+0.000j
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - 使用Mock TTS引擎
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - 导盲系统启动中...
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - 系统模式: simulation
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - YOLO模型: /root/MHSEE/perception/yolo/model/yolov8n.pt
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - VDA模型: /root/MHSEE/vda/Video-Depth-Anything
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - ASR模型: /root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - LLM模型: /root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ
+2026-03-15 16:42:23,297 - blind_guide_system - INFO - 视频路径: video/video.mp4
+2026-03-15 16:42:23,309 - blind_guide_system - INFO - 视频帧率: 30.0, 处理帧率: 1.20, 采样间隔: 25
+2026-03-15 16:42:23,309 - blind_guide_system - INFO - 使用摄像头分辨率: 640x480
+2026-03-15 16:42:23,310 - blind_guide_system - INFO - 视频写入器已初始化，输出路径: output/output_video.avi, 编码器: MJPG, 帧率: 1.20, 分辨率: 640x480
+2026-03-15 16:42:23,310 - blind_guide_system - INFO - 结果文件已初始化，输出路径: output/system_results.txt
+2026-03-15 16:42:23,311 - blind_guide_system - INFO - 资源管理器已启动
+2026-03-15 16:42:23,311 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-15 16:42:23,311 - blind_guide_system - INFO - 帧同步模块已启动
+2026-03-15 16:42:23,311 - blind_guide_system - INFO - 实时安全调度引擎已启动
+2026-03-15 16:42:23,311 - blind_guide_system - INFO - 复杂场景智能调度引擎已启动
+2026-03-15 16:42:23,312 - blind_guide_system - INFO - 语音播报调度器已启动
+2026-03-15 16:42:23,312 - blind_guide_system - WARNING - 没有图形界面，禁用调试查看器
+2026-03-15 16:42:23,312 - blind_guide_system - INFO - 导盲系统启动完成
+2026-03-15 16:42:23,312 - blind_guide_system - DEBUG - 摄像头还在初始化，继续等待...
+2026-03-15 16:42:23,335 - blind_guide_system - INFO - 摄像头 camera1 使用视频文件: video/video.mp4
+2026-03-15 16:42:23,538 - blind_guide_system - INFO - 从视频中提取音频数据，长度: 1037282 样本，采样率: 16000Hz
+2026-03-15 16:42:24,146 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:24,147 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:24,980 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:24,981 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:25,619 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:25,815 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:25,815 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:26,649 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:26,650 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:27,483 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:27,484 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:28,317 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:28,318 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:28,928 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:29,151 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:29,152 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:29,986 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:29,987 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:30,820 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:30,821 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:31,654 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:31,654 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:32,238 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:32,488 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:32,488 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:33,322 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:34,108 - blind_guide_system - DEBUG - [ASR] 识别结果: 觉然被你下天我
+2026-03-15 16:42:34,108 - blind_guide_system - INFO - [Main] 已记录ASR结果: 觉然被你下天我
+2026-03-15 16:42:34,156 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:34,156 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:34,990 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:34,990 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:35,748 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:35,824 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:35,824 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:36,658 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:36,658 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:37,492 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:37,492 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:38,326 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:38,327 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:39,057 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:39,160 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:39,160 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:39,994 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:39,995 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:40,828 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:40,828 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:41,662 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:41,662 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:42,366 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:42,496 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:42,497 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:43,330 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:43,331 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:44,165 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:44,165 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:44,267 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:42:44,572 - blind_guide_system - DEBUG - 资源 inference 正在使用中
+2026-03-15 16:42:44,894 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:42:44,998 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:44,999 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:45,675 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:45,832 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:45,832 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:46,666 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:46,666 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:47,500 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:47,501 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:48,334 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:48,335 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:48,984 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:49,169 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:49,169 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:50,003 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:50,003 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:50,837 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:50,838 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:51,672 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:51,672 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:52,293 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:52,506 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:52,507 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:53,339 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:53,340 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:54,174 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:54,174 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:55,008 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:55,009 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:55,602 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:55,842 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:55,843 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:56,676 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:56,676 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:57,510 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:57,510 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:58,344 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:58,345 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:42:58,912 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:42:59,178 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:42:59,179 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:00,012 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:00,013 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:00,846 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:00,847 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:01,680 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:01,681 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:02,221 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:02,514 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:02,514 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:03,324 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:03,348 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:03,348 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:04,182 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:04,183 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:05,016 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:05,017 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:05,119 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:43:05,147 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:43:05,147 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:43:05,147 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:43:05,151 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:43:05,186 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:43:05,530 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:05,850 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:05,851 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:06,633 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:06,684 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:06,684 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:07,518 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:07,518 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:08,352 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:08,725 - blind_guide_system - DEBUG - [ASR] 识别结果: 失血没有啥五幺五了留什么
+2026-03-15 16:43:08,725 - blind_guide_system - INFO - [Main] 已记录ASR结果: 失血没有啥五幺五了留什么
+2026-03-15 16:43:09,186 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:09,187 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:09,943 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:10,020 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:10,020 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:10,854 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:10,855 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:11,688 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:11,689 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:12,523 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:12,523 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:13,251 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:13,357 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:13,358 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:14,191 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:14,192 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:15,025 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:15,026 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:15,859 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:15,860 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:16,561 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:16,694 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:16,934 - blind_guide_system - DEBUG - [ASR] 识别结果: the
+2026-03-15 16:43:16,934 - blind_guide_system - INFO - [Main] 已记录ASR结果: the
+2026-03-15 16:43:17,528 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:17,529 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:18,362 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:18,363 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:19,196 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:19,197 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:19,870 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:20,031 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:20,031 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:20,865 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:20,865 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:21,699 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:21,700 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:22,533 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:22,534 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:23,179 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:23,368 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:23,368 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:24,202 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:24,202 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:25,036 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:25,037 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:25,870 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:25,871 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:25,973 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:43:26,005 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:43:26,488 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:26,704 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:26,705 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:27,539 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:27,539 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:28,373 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:28,373 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:29,207 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:29,208 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:29,797 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:30,042 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:30,042 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:30,876 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:30,876 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:31,710 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:31,710 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:32,544 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:32,771 - blind_guide_system - DEBUG - [ASR] 识别结果: o
+2026-03-15 16:43:32,771 - blind_guide_system - INFO - [Main] 已记录ASR结果: o
+2026-03-15 16:43:33,106 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:33,378 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:33,379 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:34,209 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:34,212 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:34,212 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:35,046 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:35,046 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:35,880 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:35,881 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:36,416 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:36,715 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:36,715 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:37,519 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:37,549 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:37,549 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:38,383 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:38,384 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:39,217 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:39,218 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:39,725 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:40,052 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:40,052 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:40,828 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:40,885 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:40,885 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:41,719 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:41,720 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:42,554 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:42,554 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:43,388 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:43,388 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:44,137 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:44,222 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:44,222 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:45,056 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:45,057 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:45,891 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:45,891 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:46,725 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:46,725 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:46,827 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:43:46,857 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:43:47,447 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:47,559 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:47,559 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:48,393 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:48,394 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:49,227 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:49,228 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:50,062 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:50,062 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:50,755 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:50,896 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:50,896 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:51,730 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:51,731 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:52,565 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:52,565 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:53,399 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:53,399 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:54,064 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:54,233 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:54,233 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:55,067 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:55,068 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:55,902 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:55,902 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:56,736 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:56,736 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:57,373 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:43:57,570 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:57,571 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:58,404 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:58,405 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:43:59,239 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:43:59,239 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:00,073 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:00,073 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:00,683 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:00,907 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:00,908 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:01,741 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:01,742 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:02,576 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:02,576 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:03,410 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:03,410 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:03,991 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:04,244 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:04,245 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:05,078 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:05,079 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:05,913 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:05,913 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:06,747 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:06,747 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:07,299 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:07,581 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:07,582 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:07,684 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:44:07,717 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:44:08,403 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:08,415 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:08,416 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:09,249 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:09,250 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:10,084 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:10,084 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:10,609 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:10,917 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:10,918 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:11,712 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:11,751 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:11,752 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:12,586 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:12,586 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:13,420 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:13,420 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:14,254 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:14,255 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:15,021 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:15,089 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:15,089 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:15,923 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:15,923 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:16,757 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:16,757 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:17,591 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:17,592 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:18,329 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:18,425 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:18,426 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:19,260 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:19,260 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:20,094 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:20,094 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:20,928 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:20,928 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:21,640 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:21,761 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:21,762 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:22,596 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:22,596 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:23,430 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:23,430 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:24,264 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:24,264 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:24,949 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:25,098 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:25,099 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:25,933 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:25,933 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:26,767 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:26,767 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:27,601 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:27,601 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:28,258 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:28,435 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:28,436 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:28,538 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:44:28,565 - blind_guide_system - DEBUG - 目标 1 已过期，已清理
+2026-03-15 16:44:28,565 - blind_guide_system - DEBUG - 目标 2 已过期，已清理
+2026-03-15 16:44:28,565 - blind_guide_system - DEBUG - 目标 3 已过期，已清理
+2026-03-15 16:44:28,565 - blind_guide_system - DEBUG - 目标 4 已过期，已清理
+2026-03-15 16:44:28,565 - blind_guide_system - DEBUG - 目标 5 已过期，已清理
+2026-03-15 16:44:28,565 - blind_guide_system - DEBUG - 目标 6 已过期，已清理
+2026-03-15 16:44:28,565 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:44:28,565 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:44:28,565 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:44:28,570 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:44:28,574 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:44:29,269 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:29,270 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:30,104 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:30,104 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:30,938 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:30,938 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:31,568 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:31,772 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:31,772 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:32,606 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:32,607 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:33,440 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:33,440 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:34,274 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:34,275 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:34,877 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:35,108 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:35,108 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:35,942 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:35,942 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:36,776 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:36,777 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:37,611 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:37,611 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:38,187 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:38,445 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:38,445 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:39,279 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:39,280 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:40,113 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:40,114 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:40,948 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:40,948 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:41,496 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:41,782 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:41,782 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:42,599 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:42,616 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:42,616 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:43,450 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:43,450 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:44,284 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:44,284 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:44,806 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:45,118 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:45,119 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:45,909 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:45,952 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:45,953 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:46,787 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:46,787 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:47,621 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:47,621 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:48,455 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:48,456 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:49,218 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:49,289 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:49,290 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:49,392 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:44:49,419 - blind_guide_system - DEBUG - 目标 8 已过期，已清理
+2026-03-15 16:44:49,420 - blind_guide_system - DEBUG - 目标 9 已过期，已清理
+2026-03-15 16:44:49,420 - blind_guide_system - DEBUG - 目标 10 已过期，已清理
+2026-03-15 16:44:49,420 - blind_guide_system - DEBUG - 目标 11 已过期，已清理
+2026-03-15 16:44:49,420 - blind_guide_system - DEBUG - 目标 12 已过期，已清理
+2026-03-15 16:44:49,424 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:44:50,124 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:50,124 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:50,958 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:50,958 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:51,792 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:51,793 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:52,527 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:52,626 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:52,627 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:53,461 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:53,461 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:54,295 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:54,295 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:55,129 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:55,130 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:55,837 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:55,963 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:55,964 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:56,798 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:56,798 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:57,632 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:57,632 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:58,466 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:58,467 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:44:59,146 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:44:59,300 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:44:59,300 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:00,134 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:00,134 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:00,968 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:00,969 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:01,802 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:01,803 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:02,455 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:02,637 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:02,637 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:03,471 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:03,471 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:04,305 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:04,306 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:05,139 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:05,140 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:05,765 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:05,974 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:05,974 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:06,808 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:06,808 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:07,642 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:07,642 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:08,476 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:08,477 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:09,074 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:09,311 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:09,311 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:10,145 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:10,145 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:10,247 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:45:10,248 - blind_guide_system - DEBUG - 资源 inference 正在使用中
+2026-03-15 16:45:10,275 - blind_guide_system - DEBUG - 目标 7 已过期，已清理
+2026-03-15 16:45:10,275 - blind_guide_system - DEBUG - 目标 13 已过期，已清理
+2026-03-15 16:45:10,275 - blind_guide_system - DEBUG - 目标 15 已过期，已清理
+2026-03-15 16:45:10,275 - blind_guide_system - DEBUG - 目标 16 已过期，已清理
+2026-03-15 16:45:10,275 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:45:10,275 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:45:10,275 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:45:10,279 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:45:10,345 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:45:10,979 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:10,979 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:11,813 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:11,814 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:12,454 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:12,648 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:12,648 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:13,482 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:13,482 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:14,316 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:14,316 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:15,150 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:15,151 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:15,763 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:15,984 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:15,984 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:16,818 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:16,818 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:17,652 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:17,653 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:18,487 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:18,487 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:19,072 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:19,321 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:19,321 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:20,155 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:20,156 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:20,989 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:20,990 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:21,824 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:21,824 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:22,382 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:22,658 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:22,658 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:23,485 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:23,492 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:23,492 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:24,326 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:24,326 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:25,160 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:25,161 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:25,691 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:25,994 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:25,995 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:26,794 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:26,829 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:26,829 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:27,663 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:27,663 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:28,497 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:28,497 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:29,002 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:29,331 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:29,331 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:30,105 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:30,165 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:30,166 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:31,000 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:31,000 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:31,102 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:45:31,131 - blind_guide_system - DEBUG - 目标 17 已过期，已清理
+2026-03-15 16:45:31,132 - blind_guide_system - DEBUG - 目标 19 已过期，已清理
+2026-03-15 16:45:31,132 - blind_guide_system - DEBUG - 目标 21 已过期，已清理
+2026-03-15 16:45:31,136 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:45:31,834 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:31,834 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:32,668 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:32,668 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:33,413 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:33,502 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:33,503 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:34,337 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:34,337 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:35,171 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:35,171 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:36,005 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:36,005 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:36,722 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:36,839 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:36,839 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:37,673 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:37,673 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:38,507 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:38,508 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:39,341 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:39,342 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:40,033 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:40,176 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:40,176 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:41,009 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:41,009 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:41,843 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:41,844 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:42,678 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:42,678 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:43,343 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:43,512 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:43,512 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:44,346 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:44,347 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:45,180 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:45,181 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:46,015 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:46,015 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:46,653 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:46,849 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:46,849 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:47,683 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:47,683 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:48,517 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:48,518 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:49,352 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:49,352 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:49,962 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:50,186 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:50,186 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:51,020 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:51,021 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:51,854 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:51,855 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:51,957 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:45:51,988 - blind_guide_system - DEBUG - 目标 14 已过期，已清理
+2026-03-15 16:45:51,988 - blind_guide_system - DEBUG - 目标 18 已过期，已清理
+2026-03-15 16:45:51,988 - blind_guide_system - DEBUG - 目标 22 已过期，已清理
+2026-03-15 16:45:51,988 - blind_guide_system - DEBUG - 目标 23 已过期，已清理
+2026-03-15 16:45:51,988 - blind_guide_system - DEBUG - 目标 25 已过期，已清理
+2026-03-15 16:45:51,988 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:45:51,988 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:45:51,988 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:45:51,992 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:45:52,016 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:45:52,688 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:52,688 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:53,273 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:53,522 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:53,523 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:54,356 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:54,357 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:55,191 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:55,191 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:56,025 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:56,025 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:56,582 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:56,859 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:56,860 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:57,686 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:45:57,693 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:57,694 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:58,528 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:58,528 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:59,362 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:45:59,363 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:45:59,892 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:00,196 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:00,196 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:00,996 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:01,030 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:01,030 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:01,864 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:01,864 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:02,698 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:02,698 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:03,202 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:03,532 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:03,533 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:04,305 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:04,366 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:04,367 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:05,201 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:05,201 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:06,035 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:06,035 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:06,869 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:06,870 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:07,613 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:07,703 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:07,704 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:08,538 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:08,538 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:09,372 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:09,372 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:10,206 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:10,207 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:10,922 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:11,041 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:11,041 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:11,875 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:11,875 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:12,709 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:12,709 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:12,813 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:46:12,843 - blind_guide_system - DEBUG - 目标 20 已过期，已清理
+2026-03-15 16:46:12,843 - blind_guide_system - DEBUG - 目标 24 已过期，已清理
+2026-03-15 16:46:12,844 - blind_guide_system - DEBUG - 目标 26 已过期，已清理
+2026-03-15 16:46:12,844 - blind_guide_system - DEBUG - 目标 27 已过期，已清理
+2026-03-15 16:46:12,847 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:46:13,543 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:13,543 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:14,232 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:14,377 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:14,378 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:15,212 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:15,212 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:16,046 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:16,046 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:16,879 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:16,880 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:17,542 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:17,713 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:17,713 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:18,547 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:18,547 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:19,381 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:19,382 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:20,215 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:20,216 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:20,851 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:21,050 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:21,050 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:21,884 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:21,884 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:22,718 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:22,719 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:23,552 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:23,552 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:24,161 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:24,386 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:24,386 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:25,220 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:25,220 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:26,054 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:26,054 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:26,888 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:26,888 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:27,470 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:27,722 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:27,723 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:28,557 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:28,557 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:29,391 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:29,391 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:30,225 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:30,225 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:30,781 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:31,059 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:31,060 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:31,884 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:31,893 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:31,894 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:32,728 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:32,728 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:33,562 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:33,562 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:33,664 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:46:33,697 - blind_guide_system - DEBUG - 目标 28 已过期，已清理
+2026-03-15 16:46:33,698 - blind_guide_system - DEBUG - 目标 29 已过期，已清理
+2026-03-15 16:46:33,698 - blind_guide_system - DEBUG - 目标 30 已过期，已清理
+2026-03-15 16:46:33,698 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:46:33,698 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:46:33,698 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:46:33,703 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:46:33,788 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:46:34,090 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:34,396 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:34,396 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:35,194 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:35,230 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:35,230 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:36,064 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:36,065 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:36,899 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:36,899 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:37,401 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:37,733 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:37,733 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:38,504 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:38,567 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:38,567 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:39,401 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:39,402 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:40,236 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:40,236 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:41,070 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:41,070 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:41,815 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:41,904 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:41,904 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:42,738 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:42,739 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:43,572 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:43,572 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:44,406 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:44,406 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:45,125 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:45,240 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:45,240 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:46,074 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:46,075 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:46,908 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:46,909 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:47,742 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:47,743 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:48,434 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:48,577 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:48,577 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:49,411 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:49,411 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:50,245 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:50,246 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:51,079 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:51,080 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:51,744 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:51,914 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:51,914 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:52,748 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:52,748 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:53,582 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:53,582 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:54,416 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:54,417 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:54,518 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:46:54,557 - blind_guide_system - DEBUG - 目标 31 已过期，已清理
+2026-03-15 16:46:54,557 - blind_guide_system - DEBUG - 目标 32 已过期，已清理
+2026-03-15 16:46:54,558 - blind_guide_system - DEBUG - 目标 33 已过期，已清理
+2026-03-15 16:46:54,563 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:46:55,054 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:55,250 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:55,250 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:56,084 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:56,084 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:56,918 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:56,918 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:57,752 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:57,752 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:58,365 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:46:58,586 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:58,587 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:46:59,420 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:46:59,421 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:00,255 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:00,255 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:01,089 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:01,089 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:01,674 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:01,923 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:01,923 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:02,757 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:02,758 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:03,592 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:03,592 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:04,426 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:04,426 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:04,983 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:05,260 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:05,260 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:06,086 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:06,094 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:06,094 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:06,928 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:06,928 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:07,762 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:07,763 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:08,292 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:08,596 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:08,596 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:09,396 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:09,430 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:09,430 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:10,264 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:10,265 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:11,099 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:11,099 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:11,602 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:11,933 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:11,933 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:12,705 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:12,767 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:12,767 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:13,601 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:13,602 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:14,436 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:14,436 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:15,270 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:15,270 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:15,373 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:47:15,402 - blind_guide_system - DEBUG - 目标 34 已过期，已清理
+2026-03-15 16:47:15,402 - blind_guide_system - DEBUG - 目标 35 已过期，已清理
+2026-03-15 16:47:15,403 - blind_guide_system - DEBUG - 目标 36 已过期，已清理
+2026-03-15 16:47:15,403 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:47:15,403 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:47:15,403 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:47:15,407 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:47:15,455 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:47:16,014 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:16,104 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:16,104 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:16,938 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:16,939 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:17,772 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:17,772 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:18,606 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:18,607 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:19,325 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:19,440 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:19,441 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:20,274 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:20,274 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:21,108 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:21,109 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:21,943 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:21,943 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:22,634 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:22,777 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:22,777 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:23,611 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:23,611 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:24,445 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:24,446 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:25,279 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:25,280 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:25,944 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:26,114 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:26,114 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:26,948 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:26,948 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:27,782 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:27,783 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:28,616 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:28,616 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:29,253 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:29,450 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:29,451 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:30,284 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:30,284 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:31,118 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:31,118 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:31,952 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:31,953 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:32,563 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:32,787 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:32,787 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:33,621 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:33,621 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:34,455 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:34,456 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:35,290 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:35,290 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:35,872 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:36,124 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:36,124 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:36,226 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:47:36,258 - blind_guide_system - DEBUG - 目标 37 已过期，已清理
+2026-03-15 16:47:36,258 - blind_guide_system - DEBUG - 目标 38 已过期，已清理
+2026-03-15 16:47:36,258 - blind_guide_system - DEBUG - 目标 39 已过期，已清理
+2026-03-15 16:47:36,262 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:47:36,958 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:36,958 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:37,792 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:37,793 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:38,627 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:38,628 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:39,181 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:39,461 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:39,461 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:40,285 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:40,295 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:40,295 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:41,129 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:41,130 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:41,964 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:41,964 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:42,491 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:42,798 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:42,798 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:43,594 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:43,632 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:43,632 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:44,466 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:44,467 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:45,300 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:45,301 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:46,135 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:46,135 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:46,903 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:46,969 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:46,969 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:47,803 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:47,804 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:48,638 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:48,638 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:49,472 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:49,472 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:50,212 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:50,306 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:50,307 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:51,140 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:51,140 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:51,974 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:51,975 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:52,808 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:52,808 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:53,521 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:53,642 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:53,643 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:54,476 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:54,476 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:55,310 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:55,311 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:56,144 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:56,144 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:56,829 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:47:56,978 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:56,978 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:57,080 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:47:57,106 - blind_guide_system - DEBUG - 目标 40 已过期，已清理
+2026-03-15 16:47:57,106 - blind_guide_system - DEBUG - 目标 41 已过期，已清理
+2026-03-15 16:47:57,106 - blind_guide_system - DEBUG - 目标 42 已过期，已清理
+2026-03-15 16:47:57,106 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:47:57,106 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:47:57,107 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:47:57,113 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:47:57,126 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:47:57,812 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:57,812 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:58,646 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:58,647 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:47:59,480 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:47:59,481 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:00,138 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:00,315 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:00,315 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:01,148 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:01,149 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:01,982 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:01,982 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:02,816 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:02,816 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:03,448 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:03,650 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:03,650 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:04,484 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:04,485 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:05,319 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:05,319 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:06,153 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:06,153 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:06,757 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:06,987 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:06,987 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:07,821 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:07,821 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:08,655 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:08,655 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:09,489 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:09,490 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:10,066 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:10,323 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:10,324 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:11,158 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:11,158 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:11,992 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:11,992 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:12,826 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:12,827 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:13,375 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:13,660 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:13,660 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:14,479 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:14,494 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:14,494 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:15,328 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:15,328 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:16,162 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:16,162 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:16,684 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:16,996 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:16,996 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:17,787 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:17,830 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:17,830 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:17,932 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:48:17,963 - blind_guide_system - DEBUG - 目标 43 已过期，已清理
+2026-03-15 16:48:17,963 - blind_guide_system - DEBUG - 目标 44 已过期，已清理
+2026-03-15 16:48:17,963 - blind_guide_system - DEBUG - 目标 45 已过期，已清理
+2026-03-15 16:48:17,963 - blind_guide_system - DEBUG - 目标 46 已过期，已清理
+2026-03-15 16:48:17,963 - blind_guide_system - DEBUG - 目标 47 已过期，已清理
+2026-03-15 16:48:17,968 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:48:18,664 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:18,665 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:19,498 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:19,499 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:20,333 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:20,333 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:21,096 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:21,167 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:21,167 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:22,001 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:22,001 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:22,835 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:22,836 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:23,670 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:23,670 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:24,406 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:24,504 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:24,504 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:25,338 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:25,339 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:26,172 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:26,173 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:27,007 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:27,007 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:27,716 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:27,841 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:27,841 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:28,675 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:28,676 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:29,509 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:29,510 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:30,344 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:30,344 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:31,025 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:31,178 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:31,178 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:32,012 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:32,013 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:32,846 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:32,847 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:33,681 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:33,681 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:34,335 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:34,514 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:34,515 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:35,348 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:35,349 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:36,182 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:36,182 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:37,016 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:37,016 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:37,644 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:37,850 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:37,851 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:38,684 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:38,685 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:38,787 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:48:38,789 - blind_guide_system - DEBUG - 资源 inference 正在使用中
+2026-03-15 16:48:38,815 - blind_guide_system - DEBUG - 目标 48 已过期，已清理
+2026-03-15 16:48:38,815 - blind_guide_system - DEBUG - 目标 49 已过期，已清理
+2026-03-15 16:48:38,815 - blind_guide_system - DEBUG - 目标 50 已过期，已清理
+2026-03-15 16:48:38,815 - blind_guide_system - DEBUG - 目标 51 已过期，已清理
+2026-03-15 16:48:38,815 - blind_guide_system - DEBUG - 目标 52 已过期，已清理
+2026-03-15 16:48:38,815 - blind_guide_system - DEBUG - 目标 53 已过期，已清理
+2026-03-15 16:48:38,816 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:48:38,816 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:48:38,816 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:48:38,819 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:48:38,894 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:48:39,519 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:39,519 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:40,353 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:40,353 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:40,995 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:41,187 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:41,188 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:42,021 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:42,022 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:42,856 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:42,856 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:43,690 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:43,690 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:44,304 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:44,524 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:44,525 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:45,359 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:45,359 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:46,193 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:46,193 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:47,027 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:47,027 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:47,614 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:47,861 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:47,861 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:48,695 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:48,696 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:49,529 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:49,530 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:50,363 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:50,364 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:50,923 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:51,197 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:51,198 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:52,026 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:52,031 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:52,031 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:52,865 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:52,866 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:53,699 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:53,700 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:54,230 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:54,533 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:54,534 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:55,333 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:55,367 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:55,368 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:56,202 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:56,202 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:57,036 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:57,036 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:57,539 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:57,870 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:57,870 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:58,643 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:48:58,704 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:58,705 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:59,539 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:48:59,539 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:48:59,641 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:48:59,668 - blind_guide_system - DEBUG - 目标 54 已过期，已清理
+2026-03-15 16:48:59,673 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:49:00,373 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:00,373 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:01,207 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:01,207 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:01,952 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:02,040 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:02,041 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:02,335 - blind_guide_system - INFO - 摄像头 camera1 视频播放完毕
+2026-03-15 16:49:02,874 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:02,875 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:03,708 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:03,708 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:04,542 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:04,542 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:05,261 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:05,376 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:05,376 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:06,210 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:06,210 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:07,044 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:07,044 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:07,878 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:07,878 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:08,570 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:08,712 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:08,712 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:09,546 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:09,546 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:10,380 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:10,380 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:11,213 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:11,214 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:11,880 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:12,048 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:12,048 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:12,882 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:12,883 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:13,716 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:13,716 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:14,550 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:14,551 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:15,188 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:15,384 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:15,385 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:16,219 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:16,219 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:17,053 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:17,053 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:17,887 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:17,889 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:18,498 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:18,722 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:18,722 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:19,556 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:19,556 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:20,390 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:20,390 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:20,493 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:49:20,518 - blind_guide_system - DEBUG - 目标 55 已过期，已清理
+2026-03-15 16:49:20,518 - blind_guide_system - DEBUG - 目标 56 已过期，已清理
+2026-03-15 16:49:20,518 - blind_guide_system - DEBUG - 目标 57 已过期，已清理
+2026-03-15 16:49:20,518 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:49:20,518 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:49:20,519 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:49:20,522 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:49:20,562 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:49:21,224 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:21,224 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:21,807 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:22,058 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:22,059 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:22,892 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:22,892 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:23,726 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:23,726 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:24,560 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:24,561 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:25,116 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:25,394 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:25,395 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:26,219 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:26,229 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:26,229 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:27,063 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:27,063 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:27,898 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:27,898 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:28,424 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:28,732 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:28,732 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:29,528 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:29,566 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:29,566 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:30,400 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:30,401 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:31,234 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:31,235 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:31,735 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:32,069 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:32,069 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:32,838 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:32,903 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:32,903 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:33,737 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:33,738 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:34,572 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:34,573 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:35,406 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:35,406 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:36,148 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:36,240 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:36,240 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:37,074 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:37,075 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:37,908 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:37,908 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:38,742 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:38,743 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:39,457 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:39,576 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:39,576 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:40,410 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:40,411 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:41,245 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:41,245 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:41,347 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:49:41,374 - blind_guide_system - DEBUG - 目标 58 已过期，已清理
+2026-03-15 16:49:41,374 - blind_guide_system - DEBUG - 目标 59 已过期，已清理
+2026-03-15 16:49:41,374 - blind_guide_system - DEBUG - 目标 60 已过期，已清理
+2026-03-15 16:49:41,374 - blind_guide_system - DEBUG - 目标 61 已过期，已清理
+2026-03-15 16:49:41,374 - blind_guide_system - DEBUG - 目标 62 已过期，已清理
+2026-03-15 16:49:41,378 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:49:42,079 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:42,079 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:42,766 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:42,913 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:42,913 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:43,747 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:43,748 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:44,581 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:44,582 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:45,416 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:45,416 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:46,075 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:46,250 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:46,251 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:47,084 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:47,085 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:47,919 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:47,919 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:48,753 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:48,753 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:49,384 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:49,587 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:49,588 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:50,421 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:50,422 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:51,256 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:51,256 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:52,090 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:52,091 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:52,694 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:52,924 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:52,925 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:53,759 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:53,759 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:54,592 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:54,593 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:55,426 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:55,427 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:56,005 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:56,261 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:56,261 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:57,095 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:57,095 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:57,929 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:57,930 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:58,764 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:58,764 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:49:59,314 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:49:59,598 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:49:59,598 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:00,418 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:00,432 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:00,432 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:01,266 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:01,267 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:02,100 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:02,100 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:02,202 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:50:02,227 - blind_guide_system - DEBUG - 目标 63 已过期，已清理
+2026-03-15 16:50:02,227 - blind_guide_system - DEBUG - 目标 64 已过期，已清理
+2026-03-15 16:50:02,227 - blind_guide_system - DEBUG - 目标 65 已过期，已清理
+2026-03-15 16:50:02,227 - blind_guide_system - DEBUG - 目标 66 已过期，已清理
+2026-03-15 16:50:02,228 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:50:02,228 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:50:02,228 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:50:02,231 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:50:02,236 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:50:02,625 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:02,934 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:02,934 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:03,727 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:03,768 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:03,768 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:04,602 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:04,603 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:05,436 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:05,437 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:06,271 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:06,271 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:07,034 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:07,105 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:07,106 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:07,939 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:07,940 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:08,774 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:08,774 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:09,608 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:09,608 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:10,341 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:10,442 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:10,443 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:11,276 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:11,276 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:12,110 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:12,110 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:12,944 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:12,944 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:13,650 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:13,778 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:13,778 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:14,612 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:14,613 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:15,447 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:15,447 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:16,281 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:16,281 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:16,967 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:17,115 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:17,118 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:17,949 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:17,950 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:18,783 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:18,783 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:19,617 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:19,618 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:20,278 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:20,451 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:20,452 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:21,286 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:21,286 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:22,120 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:22,120 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:22,954 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:22,955 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:23,057 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:50:23,089 - blind_guide_system - DEBUG - 目标 67 已过期，已清理
+2026-03-15 16:50:23,089 - blind_guide_system - DEBUG - 目标 68 已过期，已清理
+2026-03-15 16:50:23,089 - blind_guide_system - DEBUG - 目标 69 已过期，已清理
+2026-03-15 16:50:23,089 - blind_guide_system - DEBUG - 目标 70 已过期，已清理
+2026-03-15 16:50:23,089 - blind_guide_system - DEBUG - 目标 71 已过期，已清理
+2026-03-15 16:50:23,092 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:50:23,590 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:23,788 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:23,788 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:24,622 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:24,622 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:25,456 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:25,456 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:26,290 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:26,291 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:26,900 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:27,124 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:27,125 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:27,959 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:27,959 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:28,793 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:28,793 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:29,627 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:29,627 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:30,209 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:30,461 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:30,462 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:31,296 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:31,296 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:32,130 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:32,130 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:32,964 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:32,964 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:33,518 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:33,798 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:33,798 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:34,621 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:34,632 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:34,632 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:35,466 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:35,466 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:36,300 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:36,300 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:36,828 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:37,134 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:37,134 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:37,930 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:37,968 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:37,969 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:38,803 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:38,803 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:39,637 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:39,637 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:40,137 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:40,471 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:40,472 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:41,240 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:41,305 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:41,306 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:42,140 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:42,140 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:42,974 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:42,974 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:43,808 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:43,808 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:43,911 - blind_guide_system - INFO - 资源 inference 申请成功
+2026-03-15 16:50:43,936 - blind_guide_system - INFO - 高优先级任务 alert 强制申请资源
+2026-03-15 16:50:43,936 - blind_guide_system - DEBUG - 添加播报消息: 道路安全, 优先级: 2
+2026-03-15 16:50:43,936 - blind_guide_system - INFO - [Alert] 危险警报: 道路安全
+2026-03-15 16:50:43,938 - blind_guide_system - INFO - 资源 inference 已释放
+2026-03-15 16:50:44,006 - blind_guide_system - INFO - 播报: 道路安全
+2026-03-15 16:50:44,549 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:44,642 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:44,643 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:45,476 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:45,477 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:46,311 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:46,311 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:47,145 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:47,146 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:47,858 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:47,979 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:47,980 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:48,814 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:48,814 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:49,648 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:49,648 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:50,482 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:50,483 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:51,168 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:51,316 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:51,316 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:52,150 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:52,150 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:52,984 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:52,985 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:53,819 - blind_guide_system - DEBUG - [Main] 处理音频数据，长度: 3200
+2026-03-15 16:50:53,819 - blind_guide_system - DEBUG - [ASR] 识别结果: 
+2026-03-15 16:50:54,477 - blind_guide_system - WARNING - 模块 main 心跳超时
+2026-03-15 16:50:54,641 - blind_guide_system - INFO - 收到停止信号，正在停止系统...
+2026-03-15 16:50:54,642 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-15 16:50:54,725 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-15 16:50:54,857 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-15 16:50:55,010 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-15 16:50:55,010 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-15 16:50:55,011 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-15 16:50:55,478 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-15 16:50:55,480 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-15 16:50:55,480 - blind_guide_system - INFO - 结果文件已关闭
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - TTS引擎资源已释放
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 导盲系统已停止
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-15 16:50:55,510 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-15 16:50:55,511 - blind_guide_system - WARNING - 关闭结果文件失败: I/O operation on closed file.
+2026-03-15 16:50:55,511 - blind_guide_system - INFO - 导盲系统已停止

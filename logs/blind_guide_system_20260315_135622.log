@@ -1,0 +1,45 @@
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - AHP一致性检验通过，CR=0.011+0.000j
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - 使用Mock TTS引擎
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - 导盲系统启动中...
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - 系统模式: simulation
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - YOLO模型: /root/MHSEE/perception/yolo/model/yolov8n.pt
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - VDA模型: /root/MHSEE/vda/Video-Depth-Anything
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - ASR模型: /root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - LLM模型: /root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ
+2026-03-15 13:57:17,593 - blind_guide_system - INFO - 视频路径: video/video.mp4
+2026-03-15 13:57:17,605 - blind_guide_system - INFO - 视频帧率: 30.0, 处理帧率: 1.20, 采样间隔: 25
+2026-03-15 13:57:17,606 - blind_guide_system - INFO - 视频写入器已初始化，输出路径: output/output_video.avi, 编码器: MJPG, 帧率: 1.20
+2026-03-15 13:57:17,606 - blind_guide_system - INFO - 结果文件已初始化，输出路径: output/system_results.txt
+2026-03-15 13:57:17,606 - blind_guide_system - INFO - 资源管理器已启动
+2026-03-15 13:57:17,607 - blind_guide_system - INFO - 摄像头 camera1 模拟已启动
+2026-03-15 13:57:17,607 - blind_guide_system - INFO - 帧同步模块已启动
+2026-03-15 13:57:17,607 - blind_guide_system - INFO - 实时安全调度引擎已启动
+2026-03-15 13:57:17,607 - blind_guide_system - INFO - 复杂场景智能调度引擎已启动
+2026-03-15 13:57:17,608 - blind_guide_system - INFO - 语音播报调度器已启动
+2026-03-15 13:57:17,608 - blind_guide_system - WARNING - 没有图形界面，禁用调试查看器
+2026-03-15 13:57:17,608 - blind_guide_system - INFO - 导盲系统启动完成
+2026-03-15 13:57:17,608 - blind_guide_system - INFO - 视频播放完毕，停止系统
+2026-03-15 13:57:17,630 - blind_guide_system - INFO - 摄像头 camera1 使用视频文件: video/video.mp4
+2026-03-15 13:57:17,844 - blind_guide_system - INFO - 从视频中提取音频数据，长度: 1037282 样本，采样率: 16000Hz
+2026-03-15 13:57:18,442 - blind_guide_system - INFO - 视频处理完成，停止系统
+2026-03-15 13:57:18,443 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-15 13:57:18,509 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-15 13:57:18,608 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-15 13:57:18,809 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-15 13:57:18,809 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-15 13:57:18,909 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-15 13:57:19,813 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-15 13:57:19,814 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-15 13:57:19,814 - blind_guide_system - INFO - 结果文件已关闭
+2026-03-15 13:57:20,523 - blind_guide_system - INFO - TTS引擎资源已释放
+2026-03-15 13:57:20,524 - blind_guide_system - INFO - 导盲系统已停止
+2026-03-15 13:57:20,524 - blind_guide_system - INFO - 导盲系统停止中...
+2026-03-15 13:57:20,524 - blind_guide_system - INFO - 语音播报调度器已停止
+2026-03-15 13:57:20,524 - blind_guide_system - INFO - 复杂场景智能调度引擎已停止
+2026-03-15 13:57:20,525 - blind_guide_system - INFO - 实时安全调度引擎已停止
+2026-03-15 13:57:20,525 - blind_guide_system - INFO - 帧同步模块已停止
+2026-03-15 13:57:20,525 - blind_guide_system - INFO - 摄像头 camera1 模拟已停止
+2026-03-15 13:57:20,525 - blind_guide_system - INFO - 资源管理器已停止
+2026-03-15 13:57:20,525 - blind_guide_system - INFO - 视频写入器已关闭
+2026-03-15 13:57:20,525 - blind_guide_system - WARNING - 关闭结果文件失败: I/O operation on closed file.
+2026-03-15 13:57:20,525 - blind_guide_system - INFO - 导盲系统已停止

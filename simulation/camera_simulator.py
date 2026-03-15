@@ -96,10 +96,14 @@ class CameraSimulator:
                     # 从视频文件读取帧
                     ret, frame = cap.read()
                     if not ret:
-                        # 视频播放完毕，重新开始
-                        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-                        frame_count = 0
-                        continue
+                        # 视频播放完毕，停止模拟
+                        logger.info(f"摄像头 {camera_id} 视频播放完毕")
+                        # 释放摄像头资源
+                        cap.release()
+                        # 从摄像头字典中移除
+                        if camera_id in self.cameras:
+                            del self.cameras[camera_id]
+                        break
                     
                     # 调整帧大小
                     width, height = camera_config.get("resolution", [640, 480])
@@ -207,6 +211,28 @@ class CameraSimulator:
         if camera_id in self.frame_buffers and self.frame_buffers[camera_id]:
             return self.frame_buffers[camera_id][-1]
         return None, None
+    
+    def is_video_ended(self, camera_id: str) -> bool:
+        """
+        检查摄像头的视频是否播放完毕
+        
+        Args:
+            camera_id: 摄像头ID
+            
+        Returns:
+            bool: 视频是否播放完毕
+        """
+        # 检查摄像头是否存在且已关闭
+        if camera_id in self.cameras:
+            cap = self.cameras[camera_id]
+            if cap:
+                # 只有当摄像头已打开且现在关闭时，才认为视频结束
+                if not cap.isOpened():
+                    # 检查缓冲区是否也为空
+                    if camera_id in self.frame_buffers and not self.frame_buffers[camera_id]:
+                        return True
+        # 摄像头未初始化或仍在运行
+        return False
     
     def get_audio(self, camera_id: str) -> tuple:
         """

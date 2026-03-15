@@ -153,7 +153,20 @@ class RiskEvaluator:
             风险分数
         """
         category_weights = self.risk_rules.get("category_weights", {})
-        return category_weights.get(category, 5)
+        # 从配置文件获取类别权重，如果不存在则返回默认值
+        if category in category_weights:
+            return category_weights[category]
+        # 对于未明确配置的类别，根据其性质设置默认值
+        elif category in ['car', 'bus', 'truck']:
+            return 15
+        elif category in ['person', 'bicycle', 'wheelchair']:
+            return 10
+        elif category in ['construction_zone', 'obstacle', 'pothole']:
+            return 12
+        elif category in ['crosswalk', 'traffic_light', 'bus_stop']:
+            return 5
+        else:
+            return 5
     
     def evaluate_risk(self, metadata: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -188,27 +201,36 @@ class RiskEvaluator:
             category_membership = self._fuzzy_evaluation(category_score, 'category')
             
             # 计算各因素得分
-            # 使用数值评分代替字符串键
-            distance_score = sum(v * 1 for k, v in distance_membership.items() if k == 'very_close') + \
-                           sum(v * 2 for k, v in distance_membership.items() if k == 'close') + \
-                           sum(v * 3 for k, v in distance_membership.items() if k == 'medium') + \
-                           sum(v * 4 for k, v in distance_membership.items() if k == 'far') + \
-                           sum(v * 5 for k, v in distance_membership.items() if k == 'very_far')
+            # 1. 距离因素：距离越近，风险越高
+            # 距离得分 = 10 - 距离（最多10分），最小0分
+            distance_score = max(0, 10 - min(distance, 10))
             
-            speed_score = sum(v * 1 for k, v in speed_membership.items() if k == 'very_slow') + \
-                        sum(v * 2 for k, v in speed_membership.items() if k == 'slow') + \
-                        sum(v * 3 for k, v in speed_membership.items() if k == 'medium') + \
-                        sum(v * 4 for k, v in speed_membership.items() if k == 'fast') + \
-                        sum(v * 5 for k, v in speed_membership.items() if k == 'very_fast')
+            # 2. 速度因素：
+            # 对于车辆：速度越快，风险越高；速度为0（静止）时，风险降低
+            # 对于行人：适中速度风险较低，过快或过慢风险较高
+            if category in ['car', 'bus', 'truck', 'bicycle', 'motorcycle']:
+                if speed < 1.0:  # 静止或几乎静止
+                    speed_score = 2  # 基础风险
+                else:
+                    speed_score = min(10, speed * 0.3)  # 速度越快，风险越高
+            else:  # 行人等其他目标
+                if speed < 0.5 or speed > 5.0:
+                    speed_score = 6  # 过慢或过快
+                else:
+                    speed_score = 3  # 正常速度
             
-            category_score = sum(v * 1 for k, v in category_membership.items() if k == 'low_risk') + \
-                           sum(v * 2 for k, v in category_membership.items() if k == 'medium_risk') + \
-                           sum(v * 3 for k, v in category_membership.items() if k == 'high_risk') + \
-                           sum(v * 4 for k, v in category_membership.items() if k == 'very_high_risk')
+            # 3. 类别因素
+            category_score = self._get_category_risk_score(category)
             
-            # 计算场景复杂度
+            # 4. 场景复杂度
             scene_complexity = self._calculate_scene_complexity(targets)
-            scene_score = min(scene_complexity / 100, 1.0)
+            scene_score = min(scene_complexity / 100, 1.0) * 10
+            
+            # 5. 静止车辆特殊处理：如果车辆静止但距离很近，视为障碍物
+            if category in ['car', 'bus', 'truck'] and speed < 1.0 and distance < 3.0:
+                # 静止车辆离得近，风险提高
+                distance_score *= 1.5
+                category_score *= 1.2
             
             # 使用AHP权重计算综合得分
             weights = self.ahp_weights
