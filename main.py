@@ -9,35 +9,16 @@ from typing import Dict, Any, List
 # 导入工具模块
 from utils.logger import logger
 from utils.config_loader import config_loader
+from utils.message_queue import message_queue
 
 # 导入核心模块
-from core.resource_manager import ResourceManager
-from core.realtime_scheduler import RealtimeScheduler
-from core.complex_scene_scheduler import ComplexSceneScheduler
-
-# 导入感知模块
-from perception.yolo.yolo_detector import YoloDetector
-from perception.yolo.mock_yolo import MockYoloDetector
-from perception.vda.vda_depth import VDADepthEstimator
-from perception.vda.mock_vda import MockVDADepthEstimator
-from perception.asr.funasr_asr import FunASRRecognizer
-from perception.asr.mock_asr import MockFunASRRecognizer
-from perception.llm.qwen_multimodal import QwenMultimodal
-from perception.llm.mock_llm import MockQwenMultimodal
-
-# 导入融合模块
-from fusion.frame_sync import FrameSync
-from fusion.depth_fusion import DepthFusion
-from fusion.target_tracker import TargetTracker
-from fusion.metadata_wrapper import MetadataWrapper
-
-# 导入执行模块
-from execution.broadcast_scheduler import BroadcastScheduler
-from execution.tts_engine import TTSEngine
+from core.input_thread import InputThread
+from core.asr_thread import ASRThread
+from core.vision_thread import VisionThread
+from core.inference_thread import InferenceThread
 
 # 导入模拟模块
 from simulation.debug_viewer import DebugViewer
-from hardware.input_device_factory import InputDeviceFactory
 
 class BlindGuideSystem:
     def __init__(self):
@@ -48,32 +29,14 @@ class BlindGuideSystem:
         self.config = config_loader.get_config()
         self.risk_rules = config_loader.get_risk_rules()
         
-        # 初始化资源管理器
-        self.resource_manager = ResourceManager()
+        # 初始化线程
+        self.input_thread = InputThread()
+        self.asr_thread = ASRThread()
+        self.vision_thread = VisionThread()
+        self.inference_thread = InferenceThread()
         
-        # 初始化输入设备
-        self.input_device = InputDeviceFactory.create_input_device()
+        # 初始化调试查看器
         self.debug_viewer = DebugViewer()
-        
-        # 初始化感知模块
-        self.yolo = self._init_yolo()
-        self.vda = self._init_vda()
-        self.asr = self._init_asr()
-        self.llm = self._init_llm()
-        
-        # 初始化融合模块
-        self.frame_sync = FrameSync()
-        self.depth_fusion = DepthFusion()
-        self.target_tracker = TargetTracker()
-        self.metadata_wrapper = MetadataWrapper()
-        
-        # 初始化核心调度模块
-        self.realtime_scheduler = RealtimeScheduler()
-        self.complex_scene_scheduler = ComplexSceneScheduler(self.resource_manager)
-        
-        # 初始化执行模块
-        self.broadcast_scheduler = BroadcastScheduler()
-        self.tts_engine = TTSEngine(self.config.get("execution", {}))
         
         # 系统状态
         self.running = False
@@ -83,57 +46,8 @@ class BlindGuideSystem:
         
         # 结果记录文件
         self.result_file = None
-        
-        # 帧计数器和采样频率
-        self.frame_count = 0
-        self.sample_interval = 5  # 每5帧采样一次，降低处理频率以匹配推理速度
-        self.video_fps = 30  # 默认视频帧率
-        self.processing_fps = 5  # 目标处理帧率
-        self.last_process_time = time.time()
-        
-        # 存储ASR和LLM结果
-        self.asr_results = []
-        self.llm_results = []
     
-    def _init_yolo(self):
-        """
-        初始化YOLO模块
-        """
-        yolo_config = self.config.get("models", {}).get("yolo", {})
-        if yolo_config.get("type", "mock") == "real":
-            return YoloDetector(yolo_config)
-        else:
-            return MockYoloDetector(yolo_config)
-    
-    def _init_vda(self):
-        """
-        初始化VDA模块
-        """
-        vda_config = self.config.get("models", {}).get("vda", {})
-        if vda_config.get("type", "mock") == "real":
-            return VDADepthEstimator(vda_config)
-        else:
-            return MockVDADepthEstimator(vda_config)
-    
-    def _init_asr(self):
-        """
-        初始化ASR模块
-        """
-        asr_config = self.config.get("models", {}).get("asr", {})
-        if asr_config.get("type", "mock") == "real":
-            return FunASRRecognizer(asr_config)
-        else:
-            return MockFunASRRecognizer(asr_config)
-    
-    def _init_llm(self):
-        """
-        初始化LLM模块
-        """
-        llm_config = self.config.get("models", {}).get("llm", {})
-        if llm_config.get("type", "mock") == "real":
-            return QwenMultimodal(llm_config)
-        else:
-            return MockQwenMultimodal(llm_config)
+
     
     def start(self):
         """
@@ -157,23 +71,11 @@ class BlindGuideSystem:
         # 初始化结果文件
         self._init_result_file()
         
-        # 启动资源管理器
-        self.resource_manager.start()
-        
-        # 启动输入设备
-        self.input_device.start()
-        
-        # 启动帧同步
-        self.frame_sync.start()
-        
-        # 启动实时安全调度
-        self.realtime_scheduler.start()
-        
-        # 启动复杂场景调度
-        self.complex_scene_scheduler.start()
-        
-        # 启动语音播报调度
-        self.broadcast_scheduler.start()
+        # 创建消息队列
+        message_queue.create_queue("audio")
+        message_queue.create_queue("vision")
+        message_queue.create_queue("inference")
+        message_queue.create_queue("control")
         
         # 启动调试查看器（如果开启且有图形界面）
         debug_enabled = self.config.get("system", {}).get("debug", False)
@@ -196,6 +98,12 @@ class BlindGuideSystem:
                 logger.warning(f"启动调试查看器失败: {e}")
                 # 强制禁用调试模式
                 self.config["system"]["debug"] = False
+        
+        # 启动线程
+        self.input_thread.start()
+        self.asr_thread.start()
+        self.vision_thread.start()
+        self.inference_thread.start()
         
         self.running = True
         logger.info("导盲系统启动完成")
@@ -278,13 +186,25 @@ class BlindGuideSystem:
         
         self.running = False
         
-        # 停止各个模块
-        self.broadcast_scheduler.stop()
-        self.complex_scene_scheduler.stop()
-        self.realtime_scheduler.stop()
-        self.frame_sync.stop()
-        self.input_device.stop()
-        self.resource_manager.stop()
+        # 停止线程
+        if hasattr(self, 'input_thread'):
+            self.input_thread.stop()
+        if hasattr(self, 'asr_thread'):
+            self.asr_thread.stop()
+        if hasattr(self, 'vision_thread'):
+            self.vision_thread.stop()
+        if hasattr(self, 'inference_thread'):
+            self.inference_thread.stop()
+        
+        # 等待线程结束
+        if hasattr(self, 'input_thread') and self.input_thread.is_alive():
+            self.input_thread.join(timeout=2)
+        if hasattr(self, 'asr_thread') and self.asr_thread.is_alive():
+            self.asr_thread.join(timeout=2)
+        if hasattr(self, 'vision_thread') and self.vision_thread.is_alive():
+            self.vision_thread.join(timeout=2)
+        if hasattr(self, 'inference_thread') and self.inference_thread.is_alive():
+            self.inference_thread.join(timeout=2)
         
         # 停止调试查看器
         try:
@@ -304,17 +224,25 @@ class BlindGuideSystem:
         # 关闭结果文件
         if self.result_file:
             try:
-                logger.info(f"准备写入结果文件，ASR结果数量: {len(self.asr_results)}, LLM结果数量: {len(self.llm_results)}")
+                # 获取ASR和LLM结果
+                asr_results = []
+                llm_results = []
+                if hasattr(self, 'inference_thread'):
+                    results = self.inference_thread.get_results()
+                    asr_results = results.get("asr_results", [])
+                    llm_results = results.get("llm_results", [])
+                
+                logger.info(f"准备写入结果文件，ASR结果数量: {len(asr_results)}, LLM结果数量: {len(llm_results)}")
                 logger.info(f"结果文件对象: {self.result_file}")
                 
                 # 写入ASR和LLM结果
                 self.result_file.write("\n# ASR识别结果\n")
-                for i, result in enumerate(self.asr_results):
+                for i, result in enumerate(asr_results):
                     logger.info(f"写入ASR结果 {i+1}: {result}")
                     self.result_file.write(f"{i+1}. {result}\n")
                 
                 self.result_file.write("\n# LLM回复结果\n")
-                for i, result in enumerate(self.llm_results):
+                for i, result in enumerate(llm_results):
                     logger.info(f"写入LLM结果 {i+1}: {result}")
                     self.result_file.write(f"{i+1}. {result}\n")
                 
@@ -325,18 +253,6 @@ class BlindGuideSystem:
                 logger.warning(f"关闭结果文件失败: {e}")
                 import traceback
                 traceback.print_exc()
-        
-        # 释放模型资源
-        if hasattr(self, 'yolo'):
-            self.yolo.release()
-        if hasattr(self, 'vda'):
-            self.vda.release()
-        if hasattr(self, 'asr'):
-            self.asr.release()
-        if hasattr(self, 'llm'):
-            self.llm.release()
-        if hasattr(self, 'tts_engine'):
-            self.tts_engine.release()
         
         logger.info("导盲系统已停止")
     
@@ -373,208 +289,20 @@ class BlindGuideSystem:
         """
         主循环
         """
-        video_ended = False
-        
-        while self.running and not video_ended:
+        while self.running:
             try:
-                # 动态计算处理时间
-                current_time = time.time()
-                elapsed_time = current_time - self.last_process_time
-                target_interval = 1.0 / self.processing_fps
+                # 检查控制消息
+                control_message = message_queue.receive_message("control", block=False)
+                if control_message and control_message.get("type") == "stop":
+                    logger.info("收到停止消息，停止系统")
+                    self.stop()
+                    break
                 
-                # 检查视频是否播放完毕（仅模拟模式）
-                main_camera = "camera1"  # 主摄
-                if self.config.get('system', {}).get('input_mode') == 'simulated':
-                    if self.input_device.is_ended(main_camera):
-                        logger.info("视频播放完毕，停止系统")
-                        video_ended = True
-                        continue
-                
-                # 获取摄像头帧
-                frames = self.input_device.get_all_frames()
-                
-                # 处理主摄画面
-                if main_camera in frames:
-                    frame, timestamp = frames[main_camera]
-                    if frame is not None:
-                        # 帧计数器
-                        self.frame_count += 1
-                        
-                        # 获取音频数据
-                        audio_data, audio_timestamp = self.input_device.get_audio("camera1")
-                        if audio_data is not None:
-                            # 执行ASR识别
-                            logger.verbose_info(f"[Main] 处理音频数据，长度: {len(audio_data)}")
-                            wake_detected, asr_text = self.asr.inference(audio_data)
-                            logger.verbose_info(f"[ASR] 识别结果: {asr_text}")
-                        else:
-                            # 如果没有音频数据，使用空数据
-                            import numpy as np
-                            audio_data = np.array([])
-                            wake_detected, asr_text = self.asr.inference(audio_data)
-                            logger.verbose_info(f"[ASR] 识别结果 (无音频): {asr_text}")
-                        
-                        # 记录ASR结果
-                        if asr_text:
-                            self.asr_results.append(asr_text)
-                            logger.info(f"[Main] 已记录ASR结果: {asr_text}")
-                        
-                        # 帧采样
-                        if self.frame_count % self.sample_interval == 0:
-                            # 申请资源
-                            if self.resource_manager.request_resources("inference", priority=0):
-                                try:
-                                    # 添加帧到同步模块
-                                    self.frame_sync.add_frame(frame, timestamp, 0)
-                                    
-                                    # 执行YOLO检测
-                                    yolo_results = self.yolo.inference(frame)
-                                    self.frame_sync.add_yolo_result(yolo_results, timestamp)
-                                    
-                                    # 执行VDA深度估计
-                                    depth_map = self.vda.inference(frame)
-                                    self.frame_sync.add_vda_result(depth_map, timestamp)
-                                    
-                                    # 获取同步数据
-                                    sync_data = self.frame_sync.get_sync_data()
-                                    if sync_data:
-                                        sync_frame, sync_yolo, sync_depth, sync_timestamp, sync_camera_id = sync_data
-                                        
-                                        # 计算目标距离
-                                        targets_with_distance = self.depth_fusion.calculate_target_distances(sync_yolo, sync_depth)
-                                        
-                                        # 跟踪目标并计算速度
-                                        tracked_targets = self.target_tracker.track_targets(targets_with_distance, sync_timestamp)
-                                        
-                                        # 封装元数据
-                                        metadata = self.metadata_wrapper.wrap_metadata(
-                                            sync_frame,
-                                            tracked_targets,
-                                            sync_timestamp,
-                                            sync_camera_id
-                                        )
-                                        
-                                        # 处理实时安全调度
-                                        self.realtime_scheduler.process_metadata(metadata)
-                                        
-                                        # 检查是否有告警
-                                        alert = self.realtime_scheduler.get_alert()
-                                        if alert:
-                                            # 高优先级处理危险警报
-                                            if self.resource_manager.request_resources("alert", priority=10):
-                                                try:
-                                                    # 添加到语音播报队列
-                                                    self.broadcast_scheduler.add_message(
-                                                        alert.get("message"),
-                                                        priority=1 if alert.get("level") == "level1" else 2,
-                                                        alert_type=alert.get("level")
-                                                    )
-                                                    logger.info(f"[Alert] 危险警报: {alert.get('message')}")
-                                                finally:
-                                                    self.resource_manager.release_resources("alert")
-                                        
-                                        # 检查是否触发复杂场景
-                                        if self.realtime_scheduler.is_complex_scene_triggered():
-                                            # 中优先级处理复杂场景
-                                            if self.resource_manager.request_resources("llm", priority=5):
-                                                try:
-                                                    # 处理复杂场景
-                                                    response = self.complex_scene_scheduler.process_complex_scene(
-                                                        sync_frame,
-                                                        metadata,
-                                                        "请分析当前场景并提供导航建议"
-                                                    )
-                                                    if response:
-                                                        self.broadcast_scheduler.add_message(
-                                                            response,
-                                                            priority=3,
-                                                            alert_type="complex_scene"
-                                                        )
-                                                        # 记录LLM结果
-                                                        self.llm_results.append(response)
-                                                finally:
-                                                    self.resource_manager.release_resources("llm")
-                                            # 重置触发信号
-                                            self.realtime_scheduler.reset_complex_scene_trigger()
-                                        
-                                        # 更新调试画面
-                                        if self.config.get("system", {}).get("debug", False):
-                                            # 确定危险等级
-                                            risk_level = "level4"  # 默认安全
-                                            if alert:
-                                                risk_level = alert.get("level")
-                                            
-                                            self.debug_viewer.update_frame(
-                                                sync_frame,
-                                                tracked_targets,
-                                                sync_depth,
-                                                risk_level
-                                            )
-                                        
-                                        # 如果检测到唤醒词，调用LLM处理
-                                        if wake_detected:
-                                            # 中优先级处理唤醒词
-                                            if self.resource_manager.request_resources("llm", priority=5):
-                                                try:
-                                                    logger.info(f"[Main] 检测到唤醒词，调用LLM处理...")
-                                                    # 将NumPy数组转换为PIL Image
-                                                    from PIL import Image
-                                                    sync_image = Image.fromarray(sync_frame)
-                                                    # 调用复杂场景调度器处理
-                                                    response = self.complex_scene_scheduler.handle_wake_word(
-                                                        asr_text,
-                                                        sync_image,
-                                                        metadata
-                                                    )
-                                                    if response:
-                                                        logger.info(f"[LLM] 回复: {response}")
-                                                        # 添加到语音播报队列
-                                                        self.broadcast_scheduler.add_message(
-                                                            response,
-                                                            priority=3,
-                                                            alert_type="wake_word"
-                                                        )
-                                                        # 记录LLM结果
-                                                        self.llm_results.append(response)
-                                                        logger.info(f"[Main] 已记录LLM结果: {response}")
-                                                finally:
-                                                    self.resource_manager.release_resources("llm")
-                                        
-                                        # 绘制目标信息
-                                        output_frame = self._draw_targets(sync_frame.copy(), tracked_targets)
-                                        
-                                        # 写入视频文件
-                                        if self.video_writer:
-                                            self.video_writer.write(output_frame)
-                                finally:
-                                    # 释放资源
-                                    self.resource_manager.release_resources("inference")
-                    else:
-                        # 没有帧数据，摄像头可能还在初始化，继续等待
-                        logger.debug("摄像头还在初始化，继续等待...")
-                        time.sleep(0.1)
-                    
-                    # 动态控制帧率
-                    processing_time = time.time() - current_time
-                    sleep_time = max(0, target_interval - processing_time)
-                    time.sleep(sleep_time)
-                    
-                    # 更新处理时间
-                    self.last_process_time = current_time + processing_time + sleep_time
-                    
-                    # 定期更新心跳，避免超时
-                    self.resource_manager.update_heartbeat("main")
-                    
+                # 短暂休眠，避免占用过多CPU
+                time.sleep(0.1)
             except Exception as e:
                 logger.error(f"主循环出错: {e}")
-                # 出错时也要更新心跳
-                self.resource_manager.update_heartbeat("main")
                 time.sleep(0.5)
-        
-        # 视频播放完毕，停止系统
-        if video_ended:
-            logger.info("视频处理完成，停止系统")
-            self.stop()
         
 
     

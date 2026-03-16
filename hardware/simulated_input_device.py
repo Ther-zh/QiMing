@@ -67,11 +67,18 @@ class SimulatedInputDevice(InputDevice):
         # 获取视频路径
         video_path = self.config.get("simulation", {}).get("video_paths", {}).get(camera_id)
         
+        # 视频帧率
+        video_fps = 5  # 默认帧率
+        
         if video_path and os.path.exists(video_path):
             # 使用视频文件模拟
             cap = cv2.VideoCapture(video_path)
+            # 获取视频实际帧率
+            video_fps = cap.get(cv2.CAP_PROP_FPS)
+            if video_fps <= 0:
+                video_fps = 30  # 如果获取失败，使用默认值30
             self.cameras[camera_id] = cap
-            logger.info(f"摄像头 {camera_id} 使用视频文件: {video_path}")
+            logger.info(f"摄像头 {camera_id} 使用视频文件: {video_path}，帧率: {video_fps:.2f}")
             
             # 提取音频
             audio_data = self._extract_audio(video_path)
@@ -108,9 +115,8 @@ class SimulatedInputDevice(InputDevice):
                     if audio_data is not None:
                         # 简单的音频帧提取，实际应用中需要更精确的同步
                         sample_rate = 16000  # 假设音频采样率为16kHz
-                        # 使用模拟帧率而不是视频实际帧率，确保每帧有足够的音频数据
-                        sim_fps = camera_config.get("fps", 5)
-                        samples_per_frame = int(sample_rate / sim_fps)
+                        # 使用视频实际帧率
+                        samples_per_frame = int(sample_rate / video_fps)
                         start_sample = frame_count * samples_per_frame
                         end_sample = start_sample + samples_per_frame
                         if start_sample < len(audio_data):
@@ -132,7 +138,7 @@ class SimulatedInputDevice(InputDevice):
                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                     
                     # 生成随机音频
-                    audio_frame = np.random.randn(16000 // 5)  # 5FPS，每帧200ms音频
+                    audio_frame = np.random.randn(int(16000 / video_fps))  # 根据帧率生成音频
                 
                 # 添加到缓冲区
                 self.frame_buffers[camera_id].append((frame, timestamp))
@@ -140,8 +146,7 @@ class SimulatedInputDevice(InputDevice):
                     self.audio_buffers[camera_id].append((audio_frame, timestamp))
                 
                 # 控制帧率
-                fps = camera_config.get("fps", 5)
-                time.sleep(1 / fps)
+                time.sleep(1 / video_fps)
         finally:
             if cap:
                 cap.release()
