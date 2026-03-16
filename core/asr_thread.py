@@ -52,6 +52,7 @@ class ASRThread(threading.Thread):
                         wake_detected, asr_text = self.asr.inference(audio_data)
                         
                         if asr_text:
+                            # 只在识别到完整句子时输出
                             logger.info(f"[ASR] 识别结果: {asr_text}")
                             # 发送识别结果到推理决策队列
                             message_queue.send_message("inference", {

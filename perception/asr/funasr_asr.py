@@ -21,7 +21,7 @@ class FunASRRecognizer:
         self._load_models()
         # 音频缓冲
         self.audio_buffer = []
-        self.buffer_max_length = 16000 * 5  # 5秒音频缓冲
+        self.buffer_max_length = 16000 * 10  # 10秒音频缓冲
         # 流式识别缓存
         self.stream_cache = {}
         # 唤醒词列表
@@ -32,7 +32,9 @@ class FunASRRecognizer:
         self.sentence_end = False
         # 静默计数器
         self.silence_counter = 0
-        self.silence_threshold = 3  # 3个周期无语音视为静默
+        self.silence_threshold = 5  # 5个周期无语音视为静默
+        # 最小识别长度（秒）
+        self.min_recognition_length = 1.0
     
     def _load_models(self):
         """
@@ -96,7 +98,6 @@ class FunASRRecognizer:
             result = self.vad_model.generate(input=audio_data)
             return result[0].get('value', 0) == 1
         except Exception as e:
-            print(f"[ASR] VAD检测失败: {e}")
             # 失败时使用能量判断
             energy = np.sum(np.square(audio_data)) / len(audio_data)
             return energy > 0.001
@@ -153,9 +154,6 @@ class FunASRRecognizer:
                     # 限制缓冲长度
                     if len(self.audio_buffer) > self.buffer_max_length:
                         self.audio_buffer = self.audio_buffer[-self.buffer_max_length:]
-                    
-                    # 只缓冲，不执行实时识别
-                    print(f"[ASR] 正在缓冲音频数据，当前缓冲长度: {len(self.audio_buffer)} samples")
                 else:
                     # 无语音活动
                     if self.is_speaking:
@@ -165,12 +163,12 @@ class FunASRRecognizer:
                             self.sentence_end = True
                             self.is_speaking = False
                             # 执行最终识别
-                            if len(self.audio_buffer) > 16000 * 0.5:  # 至少0.5秒音频
+                            min_samples = int(16000 * self.min_recognition_length)
+                            if len(self.audio_buffer) > min_samples:  # 至少1秒音频
                                 # 使用完整识别而不是流式识别
                                 asr_text = self.model.recognize(np.array(self.audio_buffer), clean_output=True)
                                 # 添加标点
                                 asr_text = self._add_punctuation(asr_text)
-                                print(f"[ASR] 整句识别结果: {asr_text}")
                                 # 清空缓冲
                                 self.audio_buffer = []
             
