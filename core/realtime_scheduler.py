@@ -73,6 +73,11 @@ class RealtimeScheduler:
         if special_scene_result:
             risk_result = special_scene_result
         
+        # 检查是否需要跳过告警
+        if risk_result.get('skip_alert', False):
+            logger.debug("安全状态，跳过告警")
+            return
+        
         # 评估危险等级
         alert = self._evaluate_risk_level(
             risk_result['risk_score'],

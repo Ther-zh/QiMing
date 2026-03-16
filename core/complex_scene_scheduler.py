@@ -122,6 +122,11 @@ class ComplexSceneScheduler:
         Returns:
             LLM生成的回复
         """
+        # 如果没有图像或元数据，就直接使用mock LLM返回一个简单回复
+        if self.config.get("models", {}).get("llm", {}).get("type", "mock") == "mock" or image is None or metadata is None:
+            logger.info("使用Mock LLM回复唤醒词")
+            return "好的，我正在帮您查看前方路况，请稍等..."
+        
         # 根据唤醒词生成prompt
         prompt = self._generate_prompt(wake_word, metadata)
         
@@ -145,7 +150,7 @@ class ComplexSceneScheduler:
         
         # 环境信息
         prompt += "## 环境信息\n"
-        targets = metadata.get("targets", [])
+        targets = metadata.get("targets", []) if metadata else []
         if targets:
             prompt += "检测到的目标：\n"
             for i, target in enumerate(targets, 1):

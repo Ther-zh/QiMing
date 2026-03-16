@@ -184,7 +184,8 @@ class RiskEvaluator:
                 'risk_level': 'level4',
                 'risk_score': 0,
                 'message': '道路安全',
-                'details': '无目标'
+                'details': '无目标',
+                'skip_alert': True  # 标记为跳过告警
             }
         
         # 计算每个目标的风险
@@ -258,6 +259,7 @@ class RiskEvaluator:
         high_risk_target = highest_risk['target']
         
         # 确定危险等级
+        skip_alert = False
         if risk_score >= 80:
             level = "level1"
             message = "危险！请立即避让！"
@@ -270,8 +272,9 @@ class RiskEvaluator:
         else:
             level = "level4"
             message = "道路安全"
+            skip_alert = True
         
-        return {
+        result = {
             'risk_level': level,
             'risk_score': risk_score,
             'message': message,
@@ -283,6 +286,11 @@ class RiskEvaluator:
                 'speed': high_risk_target.get('speed', 0)
             }
         }
+        
+        if skip_alert:
+            result['skip_alert'] = True
+        
+        return result
     
     def evaluate_special_scene(self, metadata: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """

@@ -294,7 +294,11 @@ class BlindGuideSystem:
                 # 检查控制消息
                 control_message = message_queue.receive_message("control", block=False)
                 if control_message and control_message.get("type") == "stop":
-                    logger.info("收到停止消息，停止系统")
+                    logger.info("收到停止消息，等待10秒让所有线程处理完所有消息...")
+                    # 等待10秒，让ASR和推理线程有足够时间处理所有消息
+                    # 在这期间不停止线程，让它们继续运行
+                    time.sleep(10)
+                    logger.info("等待完毕，现在停止系统")
                     self.stop()
                     break
                 

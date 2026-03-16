@@ -25,7 +25,7 @@ class FunASRRecognizer:
         # 流式识别缓存
         self.stream_cache = {}
         # 唤醒词列表
-        self.wake_words = ["你好", "导盲", "导航","小明","小明同学"]
+        self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学"]
         # 语音活动检测状态
         self.is_speaking = False
         # 句子结束标志
@@ -49,34 +49,40 @@ class FunASRRecognizer:
             )
             print(f"[ASR] 主模型加载成功: {self.model_path}")
             
-            # 加载VAD模型
+            # 加载VAD模型 - 使用正确的FunASR API
             try:
                 from funasr import AutoModel
+                # 直接使用模型ID从modelscope加载，这样会自动下载和使用正确的版本
                 self.vad_model = AutoModel(
-                    model=self.vad_model_path,
-                    device="cuda:0" if os.environ.get('CUDA_VISIBLE_DEVICES') else "cpu",
-                    trust_remote_code=True
+                    model="iic/speech_fsmn_vad_zh-cn-16k-common-pytorch",
+                    device="cuda:0" if os.environ.get('CUDA_VISIBLE_DEVICES') else "cpu"
                 )
-                print(f"[ASR] VAD模型加载成功: {self.vad_model_path}")
+                print(f"[ASR] VAD模型加载成功")
             except Exception as e:
                 print(f"[ASR] VAD模型加载失败: {e}")
+                import traceback
+                traceback.print_exc()
                 self.vad_model = None
             
-            # 加载标点模型
+            # 加载标点模型 - 使用正确的FunASR API
             try:
                 from funasr import AutoModel
+                # 直接使用模型ID从modelscope加载，这样会自动下载和使用正确的版本
                 self.punc_model = AutoModel(
-                    model=self.punc_model_path,
-                    device="cuda:0" if os.environ.get('CUDA_VISIBLE_DEVICES') else "cpu",
-                    trust_remote_code=True
+                    model="iic/punc_ct-transformer_zh-cn-common-vocab272727-pytorch",
+                    device="cuda:0" if os.environ.get('CUDA_VISIBLE_DEVICES') else "cpu"
                 )
-                print(f"[ASR] 标点模型加载成功: {self.punc_model_path}")
+                print(f"[ASR] 标点模型加载成功")
             except Exception as e:
                 print(f"[ASR] 标点模型加载失败: {e}")
+                import traceback
+                traceback.print_exc()
                 self.punc_model = None
                 
         except Exception as e:
             print(f"[ASR] 模型加载失败: {e}")
+            import traceback
+            traceback.print_exc()
             raise
     
     def _detect_voice_activity(self, audio_data: np.ndarray) -> bool:
@@ -96,9 +102,12 @@ class FunASRRecognizer:
         
         try:
             result = self.vad_model.generate(input=audio_data)
-            return result[0].get('value', 0) == 1
+            if isinstance(result, list) and len(result) > 0:
+                return result[0].get('value', 0) == 1
+            return False
         except Exception as e:
             # 失败时使用能量判断
+            print(f"[ASR] VAD推理失败，使用能量检测: {e}")
             energy = np.sum(np.square(audio_data)) / len(audio_data)
             return energy > 0.001
     
@@ -117,14 +126,16 @@ class FunASRRecognizer:
         
         try:
             result = self.punc_model.generate(input=text)
-            return result[0].get('text', text)
+            if isinstance(result, list) and len(result) > 0:
+                return result[0].get('text', text)
+            return text
         except Exception as e:
             print(f"[ASR] 标点添加失败: {e}")
             return text
     
     def inference(self, audio_data: np.ndarray) -> Tuple[bool, str]:
         """
-        执行语音识别
+        执行语音识别 - 现在直接处理完整的累积音频！
         
         Args:
             audio_data: 输入音频数据
@@ -140,45 +151,44 @@ class FunASRRecognizer:
         
         # 执行语音识别
         try:
-            # 只有当音频数据不为空时才执行处理
-            if len(audio_data) > 0:
-                # 检测语音活动
-                has_voice = self._detect_voice_activity(audio_data)
+            # 只有当音频数据足够长时才执行处理
+            if len(audio_data) > 16000 * 0.3:  # 至少0.3秒
+                print(f"[ASR] 处理音频，长度: {len(audio_data)} 样本")
                 
-                if has_voice:
-                    self.is_speaking = True
-                    self.silence_counter = 0
-                    # 将当前音频数据添加到缓冲
-                    self.audio_buffer.extend(audio_data)
+                # 直接使用完整识别
+                try:
+                    asr_text = self.model.recognize(audio_data, clean_output=True)
+                    print(f"[ASR] 原始识别结果: '{asr_text}'")
                     
-                    # 限制缓冲长度
-                    if len(self.audio_buffer) > self.buffer_max_length:
-                        self.audio_buffer = self.audio_buffer[-self.buffer_max_length:]
-                else:
-                    # 无语音活动
-                    if self.is_speaking:
-                        self.silence_counter += 1
-                        # 如果持续静默，认为句子结束
-                        if self.silence_counter >= self.silence_threshold:
-                            self.sentence_end = True
-                            self.is_speaking = False
-                            # 执行最终识别
-                            min_samples = int(16000 * self.min_recognition_length)
-                            if len(self.audio_buffer) > min_samples:  # 至少1秒音频
-                                # 使用完整识别而不是流式识别
-                                asr_text = self.model.recognize(np.array(self.audio_buffer), clean_output=True)
-                                # 添加标点
-                                asr_text = self._add_punctuation(asr_text)
-                                # 清空缓冲
-                                self.audio_buffer = []
+                    # 添加标点
+                    asr_text = self._add_punctuation(asr_text)
+                    print(f"[ASR] 带标点结果: '{asr_text}'")
+                except Exception as e:
+                    print(f"[ASR] 模型识别失败: {e}")
+                    import traceback
+                    traceback.print_exc()
             
         except Exception as e:
             print(f"[ASR] 推理失败: {e}")
+            import traceback
+            traceback.print_exc()
             asr_text = ""
         
-        # 简单的唤醒词检测
+        # 简单的唤醒词检测 - 先去除标点符号再检测
         if asr_text:
-            wake_detected = any(word in asr_text for word in self.wake_words)
+            # 去除常用标点符号，避免标点干扰唤醒词检测
+            import re
+            clean_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', asr_text)
+            print(f"[ASR] 去除标点后的文本: '{clean_text}'")
+            
+            # 在原始文本和清洗后的文本中都检测
+            wake_detected = any(word in asr_text or word in clean_text for word in self.wake_words)
+            if wake_detected:
+                print(f"[ASR] 检测到唤醒词")
+                for word in self.wake_words:
+                    if word in asr_text or word in clean_text:
+                        print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
+                        break
         
         return wake_detected, asr_text
     
@@ -194,7 +204,8 @@ class FunASRRecognizer:
         
         if self.vad_model:
             try:
-                self.vad_model.cleanup()
+                if hasattr(self.vad_model, 'cleanup'):
+                    self.vad_model.cleanup()
                 self.vad_model = None
                 print("[ASR] VAD模型资源已释放")
             except Exception as e:
@@ -202,7 +213,8 @@ class FunASRRecognizer:
         
         if self.punc_model:
             try:
-                self.punc_model.cleanup()
+                if hasattr(self.punc_model, 'cleanup'):
+                    self.punc_model.cleanup()
                 self.punc_model = None
                 print("[ASR] 标点模型资源已释放")
             except Exception as e:

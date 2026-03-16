@@ -40,6 +40,10 @@ class InferenceThread(threading.Thread):
         # 存储ASR和LLM结果
         self.asr_results = []
         self.llm_results = []
+        # 唤醒词列表
+        self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学"]
+        # 累积的ASR文本（用于检测跨片段的唤醒词）
+        self.cumulative_asr_text = ""
     
     def run(self):
         """
@@ -60,6 +64,9 @@ class InferenceThread(threading.Thread):
         # 启动语音播报调度
         self.broadcast_scheduler.start()
         
+        video_ended = False
+        video_ended_time = None
+        
         try:
             while self.running:
                 # 从推理队列接收消息
@@ -77,10 +84,18 @@ class InferenceThread(threading.Thread):
                 # 检查控制消息
                 control_message = message_queue.receive_message("control", block=False)
                 if control_message and control_message.get("type") == "video_ended":
-                    logger.info("收到视频结束消息，准备停止系统")
-                    # 发送停止消息
-                    message_queue.send_message("control", {"type": "stop"})
-                    break
+                    if not video_ended:
+                        logger.info("收到视频结束消息，继续运行15秒处理剩余消息...")
+                        video_ended = True
+                        video_ended_time = time.time()
+                
+                # 如果视频已结束，检查是否已经过了足够长的时间
+                if video_ended and video_ended_time:
+                    if time.time() - video_ended_time >= 15:
+                        logger.info("15秒等待时间已过，准备停止系统")
+                        # 发送停止消息
+                        message_queue.send_message("control", {"type": "stop"})
+                        break
                 
                 # 短暂休眠，避免占用过多CPU
                 time.sleep(0.01)
@@ -101,6 +116,7 @@ class InferenceThread(threading.Thread):
         """
         处理ASR结果
         """
+        import re
         asr_text = message.get("text")
         wake_detected = message.get("wake_detected")
         timestamp = message.get("timestamp")
@@ -109,6 +125,56 @@ class InferenceThread(threading.Thread):
         if asr_text:
             self.asr_results.append(asr_text)
             logger.info(f"[Inference] 已记录ASR结果: {asr_text}")
+            
+            # 累积ASR文本，用于跨片段唤醒词检测
+            self.cumulative_asr_text += asr_text
+            logger.info(f"[Inference] 当前累积ASR文本: '{self.cumulative_asr_text}'")
+            
+            # 去除标点符号后的累积文本
+            clean_cumulative_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', self.cumulative_asr_text)
+            logger.info(f"[Inference] 去除标点后的累积文本: '{clean_cumulative_text}'")
+            
+            # 如果ASR端没检测到，但推理端检测到了唤醒词，也触发！
+            if not wake_detected:
+                logger.info(f"[Inference] ASR端未检测到唤醒词，开始跨片段检测...")
+                for word in self.wake_words:
+                    if word in self.cumulative_asr_text or word in clean_cumulative_text:
+                        wake_detected = True
+                        logger.info(f"[Inference] 跨片段检测到唤醒词: '{word}'")
+                        break
+        
+        # 如果检测到唤醒词，调用LLM处理
+        if wake_detected:
+            logger.info(f"[Inference] 检测到唤醒词，准备调用LLM处理...")
+            logger.info(f"[Inference] 完整查询文本: '{self.cumulative_asr_text}'")
+            # 中优先级处理唤醒词
+            if self.resource_manager.request_resources("llm", priority=5):
+                try:
+                    # 调用复杂场景调度器处理，使用累积的文本
+                    full_query = self.cumulative_asr_text
+                    response = self.complex_scene_scheduler.handle_wake_word(
+                        full_query,
+                        None,  # 暂时没有图像数据
+                        None   # 暂时没有元数据
+                    )
+                    if response:
+                        logger.info(f"[LLM] 回复: {response}")
+                        # 添加到语音播报队列
+                        self.broadcast_scheduler.add_message(
+                            response,
+                            priority=3,
+                            alert_type="wake_word"
+                        )
+                        # 记录LLM结果
+                        self.llm_results.append(response)
+                        # 检测到唤醒词处理后，重置累积文本
+                        self.cumulative_asr_text = ""
+                    else:
+                        logger.warning(f"[LLM] 没有返回回复")
+                finally:
+                    self.resource_manager.release_resources("llm")
+            else:
+                logger.warning(f"[Inference] 无法获取LLM资源")
     
     def _handle_vision_result(self, message):
         """

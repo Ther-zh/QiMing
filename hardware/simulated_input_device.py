@@ -62,7 +62,8 @@ class SimulatedInputDevice(InputDevice):
         # 初始化帧缓冲区和音频缓冲区
         buffer_size = self.config.get("system", {}).get("max_frame_buffer", 3)
         self.frame_buffers[camera_id] = deque(maxlen=buffer_size)
-        self.audio_buffers[camera_id] = deque(maxlen=buffer_size)
+        # 增大音频缓冲区，让我们能累积完整的音频！
+        self.audio_buffers[camera_id] = deque(maxlen=1000)
         
         # 获取视频路径
         video_path = self.config.get("simulation", {}).get("video_paths", {}).get(camera_id)
@@ -211,10 +212,10 @@ class SimulatedInputDevice(InputDevice):
     
     def get_audio(self, device_id: str) -> Tuple[Any, float]:
         """
-        获取设备的最新音频
+        获取设备的最新单帧音频（恢复原来的行为，让输入线程累积）
         """
         if device_id in self.audio_buffers and self.audio_buffers[device_id]:
-            return self.audio_buffers[device_id][-1]
+            return self.audio_buffers[device_id].popleft()
         return None, None
     
     def get_all_audio(self) -> Dict[str, Tuple[Any, float]]:
