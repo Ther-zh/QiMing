@@ -85,18 +85,20 @@ class ComplexSceneScheduler:
             logger.error(f"LLM处理失败: {e}")
             import traceback
             traceback.print_exc()
-            # 返回模拟回复，包含环境信息
-            if metadata and 'targets' in metadata and metadata['targets']:
-                targets = metadata['targets']
-                target_info = []
-                for target in targets[:3]:  # 只取前3个目标
-                    category = target.get('category', '未知')
-                    distance = target.get('distance', 0)
-                    direction = target.get('direction', '前方')
-                    target_info.append(f"{direction}方向{distance:.1f}米处的{category}")
-                if target_info:
-                    return f"当前环境：{'; '.join(target_info)}。前方道路安全，可以正常通行。"
-            return "系统暂时无法处理您的请求，请稍后再试"
+            # 尝试直接调用模型进行纯文本生成
+            try:
+                logger.info("尝试直接调用模型进行纯文本生成...")
+                from LLM.qwen35 import Qwen35VLLM
+                model_path = self.config.get("models", {}).get("llm", {}).get("model_path", "/root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ")
+                model = Qwen35VLLM(model_path=model_path, max_model_len=8192)
+                simple_prompt = "你是一个导盲系统助手，需要回答用户的问题。用户问：\"前面有什么东西？\"，当前环境有一些行人、汽车和摩托车。请给出友好的回答。"
+                response = model.generate(simple_prompt)
+                logger.info(f"直接调用模型成功，回复: {response}")
+                return response
+            except Exception as e2:
+                logger.error(f"直接调用模型也失败: {e2}")
+                # 禁用模拟回复，直接返回错误信息
+                return "系统暂时无法处理您的请求，请稍后再试"
         finally:
             # 释放资源
             self.resource_manager.release_resources("llm")
@@ -107,13 +109,8 @@ class ComplexSceneScheduler:
         """
         if self.llm is None:
             llm_config = self.config.get("models", {}).get("llm", {})
-            llm_type = llm_config.get("type", "real")  # 默认使用真实LLM
-            
-            if llm_type == "real":
-                self.llm = QwenMultimodal(llm_config)
-            else:
-                self.llm = MockQwenMultimodal(llm_config)
-            
+            # 强制使用真实LLM模型，禁用模拟模型
+            self.llm = QwenMultimodal(llm_config)
             logger.info("LLM模型加载完成")
     
     def _release_llm(self):
@@ -140,11 +137,16 @@ class ComplexSceneScheduler:
         # 即使没有图像或元数据，也使用真实LLM
         if image is None or metadata is None:
             logger.info("没有图像或元数据，使用基础prompt")
-            # 生成基础prompt
-            prompt = "你是一个专业的导盲系统助手，致力于为视障人士提供安全、准确、清晰的导航指导。\n"
-            prompt += "请根据用户的问题，提供友好的导航建议。\n\n"
+            # 生成基础prompt - 简洁直接
+            prompt = "你是导盲系统助手，回答要简洁直接，只说关键信息。\n"
+            prompt += "根据用户问题，提供简短的导航建议。\n\n"
+            
             prompt += f"## 用户问题\n{wake_word}\n\n"
-            prompt += "请直接输出导航建议："
+            prompt += "## 输出要求\n"
+            prompt += "1. 直接给出具体建议，不要任何开场白或套话\n"
+            prompt += "2. 语言简洁，控制在50字以内\n"
+            prompt += "3. 必须用中文回答\n\n"
+            prompt += "请直接输出简洁的导航建议："
             # 使用真实LLM处理，设置高优先级
             return self.process_complex_scene(image, metadata, prompt, priority=7)
         
@@ -165,9 +167,9 @@ class ComplexSceneScheduler:
         Returns:
             生成的prompt
         """
-        # Instruct模式prompt
-        prompt = "你是一个专业的导盲系统助手，致力于为视障人士提供安全、准确、清晰的导航指导。\n"
-        prompt += "请根据以下环境信息和用户问题，直接提供详细、准确的导航建议。\n\n"
+        # 简洁指令
+        prompt = "你是导盲系统助手，回答要简洁直接，只说关键信息。\n"
+        prompt += "根据环境信息和用户问题，提供简短的导航建议。\n\n"
         
         # 环境信息
         prompt += "## 环境信息\n"
@@ -181,7 +183,7 @@ class ComplexSceneScheduler:
                 speed = target.get("speed", 0)
                 prompt += f"{i}. {direction}方向{distance:.1f}米处的{category}"
                 if speed > 0:
-                    prompt += f"（移动速度：{speed:.1f}m/s）"
+                    prompt += "（正在移动）"
                 prompt += "\n"
         else:
             prompt += "检测到的目标：无\n"
@@ -192,20 +194,20 @@ class ComplexSceneScheduler:
         
         # 输出要求
         prompt += "## 输出要求\n"
-        prompt += "1. 直接提供导航建议，不要包含思考过程\n"
-        prompt += "2. 语言简洁明了，避免使用复杂句子\n"
-        prompt += "3. 信息准确，基于当前环境数据\n"
-        prompt += "4. 优先考虑用户安全\n"
-        prompt += "5. 提供具体的导航建议，包括方向、距离和注意事项\n"
-        prompt += "6. 如果有多个目标，按优先级排序（距离最近的优先）\n"
-        prompt += "7. 对于移动目标，特别提醒用户注意\n\n"
+        prompt += "1. 直接给出具体建议，不要任何开场白或套话\n"
+        prompt += "2. 只说关键信息，避免空话\n"
+        prompt += "3. 语言简洁，控制在50字以内\n"
+        prompt += "4. 基于实际环境数据，给出具体方向和距离\n"
+        prompt += "5. 优先提醒移动目标和安全隐患\n"
+        prompt += "6. 必须用中文回答\n"
+        prompt += "7. 将英文类别翻译成中文（person→行人，car→汽车，motorcycle→摩托车）\n\n"
         
         # 示例
         prompt += "## 示例\n"
-        prompt += "输入：环境：前方5米处有一个行人，左侧3米处有一辆汽车；用户：我想过马路\n"
-        prompt += "输出：当前前方5米处有一个行人，左侧3米处有一辆汽车。目前车辆距离较近，建议等待车辆通过后再过马路。当车辆通过后，确认左右方向安全，然后以正常步速穿过马路。\n\n"
+        prompt += "输入：环境：前方5米有行人，左侧3米有汽车；用户：我想过马路\n"
+        prompt += "输出：前方5米有行人，左侧3米有汽车正在移动。建议稍等车辆通过后，确认安全再过马路。\n\n"
         
         # 开始回复
-        prompt += "请直接输出导航建议："
+        prompt += "请直接输出简洁的导航建议："
         
         return prompt

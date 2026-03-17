@@ -52,10 +52,17 @@ class ResourceManager:
         Returns:
             是否申请成功
         """
+        # 获取verbose配置
+        try:
+            verbose = self.config.get("system", {}).get("verbose", True)
+        except Exception:
+            verbose = True
+        
         with self.lock:
             # 对于危险警报等紧急任务，即使资源被占用也允许申请
             if priority > 5:
-                logger.info(f"高优先级任务 {resource_type} 强制申请资源")
+                if verbose:
+                    logger.info(f"高优先级任务 {resource_type} 强制申请资源")
                 # 对于最高优先级的危险警报，直接返回成功
                 if priority > 8:
                     return True
@@ -65,24 +72,29 @@ class ResourceManager:
                 # 检查系统资源
                 if self._check_system_resources():
                     self.resources[resource_type] = True
-                    logger.info(f"资源 {resource_type} 申请成功")
+                    if verbose:
+                        logger.info(f"资源 {resource_type} 申请成功")
                     return True
                 else:
                     # 对于高优先级任务，即使系统资源不足也允许申请
                     if priority > 3:
-                        logger.warning(f"系统资源不足，但高优先级任务 {resource_type} 强制申请资源")
+                        if verbose:
+                            logger.warning(f"系统资源不足，但高优先级任务 {resource_type} 强制申请资源")
                         self.resources[resource_type] = True
                         return True
                     else:
-                        logger.warning(f"系统资源不足，无法申请 {resource_type}")
+                        if verbose:
+                            logger.warning(f"系统资源不足，无法申请 {resource_type}")
                         return False
             else:
                 # 对于高优先级任务，尝试抢占资源
                 if priority > 5:
-                    logger.info(f"高优先级任务 {resource_type} 抢占资源")
+                    if verbose:
+                        logger.info(f"高优先级任务 {resource_type} 抢占资源")
                     return True
                 else:
-                    logger.warning(f"资源 {resource_type} 已被占用")
+                    if verbose:
+                        logger.warning(f"资源 {resource_type} 已被占用")
                     return False
     
     def release_resources(self, resource_type: str):
@@ -92,10 +104,17 @@ class ResourceManager:
         Args:
             resource_type: 资源类型
         """
+        # 获取verbose配置
+        try:
+            verbose = self.config.get("system", {}).get("verbose", True)
+        except Exception:
+            verbose = True
+        
         with self.lock:
             if self.resources[resource_type]:
                 self.resources[resource_type] = False
-                logger.info(f"资源 {resource_type} 已释放")
+                if verbose:
+                    logger.info(f"资源 {resource_type} 已释放")
     
     def update_heartbeat(self, module_name: str):
         """

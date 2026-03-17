@@ -31,9 +31,8 @@ class QwenMultimodal:
             print(f"[LLM] 模型加载成功: {self.model_path}")
         except Exception as e:
             print(f"[LLM] 模型加载失败: {e}")
-            # 如果无法加载真实模型，使用模拟实现
-            print("[LLM] 使用模拟实现")
-            self.model = self._create_mock_model()
+            # 禁用模拟实现，直接抛出异常
+            raise
     
     def _create_mock_model(self):
         """
@@ -62,7 +61,7 @@ class QwenMultimodal:
         # 执行推理
         response = self.model.generate(
             text=prompt,
-            image=image if image else None,
+            image=image if image is not None else None,
             max_tokens=100
         )
         

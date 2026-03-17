@@ -184,6 +184,12 @@ class TargetTracker:
         Args:
             current_timestamp: 当前时间戳
         """
+        # 获取verbose配置
+        try:
+            verbose = self.config.get("system", {}).get("verbose", True)
+        except Exception:
+            verbose = True
+        
         expired_ids = []
         
         for target_id, history in self.track_history.items():
@@ -199,4 +205,5 @@ class TargetTracker:
         # 清理过期目标
         for target_id in expired_ids:
             del self.track_history[target_id]
-            logger.debug(f"目标 {target_id} 已过期，已清理")
+            if verbose:
+                logger.debug(f"目标 {target_id} 已过期，已清理")

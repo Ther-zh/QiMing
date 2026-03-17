@@ -25,6 +25,9 @@ class Logger:
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
         
+        # 禁用传播到root logger，防止其他库（如vLLM）的日志配置影响输出
+        self.logger.propagate = False
+        
         # 避免重复添加handler
         if not self.logger.handlers:
             # 创建file handler

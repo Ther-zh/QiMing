@@ -75,7 +75,13 @@ class RealtimeScheduler:
         
         # 检查是否需要跳过告警
         if risk_result.get('skip_alert', False):
-            logger.debug("安全状态，跳过告警")
+            # 只在verbose模式下输出调试信息
+            try:
+                verbose = self.config.get("system", {}).get("verbose", True)
+                if verbose:
+                    logger.debug("安全状态，跳过告警")
+            except Exception:
+                pass
             return
         
         # 评估危险等级

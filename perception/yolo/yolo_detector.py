@@ -23,10 +23,15 @@ class YoloDetector:
         try:
             # 这里使用YOLOv8的官方库
             from ultralytics import YOLO
+            # 禁用YOLO的默认输出
+            import logging
+            logging.getLogger('ultralytics').setLevel(logging.WARNING)
             self.model = YOLO(self.model_path)
-            print(f"[YOLO] 模型加载成功: {self.model_path}")
+            from utils.logger import logger
+            logger.info(f"[YOLO] 模型加载成功: {self.model_path}")
         except Exception as e:
-            print(f"[YOLO] 模型加载失败: {e}")
+            from utils.logger import logger
+            logger.error(f"[YOLO] 模型加载失败: {e}")
             raise
     
     def inference(self, image: np.ndarray) -> List[Dict[str, Any]]:

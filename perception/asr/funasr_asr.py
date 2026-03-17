@@ -153,6 +153,16 @@ class FunASRRecognizer:
         Returns:
             Tuple[bool, str]: (是否检测到唤醒词, 语音转文本结果)
         """
+        from utils.logger import logger
+        from utils.config_loader import config_loader
+        
+        # 获取verbose配置
+        try:
+            config = config_loader.get_config()
+            verbose = config.get("system", {}).get("verbose", True)
+        except Exception:
+            verbose = True
+        
         if self.model is None:
             raise RuntimeError("ASR模型未加载")
         
@@ -163,34 +173,40 @@ class FunASRRecognizer:
         try:
             # 只有当音频数据足够长时才执行处理
             if len(audio_data) > self.sample_rate * 0.3:  # 至少0.3秒
-                print(f"[ASR] 处理音频，长度: {len(audio_data)} 样本")
+                if verbose:
+                    print(f"[ASR] 处理音频，长度: {len(audio_data)} 样本")
                 
                 # 检测语音活动
                 is_speech = self._detect_voice_activity(audio_data)
-                print(f"[ASR] 语音活动检测: {is_speech}")
+                if verbose:
+                    print(f"[ASR] 语音活动检测: {is_speech}")
                 
                 # 直接使用完整识别
                 try:
                     asr_text = self.model.recognize(audio_data, clean_output=True)
-                    print(f"[ASR] 原始识别结果: '{asr_text}'")
+                    if verbose:
+                        print(f"[ASR] 原始识别结果: '{asr_text}'")
                     
                     # 不添加标点（根据要求）
                     # asr_text = self._add_punctuation(asr_text)
                     # print(f"[ASR] 带标点结果: '{asr_text}'")
                 except Exception as e:
-                    print(f"[ASR] 模型识别失败: {e}")
-                    import traceback
-                    traceback.print_exc()
+                    if verbose:
+                        print(f"[ASR] 模型识别失败: {e}")
+                        import traceback
+                        traceback.print_exc()
             
         except Exception as e:
-            print(f"[ASR] 推理失败: {e}")
-            import traceback
-            traceback.print_exc()
+            if verbose:
+                print(f"[ASR] 推理失败: {e}")
+                import traceback
+                traceback.print_exc()
             asr_text = ""
         
         # 检查是否已经处于唤醒状态
         if self.wake_state:
-            print(f"[ASR] 处于唤醒状态")
+            if verbose:
+                print(f"[ASR] 处于唤醒状态")
             # 添加当前音频到唤醒缓冲
             self.wake_audio_buffer.extend(audio_data.tolist())
             
@@ -198,65 +214,75 @@ class FunASRRecognizer:
             is_speech = self._detect_voice_activity(audio_data)
             if not is_speech:
                 self.wake_silence_counter += 1
-                print(f"[ASR] 唤醒后静默计数: {self.wake_silence_counter}")
+                if verbose:
+                    print(f"[ASR] 唤醒后静默计数: {self.wake_silence_counter}")
             else:
                 self.wake_silence_counter = 0
             
             # 如果静默时间达到阈值，认为句子结束
             if self.wake_silence_counter >= self.wake_silence_threshold or is_final:
-                print(f"[ASR] 唤醒后句子结束")
+                if verbose:
+                    print(f"[ASR] 唤醒后句子结束")
                 # 处理完整的唤醒句子
                 if len(self.wake_audio_buffer) > self.sample_rate * 0.5:  # 至少0.5秒
                     wake_audio = np.array(self.wake_audio_buffer)
                     try:
                         wake_text = self.model.recognize(wake_audio, clean_output=True)
-                        print(f"[ASR] 唤醒句子识别结果: '{wake_text}'")
+                        if verbose:
+                            print(f"[ASR] 唤醒句子识别结果: '{wake_text}'")
                         # 使用唤醒句子作为最终结果
                         asr_text = wake_text
                     except Exception as e:
-                        print(f"[ASR] 唤醒句子识别失败: {e}")
+                        if verbose:
+                            print(f"[ASR] 唤醒句子识别失败: {e}")
                 
                 # 重置唤醒状态
                 self.wake_state = False
                 self.wake_audio_buffer = []
                 self.wake_silence_counter = 0
                 wake_detected = True  # 确保返回唤醒状态
-                print(f"[ASR] 唤醒处理完成，返回wake_detected=True")
+                if verbose:
+                    print(f"[ASR] 唤醒处理完成，返回wake_detected=True")
         elif is_final and asr_text:
             # 在最终片段中也检测唤醒词
-            print(f"[ASR] 处理最终片段，检测唤醒词")
+            if verbose:
+                print(f"[ASR] 处理最终片段，检测唤醒词")
             # 去除常用标点符号，避免标点干扰唤醒词检测
             import re
             clean_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', asr_text)
-            print(f"[ASR] 去除标点后的文本: '{clean_text}'")
+            if verbose:
+                print(f"[ASR] 去除标点后的文本: '{clean_text}'")
             
             # 在原始文本和清洗后的文本中都检测
             wake_detected = any(word in asr_text or word in clean_text for word in self.wake_words)
             if wake_detected:
-                print(f"[ASR] 检测到唤醒词")
-                for word in self.wake_words:
-                    if word in asr_text or word in clean_text:
-                        print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
-                        print(f"[ASR] 检测到唤醒词，立即返回wake_detected=True")
-                        return True, asr_text
+                if verbose:
+                    print(f"[ASR] 检测到唤醒词")
+                    for word in self.wake_words:
+                        if word in asr_text or word in clean_text:
+                            print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
+                            print(f"[ASR] 检测到唤醒词，立即返回wake_detected=True")
+                return True, asr_text
         else:
             # 简单的唤醒词检测 - 先去除标点符号再检测
             if asr_text:
                 # 去除常用标点符号，避免标点干扰唤醒词检测
                 import re
                 clean_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', asr_text)
-                print(f"[ASR] 去除标点后的文本: '{clean_text}'")
+                if verbose:
+                    print(f"[ASR] 去除标点后的文本: '{clean_text}'")
                 
                 # 在原始文本和清洗后的文本中都检测
                 wake_detected = any(word in asr_text or word in clean_text for word in self.wake_words)
                 if wake_detected:
-                    print(f"[ASR] 检测到唤醒词")
-                    for word in self.wake_words:
-                        if word in asr_text or word in clean_text:
-                            print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
-                            # 立即返回唤醒状态，不需要等待句子结束
-                            print(f"[ASR] 检测到唤醒词，立即返回wake_detected=True")
-                            return True, asr_text
+                    if verbose:
+                        print(f"[ASR] 检测到唤醒词")
+                        for word in self.wake_words:
+                            if word in asr_text or word in clean_text:
+                                print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
+                                # 立即返回唤醒状态，不需要等待句子结束
+                                print(f"[ASR] 检测到唤醒词，立即返回wake_detected=True")
+                    return True, asr_text
         
         return wake_detected, asr_text
     

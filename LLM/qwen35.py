@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from typing import Optional, Union, List
 from PIL import Image
 from vllm import LLM, SamplingParams
@@ -33,6 +34,7 @@ class Qwen35VLLM:
             "tensor_parallel_size": tensor_parallel_size,
             "trust_remote_code": True,
             "gpu_memory_utilization": 0.3, # 限制显存占用到约6GB
+            "disable_log_stats": True,  # 禁用日志统计
         }
         
         # 更新用户传入的参数
@@ -42,27 +44,52 @@ class Qwen35VLLM:
         self.llm = LLM(model=model_path, **default_kwargs)
         
         # 默认采样参数
+        # 语音助手适配的采样参数（关闭思考后官方推荐配置）
+        # 通过extra_args传递chat_template_kwargs来禁用思考模式
         self.default_sampling_params = SamplingParams(
-            temperature=0.7,
-            top_p=0.9,
-            max_tokens=2048,
-            stop_token_ids=[151645, 151643] # Qwen 的停止 token
+            temperature=0.6,
+            top_p=0.8,
+            top_k=20,
+            max_tokens=512,  # 语音助手回复无需太长，减少无效生成耗时
+            stop=["<|im_end|>", "</think>"],  # 兜底stop词：万一出现思考标签直接截断
+            presence_penalty=1.5,  # 增加重复惩罚，减少重复输出
+            frequency_penalty=1.0,  # 增加频率惩罚，减少重复输出
+            extra_args={"chat_template_kwargs": {"enable_thinking": False}}  # 禁用思考模式
         )
         
         print("[System] 模型加载完成！")
 
-    def _build_prompt(self, text: str, has_image: bool) -> str:
+    def _build_prompt(self, text: str, has_image: bool = False, image_data=None) -> str:
         """
         构建 Qwen3.5 所需的 Prompt 格式。
-        如果有图片，需要在文本前加上视觉占位符。
+        使用官方apply_chat_template方法生成prompt，确保与全局禁用思考配置兼容。
         """
-        # Qwen3.5 多模态标准格式: <|vision_start|><|image_pad|><|vision_end|>...
-        if has_image:
-            # 注意：具体的占位符可能因模型版本微调而异，
-            # 通常 vllm 内部会处理，但显式加上更保险。
-            # 这里使用通义千问常用的格式
-            return f"<|vision_start|><|image_pad|><|vision_end|>{text}"
-        return text
+        # 【必须用官方方法生成prompt，不要自己乱拼】
+        # 构造对话消息
+        messages = []
+        
+        # 如果有图片，使用多模态消息格式
+        if has_image and image_data is not None:
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": image_data},
+                    {"type": "text", "text": text}
+                ]
+            })
+        else:
+            # 纯文本消息
+            messages.append({"role": "user", "content": text})
+        
+        # 使用官方tokenizer的apply_chat_template生成prompt
+        # 全局已关闭思考模式，无需额外加参数
+        prompt = self.llm.get_tokenizer().apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        
+        return prompt
 
     def generate(
         self,
@@ -90,13 +117,22 @@ class Qwen35VLLM:
                 pil_image = Image.open(image).convert("RGB")
             elif isinstance(image, Image.Image):
                 pil_image = image.convert("RGB")
+            elif isinstance(image, np.ndarray):
+                # 处理numpy数组（OpenCV格式）
+                if len(image.shape) == 3 and image.shape[2] == 3:
+                    # BGR格式转RGB
+                    if image.dtype == np.uint8:
+                        pil_image = Image.fromarray(image[:, :, ::-1])
+                    else:
+                        # 非uint8类型，先归一化到0-255
+                        image = (image * 255).astype(np.uint8)
+                        pil_image = Image.fromarray(image[:, :, ::-1])
+                else:
+                    raise ValueError("Numpy array must be RGB format (H, W, 3)")
             else:
-                raise ValueError("Image must be a file path or a PIL.Image object")
+                raise ValueError("Image must be a file path, PIL.Image object, or numpy array")
 
-        # 2. 构建 Prompt
-        prompt = self._build_prompt(text, has_image=(pil_image is not None))
-
-        # 3. 合并采样参数
+        # 2. 合并采样参数
         current_sp = sampling_params or self.default_sampling_params
         if kwargs:
             # 如果有临时参数，创建一个新的对象
@@ -104,45 +140,56 @@ class Qwen35VLLM:
                 temperature=kwargs.get("temperature", current_sp.temperature),
                 top_p=kwargs.get("top_p", current_sp.top_p),
                 max_tokens=kwargs.get("max_tokens", current_sp.max_tokens),
-                stop_token_ids=current_sp.stop_token_ids
+                stop=current_sp.stop,
+                extra_args=current_sp.extra_args if hasattr(current_sp, 'extra_args') else None
             )
 
-        # 4. 执行生成
-        # 注意：vllm 的 generate 通常是批量的，这里我们只传一条
-        try:
-            print(f"[LLM] 执行生成，prompt: {prompt[:100]}...")
-            if pil_image is not None:
-                print(f"[LLM] 多模态输入，图像大小: {pil_image.size}")
-                # 多模态输入 - 尝试传递图像数据
-                try:
-                    outputs = self.llm.generate(
-                        prompts=prompt,
-                        multi_modal_data=[{"image": pil_image}],
-                        sampling_params=current_sp
-                    )
-                    print("[LLM] 多模态输入生成")
-                except Exception as e:
-                    print(f"[LLM] 多模态输入失败: {e}")
-                    # 回退到纯文本输入
-                    outputs = self.llm.generate(
-                        prompts=prompt,
-                        sampling_params=current_sp
-                    )
-                    print("[LLM] 回退到纯文本输入生成")
-            else:
-                # 纯文本输入
-                outputs = self.llm.generate(
-                    prompts=prompt,
-                    sampling_params=current_sp
-                )
-                print("[LLM] 纯文本输入生成")
+        # 3. 构建消息格式
+        # 使用chat方法，可以传递chat_template_kwargs来禁用思考模式
+        messages = []
+        mm_data = None
+        if pil_image is not None:
+            # 多模态消息 - 使用OpenAI兼容格式
+            # 将PIL Image转换为base64编码的data URL
+            import base64
+            from io import BytesIO
+            buffered = BytesIO()
+            pil_image.save(buffered, format="JPEG")
+            img_base64 = base64.b64encode(buffered.getvalue()).decode()
+            img_url = f"data:image/jpeg;base64,{img_base64}"
             
-            # 打印输出信息
-            print(f"[LLM] 生成完成，输出数量: {len(outputs)}")
-            if outputs:
-                print(f"[LLM] 输出内容: {outputs[0].outputs[0].text[:100]}...")
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": img_url}},
+                    {"type": "text", "text": text}
+                ]
+            })
+        else:
+            # 纯文本消息
+            messages.append({"role": "user", "content": text})
+
+        # 4. 执行生成
+        # 使用chat方法，传递chat_template_kwargs来禁用思考模式
+        try:
+            import sys
+            print(f"[LLM] 执行生成...")
+            sys.stdout.flush()
+            
+            outputs = self.llm.chat(
+                messages=messages,
+                sampling_params=current_sp,
+                chat_template_kwargs={"enable_thinking": False}  # 禁用思考模式
+            )
+            
+            print("[LLM] 生成完成")
+            sys.stdout.flush()
+            
         except Exception as e:
             print(f"[LLM] 生成失败: {e}")
+            import traceback
+            traceback.print_exc()
+            sys.stdout.flush()
             return "前方道路安全，可以正常通行"
 
         # 5. 解析结果
@@ -150,12 +197,15 @@ class Qwen35VLLM:
             result = outputs[0].outputs[0].text.strip()
             if result:
                 print(f"[LLM] 生成结果: {result[:100]}...")
+                sys.stdout.flush()
                 return result
             else:
                 print("[LLM] 生成结果为空")
+                sys.stdout.flush()
                 return "前方道路安全，可以正常通行"
         else:
             print("[LLM] 没有生成结果")
+            sys.stdout.flush()
             return "前方道路安全，可以正常通行"
 
     def batch_generate(
