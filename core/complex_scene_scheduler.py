@@ -32,6 +32,8 @@ class ComplexSceneScheduler:
         启动调度引擎
         """
         self.running = True
+        # 启动时加载LLM模型
+        self._load_llm()
         self.scheduler_thread.start()
         logger.info("复杂场景智能调度引擎已启动")
     
@@ -54,7 +56,7 @@ class ComplexSceneScheduler:
             # 暂时模拟处理
             time.sleep(0.5)
     
-    def process_complex_scene(self, image: Image.Image, metadata: Dict[str, Any], prompt: str) -> Optional[str]:
+    def process_complex_scene(self, image: Image.Image, metadata: Dict[str, Any], prompt: str, priority: int = 0) -> Optional[str]:
         """
         处理复杂场景
         
@@ -62,28 +64,28 @@ class ComplexSceneScheduler:
             image: 输入图像
             metadata: 环境元数据
             prompt: 用户指令或预设prompt
+            priority: 优先级，值越高优先级越高
             
         Returns:
             LLM生成的回复
         """
         # 向资源管理器申请资源
-        if not self.resource_manager.request_resources("llm"):
+        if not self.resource_manager.request_resources("llm", priority=priority):
             logger.warning("资源不足，无法处理复杂场景")
-            return None
+            return "资源不足，无法处理当前场景"
         
         try:
-            # 加载LLM
-            self._load_llm()
-            
             # 执行推理
             input_data = (image, metadata, prompt)
             response = self.llm.inference(input_data)
             
             logger.info(f"LLM回复: {response}")
             return response
+        except Exception as e:
+            logger.error(f"LLM处理失败: {e}")
+            return "系统暂时无法处理您的请求，请稍后再试"
         finally:
-            # 释放LLM和资源
-            self._release_llm()
+            # 释放资源
             self.resource_manager.release_resources("llm")
     
     def _load_llm(self):
@@ -92,7 +94,7 @@ class ComplexSceneScheduler:
         """
         if self.llm is None:
             llm_config = self.config.get("models", {}).get("llm", {})
-            llm_type = llm_config.get("type", "mock")
+            llm_type = llm_config.get("type", "real")  # 默认使用真实LLM
             
             if llm_type == "real":
                 self.llm = QwenMultimodal(llm_config)
@@ -122,16 +124,22 @@ class ComplexSceneScheduler:
         Returns:
             LLM生成的回复
         """
-        # 如果没有图像或元数据，就直接使用mock LLM返回一个简单回复
-        if self.config.get("models", {}).get("llm", {}).get("type", "mock") == "mock" or image is None or metadata is None:
-            logger.info("使用Mock LLM回复唤醒词")
-            return "好的，我正在帮您查看前方路况，请稍等..."
+        # 即使没有图像或元数据，也使用真实LLM
+        if image is None or metadata is None:
+            logger.info("没有图像或元数据，使用基础prompt")
+            # 生成基础prompt
+            prompt = "你是一个专业的导盲系统助手，致力于为视障人士提供安全、准确、清晰的导航指导。\n"
+            prompt += "请根据用户的问题，提供友好的导航建议。\n\n"
+            prompt += f"## 用户问题\n{wake_word}\n\n"
+            prompt += "请直接输出导航建议："
+            # 使用真实LLM处理，设置高优先级
+            return self.process_complex_scene(image, metadata, prompt, priority=7)
         
         # 根据唤醒词生成prompt
         prompt = self._generate_prompt(wake_word, metadata)
         
-        # 处理复杂场景
-        return self.process_complex_scene(image, metadata, prompt)
+        # 处理复杂场景，设置高优先级
+        return self.process_complex_scene(image, metadata, prompt, priority=7)
     
     def _generate_prompt(self, wake_word: str, metadata: Dict[str, Any]) -> str:
         """

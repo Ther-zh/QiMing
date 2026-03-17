@@ -41,7 +41,7 @@ class InferenceThread(threading.Thread):
         self.asr_results = []
         self.llm_results = []
         # 唤醒词列表
-        self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学"]
+        self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学", "小"]
         # 累积的ASR文本（用于检测跨片段的唤醒词）
         self.cumulative_asr_text = ""
     

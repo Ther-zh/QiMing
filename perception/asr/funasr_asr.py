@@ -25,7 +25,7 @@ class FunASRRecognizer:
         # 流式识别缓存
         self.stream_cache = {}
         # 唤醒词列表
-        self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学"]
+        self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学", "小"]
         # 语音活动检测状态
         self.is_speaking = False
         # 句子结束标志
@@ -35,6 +35,15 @@ class FunASRRecognizer:
         self.silence_threshold = 5  # 5个周期无语音视为静默
         # 最小识别长度（秒）
         self.min_recognition_length = 1.0
+        # 唤醒状态
+        self.wake_state = False
+        # 唤醒后音频缓冲
+        self.wake_audio_buffer = []
+        # 唤醒后静默计数器
+        self.wake_silence_counter = 0
+        self.wake_silence_threshold = 3  # 唤醒后3个周期无语音视为结束
+        # 采样率
+        self.sample_rate = 16000
     
     def _load_models(self):
         """
@@ -133,12 +142,13 @@ class FunASRRecognizer:
             print(f"[ASR] 标点添加失败: {e}")
             return text
     
-    def inference(self, audio_data: np.ndarray) -> Tuple[bool, str]:
+    def inference(self, audio_data: np.ndarray, is_final: bool = False) -> Tuple[bool, str]:
         """
-        执行语音识别 - 现在直接处理完整的累积音频！
+        执行语音识别 - 实时处理短片段音频
         
         Args:
             audio_data: 输入音频数据
+            is_final: 是否为最终片段
             
         Returns:
             Tuple[bool, str]: (是否检测到唤醒词, 语音转文本结果)
@@ -152,17 +162,21 @@ class FunASRRecognizer:
         # 执行语音识别
         try:
             # 只有当音频数据足够长时才执行处理
-            if len(audio_data) > 16000 * 0.3:  # 至少0.3秒
+            if len(audio_data) > self.sample_rate * 0.3:  # 至少0.3秒
                 print(f"[ASR] 处理音频，长度: {len(audio_data)} 样本")
+                
+                # 检测语音活动
+                is_speech = self._detect_voice_activity(audio_data)
+                print(f"[ASR] 语音活动检测: {is_speech}")
                 
                 # 直接使用完整识别
                 try:
                     asr_text = self.model.recognize(audio_data, clean_output=True)
                     print(f"[ASR] 原始识别结果: '{asr_text}'")
                     
-                    # 添加标点
-                    asr_text = self._add_punctuation(asr_text)
-                    print(f"[ASR] 带标点结果: '{asr_text}'")
+                    # 不添加标点（根据要求）
+                    # asr_text = self._add_punctuation(asr_text)
+                    # print(f"[ASR] 带标点结果: '{asr_text}'")
                 except Exception as e:
                     print(f"[ASR] 模型识别失败: {e}")
                     import traceback
@@ -174,21 +188,62 @@ class FunASRRecognizer:
             traceback.print_exc()
             asr_text = ""
         
-        # 简单的唤醒词检测 - 先去除标点符号再检测
-        if asr_text:
-            # 去除常用标点符号，避免标点干扰唤醒词检测
-            import re
-            clean_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', asr_text)
-            print(f"[ASR] 去除标点后的文本: '{clean_text}'")
+        # 检查是否已经处于唤醒状态
+        if self.wake_state:
+            print(f"[ASR] 处于唤醒状态")
+            # 添加当前音频到唤醒缓冲
+            self.wake_audio_buffer.extend(audio_data.tolist())
             
-            # 在原始文本和清洗后的文本中都检测
-            wake_detected = any(word in asr_text or word in clean_text for word in self.wake_words)
-            if wake_detected:
-                print(f"[ASR] 检测到唤醒词")
-                for word in self.wake_words:
-                    if word in asr_text or word in clean_text:
-                        print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
-                        break
+            # 检测语音活动
+            is_speech = self._detect_voice_activity(audio_data)
+            if not is_speech:
+                self.wake_silence_counter += 1
+                print(f"[ASR] 唤醒后静默计数: {self.wake_silence_counter}")
+            else:
+                self.wake_silence_counter = 0
+            
+            # 如果静默时间达到阈值，认为句子结束
+            if self.wake_silence_counter >= self.wake_silence_threshold or is_final:
+                print(f"[ASR] 唤醒后句子结束")
+                # 处理完整的唤醒句子
+                if len(self.wake_audio_buffer) > self.sample_rate * 0.5:  # 至少0.5秒
+                    wake_audio = np.array(self.wake_audio_buffer)
+                    try:
+                        wake_text = self.model.recognize(wake_audio, clean_output=True)
+                        print(f"[ASR] 唤醒句子识别结果: '{wake_text}'")
+                        # 使用唤醒句子作为最终结果
+                        asr_text = wake_text
+                    except Exception as e:
+                        print(f"[ASR] 唤醒句子识别失败: {e}")
+                
+                # 重置唤醒状态
+                self.wake_state = False
+                self.wake_audio_buffer = []
+                self.wake_silence_counter = 0
+                wake_detected = True  # 确保返回唤醒状态
+                print(f"[ASR] 唤醒处理完成，返回wake_detected=True")
+        else:
+            # 简单的唤醒词检测 - 先去除标点符号再检测
+            if asr_text:
+                # 去除常用标点符号，避免标点干扰唤醒词检测
+                import re
+                clean_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', asr_text)
+                print(f"[ASR] 去除标点后的文本: '{clean_text}'")
+                
+                # 在原始文本和清洗后的文本中都检测
+                wake_detected = any(word in asr_text or word in clean_text for word in self.wake_words)
+                if wake_detected:
+                    print(f"[ASR] 检测到唤醒词")
+                    for word in self.wake_words:
+                        if word in asr_text or word in clean_text:
+                            print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
+                            self.wake_state = True
+                            self.wake_audio_buffer = []  # 重置唤醒音频缓冲
+                            self.wake_silence_counter = 0
+                            # 添加当前音频到唤醒缓冲
+                            self.wake_audio_buffer.extend(audio_data.tolist())
+                            print(f"[ASR] 检测到唤醒词，进入唤醒状态")
+                            break
         
         return wake_detected, asr_text
     

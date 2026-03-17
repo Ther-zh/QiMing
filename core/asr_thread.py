@@ -49,7 +49,8 @@ class ASRThread(threading.Thread):
                     
                     if audio_data is not None:
                         # 执行ASR识别
-                        wake_detected, asr_text = self.asr.inference(audio_data)
+                        is_final = message.get("is_final", False)
+                        wake_detected, asr_text = self.asr.inference(audio_data, is_final)
                         
                         if asr_text:
                             # 只在识别到完整句子时输出

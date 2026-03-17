@@ -6,7 +6,23 @@
 
 导盲系统采用模块化、分层架构设计，以实时感知、智能决策和安全执行为核心，构建了一个多模态融合的辅助导航系统。系统通过摄像头、深度传感器和麦克风等多源数据输入，经过感知、融合、决策和执行四个主要环节，为视障人士提供实时的环境感知和导航辅助。
 
-### 1.2 核心数据流
+### 1.2 线程架构
+
+系统采用多线程架构，通过消息队列实现模块间通信，确保各模块并行处理数据，提高系统响应速度。
+
+**核心线程**：
+- **输入线程**：负责读取视频和音频数据，发送到对应消息队列
+- **视觉线程**：负责处理视频帧，执行YOLO目标检测和VDA深度估计
+- **ASR线程**：负责处理音频数据，执行语音识别和唤醒词检测
+- **推理线程**：负责处理视觉和ASR结果，执行风险评估和决策
+
+**消息队列**：
+- `audio`：音频数据队列
+- `vision`：视觉数据队列
+- `inference`：推理数据队列
+- `control`：控制消息队列
+
+### 1.3 核心数据流
 
 系统的核心数据流如下：
 
@@ -20,17 +36,18 @@
 4. **智能决策**：实时安全调度、复杂场景调度
 5. **执行反馈**：语音播报、调试可视化、视频记录
 
-### 1.3 模块间交互机制
+### 1.4 模块间交互机制
 
-系统采用事件驱动和轮询相结合的交互方式，各模块通过明确的接口进行数据交换：
+系统采用消息队列和事件驱动相结合的交互方式，各模块通过线程和消息队列进行数据交换：
 
-- **感知模块**：提供原始感知数据给融合模块
-- **融合模块**：将多源数据融合后生成环境元数据
-- **核心调度模块**：基于元数据进行风险评估和决策
-- **执行模块**：根据调度结果执行相应的操作
+- **输入线程**：从摄像头和麦克风获取数据，发送到`vision`和`audio`消息队列
+- **视觉线程**：从`vision`队列获取数据，执行目标检测和深度估计，发送结果到`inference`队列
+- **ASR线程**：从`audio`队列获取数据，执行语音识别，发送结果到`inference`队列
+- **推理线程**：从`inference`队列获取数据，执行数据融合、风险评估和决策，发送控制消息到`control`队列
 - **资源管理器**：统一管理系统资源，协调模块间资源分配，监控模块心跳
+- **执行模块**：根据决策结果执行语音播报和可视化
 
-### 1.4 任务调度逻辑
+### 1.5 任务调度逻辑
 
 系统采用三级调度机制：
 
@@ -39,6 +56,11 @@
 3. **复杂场景调度**：中优先级（优先级5），处理需要深度理解的复杂场景
 4. **常规推理**：低优先级（优先级0），处理常规的感知推理任务
 
+调度线程优先级：
+- 实时安全调度器：最高优先级（daemon=False）
+- 复杂场景调度器：次优先级（daemon=True）
+- 广播调度器：普通优先级（daemon=True）
+
 调度逻辑流程：
 - 实时调度器持续监控环境元数据，评估危险等级
 - 当检测到高风险目标时，立即触发安全告警
@@ -46,16 +68,42 @@
 - 当检测到唤醒词时，触发LLM处理用户指令
 - 复杂场景和唤醒词处理通过 LLM 进行深度分析，生成导航建议
 
-### 1.5 系统运行流程
+### 1.6 系统运行流程
 
-1. **系统初始化**：加载配置，初始化各模块
-2. **资源管理**：启动资源管理器，监控系统资源和模块心跳
-3. **数据采集**：启动摄像头模拟器，获取视频和音频数据
-4. **感知处理**：执行目标检测、深度估计和语音识别
-5. **数据融合**：同步多源数据，计算目标距离和速度
-6. **智能决策**：评估危险等级，处理复杂场景和用户指令
-7. **执行反馈**：语音播报导航建议，可视化系统状态
-8. **结果记录**：记录ASR和LLM结果，保存处理后的视频
+系统采用多线程架构，通过消息队列进行模块间通信，具体运行流程如下：
+
+1. **系统初始化**：
+   - 加载配置文件和风险规则
+   - 初始化各核心模块和线程
+   - 创建消息队列（audio、vision、inference、control）
+   - 初始化视频写入器和结果记录文件
+
+2. **线程启动**：
+   - **输入线程**：读取视频和音频数据，发送到对应队列
+   - **视觉线程**：处理视频帧，执行YOLO检测和VDA深度估计
+   - **ASR线程**：处理音频数据，执行语音识别和唤醒词检测
+   - **推理线程**：处理视觉和ASR结果，执行风险评估和决策
+
+3. **数据处理流程**：
+   - **视频处理**：每25帧采样一次，执行目标检测和深度估计
+   - **音频处理**：累积音频数据，一次性执行完整识别
+   - **数据融合**：计算目标距离，跟踪目标运动，封装元数据
+   - **决策推理**：评估危险等级，处理复杂场景，响应唤醒词
+
+4. **智能决策**：
+   - **实时安全调度**：评估危险等级，生成安全告警
+   - **复杂场景处理**：当风险分数超过60时，触发LLM分析
+   - **唤醒词响应**：检测到唤醒词时，调用LLM生成导航建议
+
+5. **执行反馈**：
+   - **语音播报**：根据优先级播报告警和导航建议
+   - **可视化**：显示处理后的视频帧和目标信息
+   - **结果记录**：记录ASR和LLM结果，保存处理后的视频
+
+6. **系统停止**：
+   - 接收视频结束消息后，继续运行15秒处理剩余消息
+   - 释放各模块资源
+   - 关闭视频写入器和结果文件
 
 ## 2. 功能模块详细设计
 
@@ -68,28 +116,47 @@
 **实现细节**：
 - 资源状态管理：跟踪各类资源的使用状态
 - 系统资源监控：实时监控 CPU、内存、GPU 使用率
-- 模块心跳检测：监控各模块的运行状态，及时发现异常
+- 模块心跳检测：监控各模块的运行状态，及时发现异常（500ms超时检测）
 - 资源申请与释放：提供资源申请接口，支持优先级管理
 - 资源优先级：支持不同优先级的资源申请，确保高优先级任务优先获得资源
+- 强制资源分配：高优先级任务（priority > 5）可强制申请资源，最高优先级任务（priority > 8）直接获得资源
 
 **关键代码**：
 ```python
 # 资源申请逻辑
 def request_resources(self, resource_type: str, priority: int = 0) -> bool:
     with self.lock:
+        # 对于危险警报等紧急任务，即使资源被占用也允许申请
+        if priority > 5:
+            logger.info(f"高优先级任务 {resource_type} 强制申请资源")
+            # 对于最高优先级的危险警报，直接返回成功
+            if priority > 8:
+                return True
+        
         # 检查资源是否可用
-        if not self.resources.get(resource_type, False):
+        if not self.resources[resource_type]:
             # 检查系统资源
             if self._check_system_resources():
                 self.resources[resource_type] = True
-                logger.info(f"资源 {resource_type} 申请成功，优先级: {priority}")
+                logger.info(f"资源 {resource_type} 申请成功")
                 return True
             else:
-                logger.warning(f"系统资源不足，无法申请 {resource_type}")
-                return False
+                # 对于高优先级任务，即使系统资源不足也允许申请
+                if priority > 3:
+                    logger.warning(f"系统资源不足，但高优先级任务 {resource_type} 强制申请资源")
+                    self.resources[resource_type] = True
+                    return True
+                else:
+                    logger.warning(f"系统资源不足，无法申请 {resource_type}")
+                    return False
         else:
-            logger.warning(f"资源 {resource_type} 已被占用")
-            return False
+            # 对于高优先级任务，尝试抢占资源
+            if priority > 5:
+                logger.info(f"高优先级任务 {resource_type} 抢占资源")
+                return True
+            else:
+                logger.warning(f"资源 {resource_type} 已被占用")
+                return False
 ```
 
 #### 2.1.2 实时安全调度器 (RealtimeScheduler)
@@ -102,6 +169,8 @@ def request_resources(self, resource_type: str, priority: int = 0) -> bool:
 - 告警级别评估：根据风险分确定告警级别
 - 告警触发机制：考虑连续告警帧数和冷却时间，避免误报
 - 特殊场景处理：针对人行横道、交叉路口等特殊场景进行专门处理
+- 复杂场景触发：当风险分数超过60时，触发复杂场景处理
+- 安全状态跳过：对于安全状态（风险分数较低），跳过告警生成
 
 **关键代码**：
 ```python
@@ -117,6 +186,11 @@ def process_metadata(self, metadata: Dict[str, Any]):
     if special_scene_result:
         risk_result = special_scene_result
     
+    # 检查是否需要跳过告警
+    if risk_result.get('skip_alert', False):
+        logger.debug("安全状态，跳过告警")
+        return
+    
     # 评估危险等级
     alert = self._evaluate_risk_level(
         risk_result['risk_score'],
@@ -129,6 +203,10 @@ def process_metadata(self, metadata: Dict[str, Any]):
     
     if alert:
         self.alert_queue.append(alert)
+    
+    # 如果风险等级较高，触发复杂场景引擎
+    if risk_result['risk_score'] >= 60:
+        self.complex_scene_trigger.set()
 ```
 
 #### 2.1.3 风险评价器 (RiskEvaluator)
@@ -136,16 +214,19 @@ def process_metadata(self, metadata: Dict[str, Any]):
 **设计思路**：基于 AHP 层次分析法和模糊综合评价，构建科学的危险评价体系。
 
 **实现细节**：
-- AHP 权重计算：使用层次分析法计算各因素权重
+- AHP 权重计算：使用层次分析法计算各因素权重，并进行一致性检验
 - 模糊综合评价：使用梯形隶属度函数进行模糊评价
 - 特殊场景处理：针对人行横道、交叉路口、施工区域等特殊场景
 - 风险等级评估：综合考虑距离、速度、类别和场景复杂度
+- 静止车辆特殊处理：当车辆静止但距离很近时，视为障碍物，提高风险
+- 场景复杂度计算：基于目标类型、数量和特殊场景元素
 
 **关键代码**：
 ```python
 # AHP权重计算
 def _calculate_ahp_weights(self) -> Dict[str, float]:
     # 构造判断矩阵（1-9标度法）
+    # 因素：距离、速度、类别、场景复杂度
     judgment_matrix = np.array([
         [1, 3, 2, 4],  # 距离
         [1/3, 1, 1/2, 2],  # 速度
@@ -161,12 +242,155 @@ def _calculate_ahp_weights(self) -> Dict[str, float]:
     # 归一化权重
     weights = max_eigenvector.real / np.sum(max_eigenvector.real)
     
+    # 一致性检验
+    n = judgment_matrix.shape[0]
+    ci = (max_eigenvalue - n) / (n - 1)
+    ri = [0, 0, 0.58, 0.90, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49]
+    cr = ci / ri[n-1] if n > 2 else 0
+    
+    if cr < 0.1:
+        logger.info(f"AHP一致性检验通过，CR={cr:.3f}")
+    else:
+        logger.warning(f"AHP一致性检验未通过，CR={cr:.3f}")
+    
     return {
         'distance': weights[0],
         'speed': weights[1],
         'category': weights[2],
         'scene_complexity': weights[3]
     }
+
+# 模糊评价函数
+def _fuzzy_evaluation(self, value: float, param_name: str) -> Dict[str, float]:
+    params = self.fuzzy_params.get(param_name, {})
+    memberships = {}
+    
+    for level, (a, m, b) in params.items():
+        if value <= a:
+            memberships[level] = 0
+        elif a < value <= m:
+            memberships[level] = (value - a) / (m - a)
+        elif m < value <= b:
+            memberships[level] = (b - value) / (b - m)
+        else:
+            memberships[level] = 0
+    
+    return memberships
+
+# 评估危险等级
+def evaluate_risk(self, metadata: Dict[str, Any]) -> Dict[str, Any]:
+    targets = metadata.get("targets", [])
+    if not targets:
+        return {
+            'risk_level': 'level4',
+            'risk_score': 0,
+            'message': '道路安全',
+            'details': '无目标',
+            'skip_alert': True  # 标记为跳过告警
+        }
+    
+    # 计算每个目标的风险
+    target_risks = []
+    for target in targets:
+        category = target.get("category", "unknown")
+        distance = target.get("distance", 10.0)
+        speed = target.get("speed", 0.0)
+        
+        # 模糊评价
+        distance_membership = self._fuzzy_evaluation(distance, 'distance')
+        speed_membership = self._fuzzy_evaluation(speed, 'speed')
+        category_score = self._get_category_risk_score(category)
+        category_membership = self._fuzzy_evaluation(category_score, 'category')
+        
+        # 计算各因素得分
+        # 1. 距离因素：距离越近，风险越高
+        distance_score = max(0, 10 - min(distance, 10))
+        
+        # 2. 速度因素：
+        # 对于车辆：速度越快，风险越高；速度为0（静止）时，风险降低
+        # 对于行人：适中速度风险较低，过快或过慢风险较高
+        if category in ['car', 'bus', 'truck', 'bicycle', 'motorcycle']:
+            if speed < 1.0:  # 静止或几乎静止
+                speed_score = 2  # 基础风险
+            else:
+                speed_score = min(10, speed * 0.3)  # 速度越快，风险越高
+        else:  # 行人等其他目标
+            if speed < 0.5 or speed > 5.0:
+                speed_score = 6  # 过慢或过快
+            else:
+                speed_score = 3  # 正常速度
+        
+        # 3. 类别因素
+        category_score = self._get_category_risk_score(category)
+        
+        # 4. 场景复杂度
+        scene_complexity = self._calculate_scene_complexity(targets)
+        scene_score = min(scene_complexity / 100, 1.0) * 10
+        
+        # 5. 静止车辆特殊处理：如果车辆静止但距离很近，视为障碍物
+        if category in ['car', 'bus', 'truck'] and speed < 1.0 and distance < 3.0:
+            # 静止车辆离得近，风险提高
+            distance_score *= 1.5
+            category_score *= 1.2
+        
+        # 使用AHP权重计算综合得分
+        weights = self.ahp_weights
+        comprehensive_score = (
+            distance_score * weights['distance'] +
+            speed_score * weights['speed'] +
+            category_score * weights['category'] +
+            scene_score * weights['scene_complexity']
+        )
+        
+        # 特殊场景调整
+        for scene_type, adjustment in self.scene_adjustments.items():
+            if scene_type in [t.get('category') for t in targets]:
+                comprehensive_score *= adjustment
+                break
+        
+        target_risks.append({
+            'target': target,
+            'risk_score': comprehensive_score
+        })
+    
+    # 取风险最高的目标
+    highest_risk = max(target_risks, key=lambda x: x['risk_score'])
+    risk_score = highest_risk['risk_score']
+    high_risk_target = highest_risk['target']
+    
+    # 确定危险等级
+    skip_alert = False
+    if risk_score >= 80:
+        level = "level1"
+        message = "危险！请立即避让！"
+    elif risk_score >= 50:
+        level = "level2"
+        message = "注意！前方有危险！"
+    elif risk_score >= 30:
+        level = "level3"
+        message = "请注意前方情况"
+    else:
+        level = "level4"
+        message = "道路安全"
+        skip_alert = True
+    
+    result = {
+        'risk_level': level,
+        'risk_score': risk_score,
+        'message': message,
+        'target_info': high_risk_target,
+        'details': {
+            'target_count': len(targets),
+            'highest_risk_target': high_risk_target.get('category', 'unknown'),
+            'distance': high_risk_target.get('distance', 0),
+            'speed': high_risk_target.get('speed', 0)
+        }
+    }
+    
+    if skip_alert:
+        result['skip_alert'] = True
+    
+    return result
 ```
 
 #### 2.1.4 复杂场景调度器 (ComplexSceneScheduler)
@@ -175,9 +399,10 @@ def _calculate_ahp_weights(self) -> Dict[str, float]:
 
 **实现细节**：
 - 资源管理：申请和释放 LLM 资源
-- LLM 模型管理：按需加载和释放 LLM 模型
+- LLM 模型管理：按需加载和释放 LLM 模型，支持真实模型和模拟模型
 - 场景处理：接收图像和元数据，通过 LLM 进行分析
 - 唤醒词处理：根据用户语音指令生成相应的导航建议
+- Prompt 生成：根据唤醒词和环境元数据生成详细的场景描述 prompt
 
 **关键代码**：
 ```python
@@ -202,6 +427,66 @@ def process_complex_scene(self, image: Image.Image, metadata: Dict[str, Any], pr
         # 释放LLM和资源
         self._release_llm()
         self.resource_manager.release_resources("llm")
+
+# 处理唤醒词
+def handle_wake_word(self, wake_word: str, image: Image.Image, metadata: Dict[str, Any]) -> Optional[str]:
+    # 如果没有图像或元数据，就直接使用mock LLM返回一个简单回复
+    if self.config.get("models", {}).get("llm", {}).get("type", "mock") == "mock" or image is None or metadata is None:
+        logger.info("使用Mock LLM回复唤醒词")
+        return "好的，我正在帮您查看前方路况，请稍等..."
+    
+    # 根据唤醒词生成prompt
+    prompt = self._generate_prompt(wake_word, metadata)
+    
+    # 处理复杂场景
+    return self.process_complex_scene(image, metadata, prompt)
+
+# 生成prompt
+def _generate_prompt(self, wake_word: str, metadata: Dict[str, Any]) -> str:
+    # Instruct模式prompt
+    prompt = "你是一个专业的导盲系统助手，致力于为视障人士提供安全、准确、清晰的导航指导。\n"
+    prompt += "请根据以下环境信息和用户问题，直接提供详细、准确的导航建议。\n\n"
+    
+    # 环境信息
+    prompt += "## 环境信息\n"
+    targets = metadata.get("targets", []) if metadata else []
+    if targets:
+        prompt += "检测到的目标：\n"
+        for i, target in enumerate(targets, 1):
+            category = target.get("category", "未知")
+            distance = target.get("distance", 0)
+            direction = target.get("direction", "前方")
+            speed = target.get("speed", 0)
+            prompt += f"{i}. {direction}方向{distance:.1f}米处的{category}"
+            if speed > 0:
+                prompt += f"（移动速度：{speed:.1f}m/s）"
+            prompt += "\n"
+    else:
+        prompt += "检测到的目标：无\n"
+    
+    # 用户问题
+    prompt += "\n## 用户问题\n"
+    prompt += f"{wake_word}\n\n"
+    
+    # 输出要求
+    prompt += "## 输出要求\n"
+    prompt += "1. 直接提供导航建议，不要包含思考过程\n"
+    prompt += "2. 语言简洁明了，避免使用复杂句子\n"
+    prompt += "3. 信息准确，基于当前环境数据\n"
+    prompt += "4. 优先考虑用户安全\n"
+    prompt += "5. 提供具体的导航建议，包括方向、距离和注意事项\n"
+    prompt += "6. 如果有多个目标，按优先级排序（距离最近的优先）\n"
+    prompt += "7. 对于移动目标，特别提醒用户注意\n\n"
+    
+    # 示例
+    prompt += "## 示例\n"
+    prompt += "输入：环境：前方5米处有一个行人，左侧3米处有一辆汽车；用户：我想过马路\n"
+    prompt += "输出：当前前方5米处有一个行人，左侧3米处有一辆汽车。目前车辆距离较近，建议等待车辆通过后再过马路。当车辆通过后，确认左右方向安全，然后以正常步速穿过马路。\n\n"
+    
+    # 开始回复
+    prompt += "请直接输出导航建议："
+    
+    return prompt
 ```
 
 ### 2.2 感知模块
@@ -211,9 +496,57 @@ def process_complex_scene(self, image: Image.Image, metadata: Dict[str, Any], pr
 **设计思路**：实时检测环境中的目标，为后续分析提供基础数据。
 
 **实现细节**：
-- 模型加载：支持真实模型和模拟模型
+- 模型加载：支持真实模型和模拟模型，使用YOLOv8官方库
 - 目标检测：识别环境中的人、车、障碍物等目标
-- 结果输出：返回目标类别、位置等信息
+- 结果输出：返回目标类别、位置、置信度和方向信息
+- 方向判断：基于目标中心点位置判断目标方向（左、中、右）
+
+**关键代码**：
+```python
+# 执行目标检测
+def inference(self, image: np.ndarray) -> List[Dict[str, Any]]:
+    if self.model is None:
+        raise RuntimeError("YOLO模型未加载")
+    
+    # 执行检测
+    results = self.model(image, conf=self.conf_threshold)
+    
+    # 处理检测结果
+    detections = []
+    for result in results:
+        for box in result.boxes:
+            # 获取边界框坐标
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            
+            # 获取类别和置信度
+            class_id = int(box.cls[0])
+            confidence = float(box.conf[0])
+            
+            # 获取类别名称
+            category = result.names.get(class_id, "unknown")
+            
+            # 计算中心点
+            center_x = (x1 + x2) / 2
+            center_y = (y1 + y2) / 2
+            
+            # 简单的方向判断
+            height, width = image.shape[:2]
+            if center_x < width * 0.3:
+                direction = "left"
+            elif center_x > width * 0.7:
+                direction = "right"
+            else:
+                direction = "front"
+            
+            detections.append({
+                "category": category,
+                "confidence": confidence,
+                "roi_coords": [float(x1), float(y1), float(x2), float(y2)],
+                "direction": direction
+            })
+    
+    return detections
+```
 
 #### 2.2.2 VDA 深度估计 (VDADepthEstimator)
 
@@ -222,38 +555,122 @@ def process_complex_scene(self, image: Image.Image, metadata: Dict[str, Any], pr
 **实现细节**：
 - 深度图生成：根据输入图像生成深度图
 - 距离计算：基于深度图计算目标距离
+- 模型加载：支持真实模型和模拟模型
+
+**关键代码**：
+```python
+# 执行深度估计
+def inference(self, image: np.ndarray) -> np.ndarray:
+    if self.model is None:
+        raise RuntimeError("VDA模型未加载")
+    
+    # 执行深度估计
+    # 这里只是一个示例实现，实际需要调用真实的模型
+    height, width = image.shape[:2]
+    
+    # 生成模拟深度图
+    # 实际实现应该调用真实的深度估计模型
+    depth_map = np.random.rand(height, width) * 20.0  # 模拟0-20米的深度
+    
+    return depth_map
+```
 
 #### 2.2.3 ASR 语音识别 (FunASRRecognizer)
 
 **设计思路**：识别用户语音指令，支持唤醒词检测。
 
 **实现细节**：
-- 模型加载：加载 FunASR 语音识别模型
+- 模型加载：加载 FunASR 语音识别模型，包括主ASR模型、VAD模型和标点模型
 - 语音识别：将音频数据转换为文本
-- 唤醒词检测：检测预设的唤醒词
+- 唤醒词检测：检测预设的唤醒词，支持标点符号处理
+- 语音活动检测：使用VAD模型检测语音活动
+- 标点添加：为识别结果添加标点符号，提高可读性
+- 音频缓冲：支持音频数据缓冲和流式处理
 
 **关键代码**：
 ```python
-# 语音识别与唤醒词检测
+# 执行语音识别
 def inference(self, audio_data: np.ndarray) -> Tuple[bool, str]:
     if self.model is None:
         raise RuntimeError("ASR模型未加载")
     
+    asr_text = ""
+    wake_detected = False
+    
     # 执行语音识别
-    result = self.model.predict(
-        audio_data=audio_data,
-        task="asr",
-        vad_silence_time=0.8,
-        punc=True
-    )
+    try:
+        # 只有当音频数据足够长时才执行处理
+        if len(audio_data) > 16000 * 0.3:  # 至少0.3秒
+            print(f"[ASR] 处理音频，长度: {len(audio_data)} 样本")
+            
+            # 直接使用完整识别
+            try:
+                asr_text = self.model.recognize(audio_data, clean_output=True)
+                print(f"[ASR] 原始识别结果: '{asr_text}'")
+                
+                # 添加标点
+                asr_text = self._add_punctuation(asr_text)
+                print(f"[ASR] 带标点结果: '{asr_text}'")
+            except Exception as e:
+                print(f"[ASR] 模型识别失败: {e}")
+                import traceback
+                traceback.print_exc()
+        
+    except Exception as e:
+        print(f"[ASR] 推理失败: {e}")
+        import traceback
+        traceback.print_exc()
+        asr_text = ""
     
-    asr_text = result[0]["text"].strip()
-    
-    # 简单的唤醒词检测
-    wake_words = ["你好", "导盲", "导航","小明","小明同学"]
-    wake_detected = any(word in asr_text for word in wake_words)
+    # 简单的唤醒词检测 - 先去除标点符号再检测
+    if asr_text:
+        # 去除常用标点符号，避免标点干扰唤醒词检测
+        import re
+        clean_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', asr_text)
+        print(f"[ASR] 去除标点后的文本: '{clean_text}'")
+        
+        # 在原始文本和清洗后的文本中都检测
+        wake_detected = any(word in asr_text or word in clean_text for word in self.wake_words)
+        if wake_detected:
+            print(f"[ASR] 检测到唤醒词")
+            for word in self.wake_words:
+                if word in asr_text or word in clean_text:
+                    print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
+                    break
     
     return wake_detected, asr_text
+
+# 检测语音活动
+def _detect_voice_activity(self, audio_data: np.ndarray) -> bool:
+    if self.vad_model is None:
+        # 如果没有VAD模型，简单判断能量
+        energy = np.sum(np.square(audio_data)) / len(audio_data)
+        return energy > 0.001
+    
+    try:
+        result = self.vad_model.generate(input=audio_data)
+        if isinstance(result, list) and len(result) > 0:
+            return result[0].get('value', 0) == 1
+        return False
+    except Exception as e:
+        # 失败时使用能量判断
+        print(f"[ASR] VAD推理失败，使用能量检测: {e}")
+        energy = np.sum(np.square(audio_data)) / len(audio_data)
+        return energy > 0.001
+
+# 添加标点
+def _add_punctuation(self, text: str) -> str:
+    if self.punc_model is None or not text:
+        return text
+    
+    try:
+        result = self.punc_model.generate(input=text)
+        if isinstance(result, list) and len(result) > 0:
+            return result[0].get('text', text)
+        return text
+    except Exception as e:
+        print(f"[ASR] 标点添加失败: {e}")
+        return text
 ```
 
 #### 2.2.4 LLM 多模态理解 (QwenMultimodal)
@@ -272,8 +689,41 @@ def inference(self, audio_data: np.ndarray) -> Tuple[bool, str]:
 **设计思路**：同步多源数据，确保数据一致性。
 
 **实现细节**：
-- 帧管理：管理摄像头帧、YOLO 结果、VDA 结果
-- 数据同步：根据时间戳同步多源数据
+- 帧管理：管理摄像头帧、YOLO 结果、VDA 结果，使用双端队列存储
+- 数据同步：根据时间戳同步多源数据，寻找时间戳最接近的匹配
+- 缓冲区管理：支持清空缓冲区和多摄像头同步
+- 时间差阈值：100ms内视为同步
+
+**关键代码**：
+```python
+# 获取同步的数据
+def get_sync_data(self) -> Optional[Tuple[np.ndarray, Dict[str, Any], np.ndarray, float, int]]:
+    with self.lock:
+        if not self.frame_buffer or not self.yolo_results or not self.vda_results:
+            return None
+        
+        # 寻找时间戳最接近的帧、YOLO结果和VDA结果
+        best_match = None
+        min_time_diff = float('inf')
+        
+        for frame, frame_ts, camera_id in self.frame_buffer:
+            for yolo_result, yolo_ts in self.yolo_results:
+                for depth_map, vda_ts in self.vda_results:
+                    # 计算时间差
+                    time_diff = abs(frame_ts - yolo_ts) + abs(frame_ts - vda_ts)
+                    
+                    if time_diff < min_time_diff:
+                        min_time_diff = time_diff
+                        best_match = (frame, yolo_result, depth_map, frame_ts, camera_id)
+        
+        # 如果找到匹配且时间差在可接受范围内
+        if best_match and min_time_diff < 0.1:  # 100ms内视为同步
+            # 从缓冲区中移除已使用的数据
+            # 注意：这里简化处理，实际应该更精确地移除对应的数据
+            return best_match
+        
+        return None
+```
 
 #### 2.3.2 深度融合 (DepthFusion)
 
@@ -355,8 +805,48 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 **设计思路**：管理语音播报队列，确保重要信息优先播报。
 
 **实现细节**：
-- 消息队列：维护不同优先级的消息队列
+- 消息队列：使用优先级队列（最小堆）管理消息
 - 调度策略：根据优先级和类型调度消息
+- 冷却时间：避免同一类型消息频繁播报
+- 优先级管理：支持1-4级优先级，1最高
+
+**关键代码**：
+```python
+# 添加播报消息
+def add_message(self, message: str, priority: int = 3, alert_type: str = "normal"):
+    with self.lock:
+        # 检查冷却时间
+        current_time = time.time()
+        if alert_type in self.last_alert_time:
+            cooldown = self.config.get("risk", {}).get("alert_cooldown", 3)
+            if current_time - self.last_alert_time[alert_type] < cooldown:
+                logger.debug(f"告警类型 {alert_type} 处于冷却期，跳过播报")
+                return
+        
+        # 添加到优先级队列
+        # 使用负数作为优先级，因为heapq是最小堆
+        heapq.heappush(self.queue, (-priority, current_time, message, alert_type))
+        logger.debug(f"添加播报消息: {message}, 优先级: {priority}")
+
+# 调度循环
+def _scheduler_loop(self):
+    while self.running:
+        # 检查队列是否有消息
+        with self.lock:
+            if self.queue:
+                # 获取最高优先级的消息
+                priority, timestamp, message, alert_type = heapq.heappop(self.queue)
+                
+                # 更新最后播报时间
+                self.last_alert_time[alert_type] = time.time()
+                
+                # 播报消息
+                logger.info(f"播报: {message}")
+                # 这里应该调用TTS引擎
+                # self.tts_engine.speak(message)
+        
+        time.sleep(0.1)
+```
 
 #### 2.4.2 TTS 引擎 (TTSEngine)
 
@@ -393,6 +883,10 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 | 核心模块 | 实时安全调度器 | 评估危险等级，生成安全告警 | core/realtime_scheduler.py |
 | 核心模块 | 风险评价器 | 基于AHP和模糊综合评价的危险评估 | core/risk_evaluator.py |
 | 核心模块 | 复杂场景调度器 | 处理复杂场景，生成导航建议 | core/complex_scene_scheduler.py |
+| 核心模块 | 输入线程 | 读取视频和音频数据 | core/input_thread.py |
+| 核心模块 | 视觉线程 | 处理视频帧，执行目标检测和深度估计 | core/vision_thread.py |
+| 核心模块 | ASR线程 | 处理音频数据，执行语音识别 | core/asr_thread.py |
+| 核心模块 | 推理线程 | 处理视觉和ASR结果，执行风险评估和决策 | core/inference_thread.py |
 | 感知模块 | YOLO 目标检测 | 检测环境中的目标 | perception/yolo/yolo_detector.py |
 | 感知模块 | YOLO 模拟检测器 | 模拟YOLO检测结果 | perception/yolo/mock_yolo.py |
 | 感知模块 | VDA 深度估计 | 估计目标距离 | perception/vda/vda_depth.py |
@@ -412,18 +906,23 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 | 工具模块 | 配置加载器 | 加载系统配置和风险规则 | utils/config_loader.py |
 | 工具模块 | 日志工具 | 系统日志管理 | utils/logger.py |
 | 工具模块 | 数据格式化 | 数据格式处理 | utils/data_formatter.py |
+| 工具模块 | 消息队列 | 模块间通信 | utils/message_queue.py |
 
 ## 4. 接口定义
 
 ### 4.1 核心模块接口
 
 #### 4.1.1 ResourceManager
+- `start()`：启动资源管理器
+- `stop()`：停止资源管理器
 - `request_resources(resource_type: str, priority: int = 0) -> bool`：申请资源，支持优先级
 - `release_resources(resource_type: str)`：释放资源
 - `update_heartbeat(module_name: str)`：更新模块心跳
 - `get_resource_status() -> Dict[str, Any]`：获取资源状态
 
 #### 4.1.2 RealtimeScheduler
+- `start()`：启动实时安全调度器
+- `stop()`：停止实时安全调度器
 - `process_metadata(metadata: Dict[str, Any])`：处理环境元数据
 - `get_alert() -> Optional[Dict[str, Any]]`：获取告警信息
 - `is_complex_scene_triggered() -> bool`：检查是否触发复杂场景
@@ -434,8 +933,27 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
 - `evaluate_special_scene(metadata: Dict[str, Any]) -> Optional[Dict[str, Any]]`：评估特殊场景
 
 #### 4.1.4 ComplexSceneScheduler
+- `start()`：启动复杂场景调度器
+- `stop()`：停止复杂场景调度器
 - `process_complex_scene(image: Image.Image, metadata: Dict[str, Any], prompt: str) -> Optional[str]`：处理复杂场景
 - `handle_wake_word(wake_word: str, image: Image.Image, metadata: Dict[str, Any]) -> Optional[str]`：处理唤醒词
+
+#### 4.1.5 InputThread
+- `run()`：线程运行方法
+- `stop()`：停止线程
+
+#### 4.1.6 VisionThread
+- `run()`：线程运行方法
+- `stop()`：停止线程
+
+#### 4.1.7 ASRThread
+- `run()`：线程运行方法
+- `stop()`：停止线程
+
+#### 4.1.8 InferenceThread
+- `run()`：线程运行方法
+- `stop()`：停止线程
+- `get_results() -> Dict[str, List[str]]`：获取ASR和LLM结果
 
 ### 4.2 感知模块接口
 
@@ -734,9 +1252,15 @@ def _calculate_distance(self, target: Dict[str, Any], depth_map: np.ndarray) -> 
    - 配置危险分级规则：修改 `config/risk_rules.yaml`
    - 启动系统：`python main.py`
 
-4. **输出文件**：
+4. **系统配置**：
+   - **系统模式**：支持模拟模式和真实模式
+   - **输入模式**：支持模拟输入（视频文件）和真实输入（摄像头）
+   - **模型类型**：支持真实模型和模拟模型
+   - **调试模式**：支持可视化调试
+
+5. **输出文件**：
    - 处理后的视频：`output/output_video.avi`
-   - 系统测试结果：`output/system_results.txt`
+   - 系统测试结果：`output/system_results.txt`（包含ASR和LLM结果）
 
 ### 7.2 维护策略
 
