@@ -71,6 +71,13 @@ class SimulatedInputDevice(InputDevice):
         # 视频帧率
         video_fps = 5  # 默认帧率
         
+        # 优先使用配置文件中的音频路径
+        audio_data = None
+        audio_path = self.config.get("simulation", {}).get("audio_path")
+        if audio_path and os.path.exists(audio_path):
+            logger.info(f"使用配置文件中的音频文件: {audio_path}")
+            audio_data = self._extract_audio(audio_path)
+        
         if video_path and os.path.exists(video_path):
             # 使用视频文件模拟
             cap = cv2.VideoCapture(video_path)
@@ -81,12 +88,14 @@ class SimulatedInputDevice(InputDevice):
             self.cameras[camera_id] = cap
             logger.info(f"摄像头 {camera_id} 使用视频文件: {video_path}，帧率: {video_fps:.2f}")
             
-            # 提取音频
-            audio_data = self._extract_audio(video_path)
+            # 如果没有配置音频，从视频中提取
+            if audio_data is None:
+                audio_data = self._extract_audio(video_path)
         else:
             # 使用随机生成的图像模拟
             cap = None
-            audio_data = None
+            if audio_data is None:
+                audio_data = None
             logger.info(f"摄像头 {camera_id} 使用随机图像模拟")
         
         try:

@@ -113,13 +113,22 @@ class Qwen35VLLM:
             print(f"[LLM] 执行生成，prompt: {prompt[:100]}...")
             if pil_image is not None:
                 print(f"[LLM] 多模态输入，图像大小: {pil_image.size}")
-                # 多模态输入 - 对于Qwen3.5，使用纯文本方式，因为vLLM版本可能不支持图像参数
-                # 直接使用带有视觉占位符的prompt
-                outputs = self.llm.generate(
-                    prompts=prompt,
-                    sampling_params=current_sp
-                )
-                print("[LLM] 使用纯文本方式生成（包含视觉占位符）")
+                # 多模态输入 - 尝试传递图像数据
+                try:
+                    outputs = self.llm.generate(
+                        prompts=prompt,
+                        multi_modal_data=[{"image": pil_image}],
+                        sampling_params=current_sp
+                    )
+                    print("[LLM] 多模态输入生成")
+                except Exception as e:
+                    print(f"[LLM] 多模态输入失败: {e}")
+                    # 回退到纯文本输入
+                    outputs = self.llm.generate(
+                        prompts=prompt,
+                        sampling_params=current_sp
+                    )
+                    print("[LLM] 回退到纯文本输入生成")
             else:
                 # 纯文本输入
                 outputs = self.llm.generate(

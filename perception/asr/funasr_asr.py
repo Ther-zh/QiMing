@@ -222,6 +222,23 @@ class FunASRRecognizer:
                 self.wake_silence_counter = 0
                 wake_detected = True  # 确保返回唤醒状态
                 print(f"[ASR] 唤醒处理完成，返回wake_detected=True")
+        elif is_final and asr_text:
+            # 在最终片段中也检测唤醒词
+            print(f"[ASR] 处理最终片段，检测唤醒词")
+            # 去除常用标点符号，避免标点干扰唤醒词检测
+            import re
+            clean_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', asr_text)
+            print(f"[ASR] 去除标点后的文本: '{clean_text}'")
+            
+            # 在原始文本和清洗后的文本中都检测
+            wake_detected = any(word in asr_text or word in clean_text for word in self.wake_words)
+            if wake_detected:
+                print(f"[ASR] 检测到唤醒词")
+                for word in self.wake_words:
+                    if word in asr_text or word in clean_text:
+                        print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
+                        print(f"[ASR] 检测到唤醒词，立即返回wake_detected=True")
+                        return True, asr_text
         else:
             # 简单的唤醒词检测 - 先去除标点符号再检测
             if asr_text:
@@ -237,13 +254,9 @@ class FunASRRecognizer:
                     for word in self.wake_words:
                         if word in asr_text or word in clean_text:
                             print(f"[ASR]   - 唤醒词 '{word}' 被检测到")
-                            self.wake_state = True
-                            self.wake_audio_buffer = []  # 重置唤醒音频缓冲
-                            self.wake_silence_counter = 0
-                            # 添加当前音频到唤醒缓冲
-                            self.wake_audio_buffer.extend(audio_data.tolist())
-                            print(f"[ASR] 检测到唤醒词，进入唤醒状态")
-                            break
+                            # 立即返回唤醒状态，不需要等待句子结束
+                            print(f"[ASR] 检测到唤醒词，立即返回wake_detected=True")
+                            return True, asr_text
         
         return wake_detected, asr_text
     

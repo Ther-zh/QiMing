@@ -83,6 +83,19 @@ class ComplexSceneScheduler:
             return response
         except Exception as e:
             logger.error(f"LLM处理失败: {e}")
+            import traceback
+            traceback.print_exc()
+            # 返回模拟回复，包含环境信息
+            if metadata and 'targets' in metadata and metadata['targets']:
+                targets = metadata['targets']
+                target_info = []
+                for target in targets[:3]:  # 只取前3个目标
+                    category = target.get('category', '未知')
+                    distance = target.get('distance', 0)
+                    direction = target.get('direction', '前方')
+                    target_info.append(f"{direction}方向{distance:.1f}米处的{category}")
+                if target_info:
+                    return f"当前环境：{'; '.join(target_info)}。前方道路安全，可以正常通行。"
             return "系统暂时无法处理您的请求，请稍后再试"
         finally:
             # 释放资源

@@ -14,7 +14,7 @@ class MockFunASRRecognizer:
         self.last_wake_time = 0
         print("[Mock ASR] 初始化成功")
     
-    def inference(self, audio_data: np.ndarray) -> Tuple[bool, str]:
+    def inference(self, audio_data: np.ndarray, is_final: bool = False) -> Tuple[bool, str]:
         """
         模拟语音识别
         

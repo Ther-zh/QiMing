@@ -44,6 +44,10 @@ class InferenceThread(threading.Thread):
         self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学", "小"]
         # 累积的ASR文本（用于检测跨片段的唤醒词）
         self.cumulative_asr_text = ""
+        # 存储最近的视觉数据
+        self.latest_frame = None
+        self.latest_metadata = None
+        self.latest_vision_timestamp = 0
     
     def run(self):
         """
@@ -150,12 +154,12 @@ class InferenceThread(threading.Thread):
             # 中优先级处理唤醒词
             if self.resource_manager.request_resources("llm", priority=5):
                 try:
-                    # 调用复杂场景调度器处理，使用累积的文本
+                    # 调用复杂场景调度器处理，使用累积的文本和最近的视觉数据
                     full_query = self.cumulative_asr_text
                     response = self.complex_scene_scheduler.handle_wake_word(
                         full_query,
-                        None,  # 暂时没有图像数据
-                        None   # 暂时没有元数据
+                        self.latest_frame,  # 使用最近的图像数据
+                        self.latest_metadata   # 使用最近的元数据
                     )
                     if response:
                         logger.info(f"[LLM] 回复: {response}")
@@ -202,6 +206,11 @@ class InferenceThread(threading.Thread):
                     timestamp,
                     camera_id
                 )
+                
+                # 更新最近的视觉数据
+                self.latest_frame = frame
+                self.latest_metadata = metadata
+                self.latest_vision_timestamp = timestamp
                 
                 # 处理实时安全调度
                 self.realtime_scheduler.process_metadata(metadata)
