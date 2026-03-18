@@ -22,12 +22,10 @@ Thumbs.db
 output/
 
 # Models
-*.pt
 *.pth
 *.onnx
 
 # Configuration
-config/*.yaml
 
 # Logs
 *.log
@@ -37,7 +35,6 @@ config/*.yaml
 *.temp
 
 # Audio/Video files
-*.mp4
 *.avi
 *.wav
 
@@ -53,7 +50,6 @@ config/*.yaml
 useless/
 
 # FunASR audio
-funasr/
 
 # AutoDL tmp files
 autodl-tmp/
@@ -62,6 +58,5 @@ autodl-tmp/
 .git/
 
 # Third-party code
-perception/vda/Video-Depth-Anything/
-perception/yolo/model/
+
 
