@@ -16,6 +16,7 @@ from core.input_thread import InputThread
 from core.asr_thread import ASRThread
 from core.vision_thread import VisionThread
 from core.inference_thread import InferenceThread
+from core.resource_manager import ResourceManager
 
 # 导入模拟模块
 from simulation.debug_viewer import DebugViewer
@@ -28,6 +29,9 @@ class BlindGuideSystem:
         # 加载配置
         self.config = config_loader.get_config()
         self.risk_rules = config_loader.get_risk_rules()
+        
+        # 初始化资源管理器（用于GPU显存监控）
+        self.resource_manager = ResourceManager()
         
         # 初始化线程
         self.input_thread = InputThread()
@@ -55,6 +59,9 @@ class BlindGuideSystem:
         """
         logger.info("导盲系统启动中...")
         
+        # 打印初始资源状态
+        logger.info("\n" + self.resource_manager.get_memory_summary())
+        
         # 打印配置信息
         logger.info(f"系统模式: {self.config.get('system', {}).get('mode')}")
         logger.info(f"输入模式: {self.config.get('system', {}).get('input_mode', 'simulated')}")
@@ -70,6 +77,9 @@ class BlindGuideSystem:
         
         # 初始化结果文件
         self._init_result_file()
+        
+        # 打印资源状态（初始化后）
+        self.resource_manager.print_gpu_memory("初始化完成")
         
         # 创建消息队列
         message_queue.create_queue("audio")
@@ -183,6 +193,9 @@ class BlindGuideSystem:
         停止系统
         """
         logger.info("导盲系统停止中...")
+        
+        # 打印最终资源状态
+        logger.info("\n" + self.resource_manager.get_memory_summary())
         
         self.running = False
         

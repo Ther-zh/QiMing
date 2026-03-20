@@ -7,6 +7,12 @@ from collections import defaultdict
 from utils.logger import logger
 from utils.config_loader import config_loader
 
+try:
+    from pynvml import nvmlInit, nvmlShutdown, nvmlDeviceGetCount, nvmlDeviceGetHandleByIndex, nvmlDeviceGetMemoryInfo, nvmlDeviceGetName
+    NVML_AVAILABLE = True
+except ImportError:
+    NVML_AVAILABLE = False
+
 class ResourceManager:
     def __init__(self):
         """
@@ -17,12 +23,95 @@ class ResourceManager:
         self.heartbeat_times = defaultdict(float)  # 模块心跳时间
         self.lock = threading.Lock()
         
-        # 启动资源监控线程
+        self.nvml_initialized = False
+        self.gpu_handle = None
+        self.gpu_name = None
+        self._init_nvml()
+        
         self.monitor_thread = threading.Thread(
             target=self._monitor_resources,
             daemon=True
         )
         self.running = False
+    
+    def _init_nvml(self):
+        """初始化NVML进行GPU监控"""
+        if NVML_AVAILABLE:
+            try:
+                nvmlInit()
+                gpu_count = nvmlDeviceGetCount()
+                if gpu_count > 0:
+                    self.gpu_handle = nvmlDeviceGetHandleByIndex(0)
+                    self.gpu_name = nvmlDeviceGetName(self.gpu_handle)
+                    self.nvml_initialized = True
+                    logger.info(f"GPU监控已初始化: {self.gpu_name}")
+            except Exception as e:
+                logger.warning(f"NVML初始化失败: {e}")
+    
+    def get_gpu_memory_info(self) -> Dict[str, float]:
+        """
+        获取GPU显存信息
+        
+        Returns:
+            包含total, used, free, usage_percent的字典（单位：GB）
+        """
+        result = {"total": 0, "used": 0, "free": 0, "usage_percent": 0, "available": False}
+        
+        if self.nvml_initialized and self.gpu_handle:
+            try:
+                info = nvmlDeviceGetMemoryInfo(self.gpu_handle)
+                result["total"] = info.total / 1024**3
+                result["used"] = info.used / 1024**3
+                result["free"] = info.free / 1024**3
+                result["usage_percent"] = (info.used / info.total) * 100 if info.total > 0 else 0
+                result["available"] = True
+            except Exception as e:
+                logger.debug(f"获取GPU显存信息失败: {e}")
+        
+        return result
+    
+    def print_gpu_memory(self, stage: str = ""):
+        """
+        打印GPU显存使用情况
+        
+        Args:
+            stage: 当前阶段描述
+        """
+        gpu_info = self.get_gpu_memory_info()
+        if gpu_info["available"]:
+            prefix = f"[{stage}] " if stage else ""
+            logger.info(f"{prefix}GPU显存: 总计={gpu_info['total']:.2f}GB, "
+                       f"使用={gpu_info['used']:.2f}GB ({gpu_info['usage_percent']:.1f}%), "
+                       f"可用={gpu_info['free']:.2f}GB")
+        else:
+            logger.debug("GPU显存监控不可用")
+    
+    def get_memory_summary(self) -> str:
+        """
+        获取内存使用摘要字符串
+        
+        Returns:
+            格式化的内存使用摘要
+        """
+        lines = []
+        lines.append("=" * 50)
+        lines.append("系统资源使用情况")
+        lines.append("=" * 50)
+        
+        cpu_usage = psutil.cpu_percent(interval=0.1)
+        memory = psutil.virtual_memory()
+        lines.append(f"CPU使用率: {cpu_usage:.1f}%")
+        lines.append(f"内存使用: {memory.used/1024**3:.2f}GB / {memory.total/1024**3:.2f}GB ({memory.percent:.1f}%)")
+        
+        gpu_info = self.get_gpu_memory_info()
+        if gpu_info["available"]:
+            lines.append(f"GPU型号: {self.gpu_name}")
+            lines.append(f"GPU显存: {gpu_info['used']:.2f}GB / {gpu_info['total']:.2f}GB ({gpu_info['usage_percent']:.1f}%)")
+        else:
+            lines.append("GPU显存: 不可用")
+        
+        lines.append("=" * 50)
+        return "\n".join(lines)
     
     def start(self):
         """
@@ -170,6 +259,9 @@ class ResourceManager:
         """
         监控系统资源和模块心跳
         """
+        monitor_interval = 5  # 每5秒输出一次资源状态
+        last_monitor_time = time.time()
+        
         while self.running:
             # 检查系统资源
             self._check_system_resources()
@@ -179,6 +271,12 @@ class ResourceManager:
             
             # 检查资源使用情况
             self._check_resource_usage()
+            
+            # 定期输出GPU显存状态
+            current_time = time.time()
+            if current_time - last_monitor_time >= monitor_interval:
+                self.print_gpu_memory("资源监控")
+                last_monitor_time = current_time
             
             time.sleep(1)  # 每秒检查一次
     

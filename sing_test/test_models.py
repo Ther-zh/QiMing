@@ -40,7 +40,7 @@ def test_llm():
     try:
         from perception.llm.qwen_multimodal import QwenMultimodal
         config = {
-            'model_path': '/root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ'
+            'model_name': 'qwen3.5-4b'
         }
         llm = QwenMultimodal(config)
         print("LLM 模型加载成功")

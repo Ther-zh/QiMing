@@ -42,7 +42,8 @@ models:
     model_path: "/root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall"
   llm:
     type: "real"  # mock 或 real
-    model_path: "/root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ"
+    model_path: "/root/autodl-tmp/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf"
+    model_name: "qwen3.5-4b"
 
 # 目标跟踪配置
 tracking:

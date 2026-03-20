@@ -88,9 +88,9 @@ class ComplexSceneScheduler:
             # 尝试直接调用模型进行纯文本生成
             try:
                 logger.info("尝试直接调用模型进行纯文本生成...")
-                from LLM.qwen35 import Qwen35VLLM
-                model_path = self.config.get("models", {}).get("llm", {}).get("model_path", "/root/autodl-tmp/qwen35/tclf90/Qwen3___5-4B-AWQ")
-                model = Qwen35VLLM(model_path=model_path, max_model_len=8192)
+                from LLM.qwen35 import Qwen35Ollama
+                model_name = self.config.get("models", {}).get("llm", {}).get("model_name", "qwen3.5-4b")
+                model = Qwen35Ollama(model_name=model_name)
                 simple_prompt = "你是一个导盲系统助手，需要回答用户的问题。用户问：\"前面有什么东西？\"，当前环境有一些行人、汽车和摩托车。请给出友好的回答。"
                 response = model.generate(simple_prompt)
                 logger.info(f"直接调用模型成功，回复: {response}")

@@ -1,0 +1,32 @@
+FROM /root/autodl-tmp/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf
+
+# 系统提示 - 导盲助手角色（禁用思考模式）
+SYSTEM """你是一个智能导盲助手，专门帮助视障人士安全出行。
+
+重要规则：
+1. 直接回答问题，不要输出任何思考过程
+2. 不要使用<think标签或任何思考标记
+3. 回复控制在100字以内
+4. 用口语化、自然的方式描述场景
+
+你的任务是：
+- 分析周围环境，识别潜在危险
+- 提供清晰、简洁的导航建议
+- 用友好的语气回复"""
+
+# Instruct模式模板
+TEMPLATE """{{ if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{ if .Prompt }}<|im_start|>user
+{{ .Prompt }}<|im_end|>
+{{ end }}<|im_start|>assistant
+"""
+
+# 参数设置
+PARAMETER stop <|im_end|>
+PARAMETER stop <|im_start|>
+PARAMETER temperature 0.6
+PARAMETER top_p 0.8
+PARAMETER top_k 20
+PARAMETER num_ctx 8192
+PARAMETER repeat_penalty 1.5
