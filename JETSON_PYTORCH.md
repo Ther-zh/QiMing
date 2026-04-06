@@ -82,35 +82,3 @@ python sing_test/ensure_yolo_weights.py
 | YOLO 视频验收 | `python sing_test/module_debug.py --module yolo`：`cuda` 可用时为 GPU；已用 `stream=True` |
 
 大模型若通过 **Ollama** 运行，其 GPU 路径独立于本环境内的 Python `torch`；若使用 **Transformers + Qwen** 等路径，则与当前 `torch` 强相关。Ollama 容器说明见 [`docker/ollama/README.md`](docker/ollama/README.md)。
-
-**资源摘要里的「GPU 显存」**：在 Orin 上 NVML 常读失败时，日志中的 CUDA 数字来自 **本进程 PyTorch 的 `memory_allocated`**，不是 `nvidia-smi` 式整卡占用，也不含 **ollama**。启停时若开启 `resources.show_tegrastats_in_summary`，会多一行 **`tegrastats` 采样**（RAM、GR3D 等），更接近整机观感；平时也可用 `tegrastats` / `jtop` 自行观察。
-
-## LLM / Ollama 调试检查表（QiMing）
-
-1. **区分真输出与代码兜底**  
-   - 控制台或日志中搜索 `[LLM_META]`：`event='ok'` 为正常；`fallback_empty` / `fallback_exception` 表示走了 [LLM/qwen35.py](LLM/qwen35.py) 的兜底话术（默认与 [config/config.yaml](config/config.yaml) 中 `models.llm.fallback_phrase` 一致）。  
-   - 若连续多条用户可见回复与 `fallback_phrase` 完全相同，优先查 `LLM_META` 而非猜测模型「变笨」。
-
-2. **模型是否支持多模态**  
-   - `ollama show <model_name>`，确认 families/capabilities 含 vision/VL 语义；否则 `generate(..., image=...)` 会异常或空内容。  
-   - 快速探针：`python sing_test/llm_context_probe.py`（短/长 prompt，观察 `[LLM_META]` 与回复长度）。
-
-3. **`num_ctx` 与长 prompt**  
-   - 主系统唤醒词 prompt 较长（见 [core/complex_scene_scheduler.py](core/complex_scene_scheduler.py)）。若 `fallback_empty` 且 `raw_len=0`，在 [config/config.yaml](config/config.yaml) 的 `models.llm.ollama_options` 中逐步提高 `num_ctx`（如 512→1024），并注意 Jetson **统一内存 OOM**；用 `llm_context_probe` 做前后对比。
-
-4. **Think 模式**  
-   - Qwen3.5 须 `ollama_think: false` 且**不要**把 `think` 放进 Ollama `options`（见代码注释 ollama#14793）。
-
-5. **分模块视频调试与内存**  
-   - `python sing_test/module_debug.py --module all --vda-max-frames 30`：`all` 默认用 **四个子进程** 顺序跑 **VDA → ASR → YOLO → LLM**，每段退出后释放 PyTorch 占用的统一内存，再启动 Ollama，显著降低被 kill 的概率；单进程调试加 `--single-process`。  
-   - 仍 OOM 时：`--module llm --video ...` 单独跑，或先停其它占内存进程。
-
-6. **与主系统对齐**  
-   - `max_reply_chars` / `max_generate_tokens` / `ollama_options` / `fallback_phrase` 在 [perception/llm/qwen_multimodal.py](perception/llm/qwen_multimodal.py) 与 `module_debug` 共用同一 [config/config.yaml](config/config.yaml) 段。
-
-7. **融合被资源门控跳过**  
-   - 日志 `[Inference] fusion 统计 ok=… skipped=…`：若 `skipped_ratio` 过高，放宽 `resources.memory_threshold` 或降低 `system.vision_sample_interval` 的代价是峰值内存上升，需与 OOM 折中。
-
-8. **全流程 main.py 下 Ollama 报「requires more system memory」**  
-   - 已默认 `system.pause_asr_during_llm: true`：唤醒词触发后尽早 `set_llm_busy`，ASR 线程暂停 FunASR 推理，减少与 Ollama 争抢统一内存。  
-   - 仍失败时可再降 `models.llm.ollama_options.num_ctx` / `num_predict`，或设置环境变量 `QIMING_VL_MAX_SIDE=256` 压低送 VLM 的分辨率。

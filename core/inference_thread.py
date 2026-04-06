@@ -54,30 +54,12 @@ class InferenceThread(threading.Thread):
         self.latest_frame = None
         self.latest_metadata = None
         self.latest_vision_timestamp = 0
-        # 量化资源门控导致的「有帧无融合」占比，便于调 memory_threshold / vision_sample_interval
-        self._fusion_stats = {"ok": 0, "skipped": 0}
-
-    def _log_fusion_stats_if_needed(self, force: bool = False) -> None:
-        sk = self._fusion_stats["skipped"]
-        ok = self._fusion_stats["ok"]
-        total = ok + sk
-        if total == 0:
-            return
-        if force or (sk > 0 and sk % 25 == 0):
-            pct = 100.0 * sk / total
-            logger.info(
-                f"[Inference] fusion 统计 ok={ok} skipped={sk} skipped_ratio={pct:.1f}%"
-            )
 
     def _trim_cuda_before_llm(self) -> None:
         """在调用 Ollama 前尽量压低 PyTorch CUDA 峰值，减轻 Jetson 统一内存 OOM。"""
         gc.collect()
         if torch.cuda.is_available():
-            torch.cuda.synchronize()
             torch.cuda.empty_cache()
-        gc.collect()
-        # 短暂等待，让 FunASR 等 CPU 线程完成当前片段、内核回收部分匿名页
-        time.sleep(0.55)
     
     def run(self):
         """
@@ -120,7 +102,6 @@ class InferenceThread(threading.Thread):
                 if control_message and control_message.get("type") == "video_ended":
                     if not video_ended:
                         logger.info("收到视频结束消息，继续运行15秒处理剩余消息...")
-                        self._log_fusion_stats_if_needed(force=True)
                         video_ended = True
                         video_ended_time = time.time()
                 
@@ -182,17 +163,16 @@ class InferenceThread(threading.Thread):
         if wake_detected:
             logger.info(f"[Inference] 检测到唤醒词，准备调用LLM处理...")
             logger.info(f"[Inference] 完整查询文本: '{self.cumulative_asr_text}'")
-            # 尽早置位，使 ASR 在 pause_asr_during_llm 下不再跑 FunASR，腾出统一内存给 Ollama
+            # 首帧视觉可能尚未到达，或推理资源曾拒绝导致未缓存帧；短暂等待以免误落「无图」分支
+            if self.latest_frame is None:
+                _deadline = time.time() + 2.5
+                while self.latest_frame is None and self.running and time.time() < _deadline:
+                    time.sleep(0.05)
+                if self.latest_frame is not None:
+                    logger.info("[Inference] 已等到最近一帧视觉，将结合图像调用 LLM")
+            self._trim_cuda_before_llm()
             set_llm_busy(True)
             try:
-                # 首帧视觉可能尚未到达，或推理资源曾拒绝导致未缓存帧；短暂等待以免误落「无图」分支
-                if self.latest_frame is None:
-                    _deadline = time.time() + 2.5
-                    while self.latest_frame is None and self.running and time.time() < _deadline:
-                        time.sleep(0.05)
-                    if self.latest_frame is not None:
-                        logger.info("[Inference] 已等到最近一帧视觉，将结合图像调用 LLM")
-                self._trim_cuda_before_llm()
                 if self.resource_manager.request_resources("llm", priority=5):
                     try:
                         full_query = self.cumulative_asr_text
@@ -239,7 +219,6 @@ class InferenceThread(threading.Thread):
 
         # 申请资源（priority>3 时若 CPU/内存瞬时超标仍允许融合，避免 8GB+ASR 峰值下长期 fusion_skipped）
         if self.resource_manager.request_resources("inference", priority=4):
-            self._fusion_stats["ok"] += 1
             try:
                 # 计算目标距离
                 targets_with_distance = self.depth_fusion.calculate_target_distances(yolo_results, depth_map)
@@ -352,8 +331,6 @@ class InferenceThread(threading.Thread):
         else:
             # 资源不足未跑融合时，仍提供非 None 元数据，便于带图 prompt（目标列表为空）
             if frame is not None:
-                self._fusion_stats["skipped"] += 1
-                self._log_fusion_stats_if_needed()
                 self.latest_metadata = {
                     "targets": [],
                     "timestamp": timestamp,

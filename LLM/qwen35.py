@@ -15,19 +15,7 @@ except ImportError:
     _llm_logger = None
 
 # 送入 Ollama VLM 的长边上限，减轻 Jetson 统一内存上视觉编码峰值（需 >32 以满足 Qwen3-VL 预处理）
-# 全流程 ASR+YOLO+VDA 并行时可用环境变量 QIMING_VL_MAX_SIDE 再压低（如 256）
-_MAX_VL_IMAGE_SIDE = int(os.environ.get("QIMING_VL_MAX_SIDE", "288"))
-
-# 日志与自动化 grep：真模型输出不应包含该前缀；兜底时 stderr/日志会出现 LLM_META
-DEFAULT_FALLBACK_PHRASE = "前方道路安全，可以正常通行"
-
-
-def _log_llm_meta(event: str, **kwargs) -> None:
-    """机器可读一行，便于区分真输出与兜底（勿写入对用户播报的字符串）。"""
-    parts = [f"event={event!r}"] + [f"{k}={v!r}" for k, v in kwargs.items()]
-    print("[LLM_META] " + " ".join(parts), flush=True)
-    if _llm_logger:
-        _llm_logger.info("[LLM_META] " + " ".join(parts))
+_MAX_VL_IMAGE_SIDE = 384
 
 
 def _safe_strip_content(val) -> str:
@@ -50,28 +38,18 @@ class Qwen35Ollama:
             think: 是否启用 Ollama「思考」模式。Qwen3.5 系列默认应传 False：
                 think 只能作为 chat/generate 的顶层参数；放在 options 里会被忽略，
                 思考会占满 num_predict 导致 content/response 为空（见 ollama#14793）。
-            ollama_options: 合并进 Ollama options 的键值，如 num_ctx、num_predict、temperature
-            fallback_phrase: 空响应或异常时的兜底话术（与真输出区分靠 [LLM_META] 日志）
             **kwargs: 其他参数（兼容旧接口）
         """
         self.model_name = model_name
         # 显式 False：关闭 Qwen3.5 thinking；None 表示不向 API 传 think（由模型默认）
         self.think: Optional[bool] = kwargs.pop("think", False)
-        self.fallback_phrase: str = kwargs.pop("fallback_phrase", DEFAULT_FALLBACK_PHRASE)
-        ollama_options = kwargs.pop("ollama_options", None) or {}
         self.default_params = {
             "temperature": 0.6,
             "top_p": 0.8,
             "top_k": 20,
-            # 默认偏小省内存；长 prompt 可在 config models.llm.ollama_options 提高 num_ctx
+            # 全栈 YOLO+VDA+ASR+Ollama 下抬高 num_ctx 易触发 OOM kill；先保持 256，依赖 think=False 与足够 num_predict
             "num_ctx": 256,
-            "num_predict": 256,
         }
-        for k, v in ollama_options.items():
-            if k in self.default_params or k in ("temperature", "top_p", "top_k", "repeat_penalty"):
-                self.default_params[k] = v
-        if kwargs:
-            print(f"[System] Ollama 忽略未识别构造参数: {list(kwargs.keys())}", flush=True)
         print(f"[System] Ollama模型已就绪: {model_name}")
 
     @staticmethod
@@ -79,7 +57,7 @@ class Qwen35Ollama:
         msg = str(exc).lower()
         return "system memory" in msg or "requires more" in msg
 
-    def _release_pressure_before_ollama_retry(self, attempt: int = 0) -> None:
+    def _release_pressure_before_ollama_retry(self) -> None:
         gc.collect()
         try:
             import torch
@@ -89,8 +67,7 @@ class Qwen35Ollama:
                 torch.cuda.synchronize()
         except Exception:
             pass
-        # 给 FunASR 等线程留出归还页的时间；随重试递增
-        time.sleep(0.45 + min(attempt, 4) * 0.2)
+        time.sleep(0.35)
 
     def _clean_response(self, text: str) -> str:
         """
@@ -163,17 +140,12 @@ class Qwen35Ollama:
         Returns:
             生成的文本字符串
         """
-        text_fallback_model = kwargs.pop("text_fallback_model", None)
-
         params = self.default_params.copy()
         if kwargs:
             if "temperature" in kwargs:
                 params["temperature"] = kwargs["temperature"]
             if "max_tokens" in kwargs:
                 params["num_predict"] = kwargs["max_tokens"]
-            for opt_key in ("num_ctx", "num_predict", "top_p", "top_k", "temperature"):
-                if opt_key in kwargs and kwargs[opt_key] is not None:
-                    params[opt_key] = kwargs[opt_key]
         
         try:
             import sys
@@ -181,8 +153,7 @@ class Qwen35Ollama:
             sys.stdout.flush()
 
             last_err: Optional[BaseException] = None
-            _mem_attempts = 6
-            for attempt in range(_mem_attempts):
+            for attempt in range(4):
                 try:
                     if image is not None:
                         img_payload = self._prepare_image_for_ollama(image)
@@ -214,23 +185,21 @@ class Qwen35Ollama:
                     break
                 except Exception as e:
                     last_err = e
-                    if not self._is_ollama_memory_shortage(e) or attempt >= _mem_attempts - 1:
+                    if not self._is_ollama_memory_shortage(e) or attempt >= 3:
                         raise
                     print(
-                        f"[LLM] Ollama 报告内存紧张，重试 {attempt + 1}/{_mem_attempts} …"
+                        f"[LLM] Ollama 报告内存紧张，重试 {attempt + 1}/3 …"
                     )
                     sys.stdout.flush()
-                    self._release_pressure_before_ollama_retry(attempt)
+                    self._release_pressure_before_ollama_retry()
             if last_err is not None:
                 raise last_err
 
-            raw_len = len(result or "")
             raw_preview = (result or "")[:160]
             if _llm_logger:
                 _llm_logger.info(
                     f"[LLM/Ollama] 完成 model={self.model_name} multimodal={image is not None} "
-                    f"raw_len={raw_len} think={self.think!r} num_ctx={params.get('num_ctx')} "
-                    f"num_predict={params.get('num_predict')} preview={raw_preview!r}"
+                    f"raw_len={len(result or '')} think={self.think!r} preview={raw_preview!r}"
                 )
             print("[LLM] 生成完成")
             sys.stdout.flush()
@@ -238,78 +207,22 @@ class Qwen35Ollama:
             cleaned = self._clean_response(result)
             if cleaned != result and _llm_logger:
                 _llm_logger.info(
-                    f"[LLM/Ollama] 清洗后 len={len(cleaned)}（原 len={raw_len}）"
+                    f"[LLM/Ollama] 清洗后 len={len(cleaned)}（原 len={len(result or '')}）"
                 )
 
             if cleaned:
-                _log_llm_meta(
-                    "ok",
-                    model=self.model_name,
-                    multimodal=image is not None,
-                    reply_len=len(cleaned),
-                    raw_len=raw_len,
-                )
                 print(f"[LLM] 生成结果: {cleaned[:100]}...")
                 sys.stdout.flush()
                 return cleaned
             print("[LLM] 生成结果为空（API 无正文或清洗后为空），使用兜底")
             sys.stdout.flush()
-            _log_llm_meta(
-                "fallback_empty",
-                model=self.model_name,
-                multimodal=image is not None,
-                raw_len=raw_len,
-                num_ctx=params.get("num_ctx"),
-                hint="check_think_false_num_ctx_model_vision",
-            )
             if _llm_logger:
                 _llm_logger.warning(
                     "[LLM/Ollama] 空回复兜底：请检查 think=False、num_ctx、或 Ollama 日志"
                 )
-            return self.fallback_phrase
+            return "前方道路安全，可以正常通行"
         except Exception as e:
             print(f"[LLM] 生成失败: {e}")
-            # Jetson 统一内存下 VLM 常固定需 ~2.7GiB；不足时改用已配置的纯文本小模型，避免整句静态兜底
-            if (
-                image is not None
-                and text_fallback_model
-                and text_fallback_model != self.model_name
-                and self._is_ollama_memory_shortage(e)
-            ):
-                _log_llm_meta(
-                    "degrade_text_only",
-                    from_model=self.model_name,
-                    to_model=text_fallback_model,
-                    error=str(e)[:160],
-                )
-                print(
-                    f"[LLM] VLM 内存不足，降级为纯文本模型: {text_fallback_model}",
-                    flush=True,
-                )
-                mtok = min(160, int(kwargs.get("max_tokens", 256) or 256))
-                backup = Qwen35Ollama(
-                    model_name=text_fallback_model,
-                    think=self.think,
-                    ollama_options={"num_ctx": 256, "num_predict": 96},
-                    fallback_phrase=self.fallback_phrase,
-                )
-                aug = (
-                    text
-                    + "\n\n（当前无图像，请仅根据上文用户话语与环境文字摘要，用一句话给出中文导盲建议。）"
-                )
-                return backup.generate(
-                    text=aug,
-                    image=None,
-                    max_tokens=mtok,
-                    text_fallback_model=None,
-                )
-
-            _log_llm_meta(
-                "fallback_exception",
-                model=self.model_name,
-                multimodal=image is not None,
-                error=str(e)[:200],
-            )
             if image is not None:
                 print(
                     "[LLM] 多模态失败常见原因：Ollama 中该 model_name 不是视觉模型，"
@@ -318,7 +231,7 @@ class Qwen35Ollama:
             import traceback
             traceback.print_exc()
             sys.stdout.flush()
-            return self.fallback_phrase
+            return "前方道路安全，可以正常通行"
 
     def chat(
         self,
@@ -356,16 +269,10 @@ class Qwen35Ollama:
                 out = _safe_strip_content(msg.get("content"))
             else:
                 out = _safe_strip_content(getattr(msg, "content", None))
-            cleaned = self._clean_response(out)
-            if cleaned:
-                _log_llm_meta("ok", model=self.model_name, route="chat", reply_len=len(cleaned))
-                return cleaned
-            _log_llm_meta("fallback_empty", model=self.model_name, route="chat", raw_len=len(out or ""))
-            return self.fallback_phrase
+            return self._clean_response(out) or "前方道路安全，可以正常通行"
         except Exception as e:
             print(f"[LLM] Chat失败: {e}")
-            _log_llm_meta("fallback_exception", model=self.model_name, route="chat", error=str(e)[:200])
-            return self.fallback_phrase
+            return "前方道路安全，可以正常通行"
 
     def batch_generate(
         self,

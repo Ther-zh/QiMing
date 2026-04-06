@@ -331,19 +331,16 @@ class BlindGuideSystem:
                 logger.info(f"准备写入结果文件，ASR结果数量: {len(asr_results)}, LLM结果数量: {len(llm_results)}")
                 logger.info(f"结果文件对象: {self.result_file}")
                 
-                def _one_line(val) -> str:
-                    return " ".join(str(val).split())
-
-                # 写入ASR和LLM结果（单行，避免模型输出里的换行被误读成下一条）
+                # 写入ASR和LLM结果
                 self.result_file.write("\n# ASR识别结果\n")
                 for i, result in enumerate(asr_results):
                     logger.info(f"写入ASR结果 {i+1}: {result}")
-                    self.result_file.write(f"{i+1}. {_one_line(result)}\n")
-
+                    self.result_file.write(f"{i+1}. {result}\n")
+                
                 self.result_file.write("\n# LLM回复结果\n")
                 for i, result in enumerate(llm_results):
                     logger.info(f"写入LLM结果 {i+1}: {result}")
-                    self.result_file.write(f"{i+1}. {_one_line(result)}\n")
+                    self.result_file.write(f"{i+1}. {result}\n")
                 
                 self.result_file.flush()  # 立即写入
                 self.result_file.close()

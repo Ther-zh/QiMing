@@ -104,24 +104,10 @@ class ComplexSceneScheduler:
             traceback.print_exc()
             # 尝试直接调用模型进行纯文本生成
             try:
-                logger.warning(
-                    "[LLM_META] event=fallback_degraded_stub reason=primary_multimodal_failed "
-                    "— 将使用固定场景描述的纯文本二次调用，非真实感知结果"
-                )
-                logger.info("尝试直接调用模型进行纯文本生成（降级桩）...")
+                logger.info("尝试直接调用模型进行纯文本生成...")
                 from LLM.qwen35 import Qwen35Ollama
-                llm_cfg = self.config.get("models", {}).get("llm", {}) or {}
-                model_name = llm_cfg.get("model_name", "qwen3.5-4b")
-                _opts = dict(llm_cfg.get("ollama_options") or {})
-                _fb = llm_cfg.get("fallback_phrase")
-                _kw = dict(ollama_options=_opts)
-                if _fb:
-                    _kw["fallback_phrase"] = _fb
-                model = Qwen35Ollama(
-                    model_name=model_name,
-                    think=llm_cfg.get("ollama_think", False),
-                    **_kw,
-                )
+                model_name = self.config.get("models", {}).get("llm", {}).get("model_name", "qwen3.5-4b")
+                model = Qwen35Ollama(model_name=model_name)
                 simple_prompt = "你是一个导盲系统助手，需要回答用户的问题。用户问：\"前面有什么东西？\"，当前环境有一些行人、汽车和摩托车。请给出友好的回答。"
                 response = model.generate(simple_prompt)
                 logger.info(f"直接调用模型成功，回复: {response}")
@@ -245,11 +231,11 @@ class ComplexSceneScheduler:
         prompt += "6. 必须用中文回答\n"
         prompt += "7. 将英文类别翻译成中文（person→行人，car→汽车，motorcycle→摩托车）\n\n"
         
-        # 勿给可逐字复述的「标准答案」，否则小参数文本模型会照抄（尤其 VLM 内存不足走纯文本降级时）
-        prompt += "## 格式说明\n"
-        prompt += "若有目标：写清方位、约略距离、类别（中文）与一条可执行建议；若无目标：结合用户问句给保守、具体的简短提示。\n"
-        prompt += "禁止复述任何虚构示例句，须依据上方「环境信息」与「用户问题」生成。\n\n"
-
+        # 示例
+        prompt += "## 示例\n"
+        prompt += "输入：环境：前方5米有行人，左侧3米有汽车；用户：我想过马路\n"
+        prompt += "输出：前方5米有行人，左侧3米有汽车正在移动。建议稍等车辆通过后，确认安全再过马路。\n\n"
+        
         # 开始回复
         prompt += "请直接输出简洁的导航建议："
         
