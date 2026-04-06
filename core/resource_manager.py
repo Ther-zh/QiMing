@@ -1,3 +1,5 @@
+import shutil
+import subprocess
 import threading
 import time
 import psutil
@@ -13,7 +15,24 @@ try:
 except ImportError:
     NVML_AVAILABLE = False
 
+
+def _decode_nvml_str(name):
+    if name is None:
+        return None
+    if isinstance(name, bytes):
+        return name.decode("utf-8", errors="replace")
+    return name
+
+
 class ResourceManager:
+    """进程内 NVML 只初始化一次，避免 main 与 InferenceThread 各建实例时重复 nvmlInit。"""
+
+    _nvml_lock = threading.Lock()
+    _nvml_state = "pending"  # pending | ok | failed
+    _shared_gpu_handle = None
+    _shared_gpu_name = None
+    _nvml_read_warned = False
+
     def __init__(self):
         """
         初始化资源管理器
@@ -35,28 +54,81 @@ class ResourceManager:
         self.running = False
     
     def _init_nvml(self):
-        """初始化NVML进行GPU监控"""
-        if NVML_AVAILABLE:
+        """初始化 NVML（全进程单例）；失败则后续依赖 PyTorch 兜底读数。"""
+        if not NVML_AVAILABLE:
+            with ResourceManager._nvml_lock:
+                if ResourceManager._nvml_state == "pending":
+                    ResourceManager._nvml_state = "failed"
+            return
+
+        with ResourceManager._nvml_lock:
+            if ResourceManager._nvml_state == "ok":
+                self.gpu_handle = ResourceManager._shared_gpu_handle
+                self.gpu_name = ResourceManager._shared_gpu_name
+                self.nvml_initialized = True
+                return
+            if ResourceManager._nvml_state == "failed":
+                return
+
             try:
                 nvmlInit()
                 gpu_count = nvmlDeviceGetCount()
                 if gpu_count > 0:
-                    self.gpu_handle = nvmlDeviceGetHandleByIndex(0)
-                    self.gpu_name = nvmlDeviceGetName(self.gpu_handle)
+                    h = nvmlDeviceGetHandleByIndex(0)
+                    raw_name = nvmlDeviceGetName(h)
+                    name = _decode_nvml_str(raw_name)
+                    ResourceManager._shared_gpu_handle = h
+                    ResourceManager._shared_gpu_name = name
+                    ResourceManager._nvml_state = "ok"
+                    self.gpu_handle = h
+                    self.gpu_name = name
                     self.nvml_initialized = True
                     logger.info(f"GPU监控已初始化: {self.gpu_name}")
+                else:
+                    ResourceManager._nvml_state = "failed"
+                    logger.warning("NVML: 未检测到 GPU 设备")
             except Exception as e:
+                ResourceManager._nvml_state = "failed"
                 logger.warning(f"NVML初始化失败: {e}")
-    
-    def get_gpu_memory_info(self) -> Dict[str, float]:
+
+    def _fill_gpu_memory_from_torch(self, result: Dict[str, Any]) -> None:
+        """Jetson 等平台 NVML 读显存失败时，用当前进程 PyTorch CUDA 计数作展示（非整卡、不含 Ollama）。"""
+        try:
+            import torch
+            if not torch.cuda.is_available():
+                return
+            props = torch.cuda.get_device_properties(0)
+            total = props.total_memory / 1024**3
+            allocated = torch.cuda.memory_allocated(0) / 1024**3
+            reserved = torch.cuda.memory_reserved(0) / 1024**3
+            result["total"] = total
+            result["used"] = allocated
+            result["reserved"] = reserved
+            result["free"] = max(0.0, total - reserved)
+            result["usage_percent"] = (allocated / total) * 100 if total > 0 else 0
+            result["available"] = True
+            result["source"] = "torch"
+            if not self.gpu_name:
+                self.gpu_name = torch.cuda.get_device_name(0)
+        except Exception as e:
+            logger.debug(f"PyTorch CUDA 显存统计不可用: {e}")
+
+    def get_gpu_memory_info(self) -> Dict[str, Any]:
         """
         获取GPU显存信息
         
         Returns:
-            包含total, used, free, usage_percent的字典（单位：GB）
+            包含 total, used, free, usage_percent, available, source(nvml|torch) 的字典（单位：GB）
         """
-        result = {"total": 0, "used": 0, "free": 0, "usage_percent": 0, "available": False}
-        
+        result: Dict[str, Any] = {
+            "total": 0.0,
+            "used": 0.0,
+            "free": 0.0,
+            "usage_percent": 0.0,
+            "available": False,
+            "source": None,
+        }
+
         if self.nvml_initialized and self.gpu_handle:
             try:
                 info = nvmlDeviceGetMemoryInfo(self.gpu_handle)
@@ -65,11 +137,64 @@ class ResourceManager:
                 result["free"] = info.free / 1024**3
                 result["usage_percent"] = (info.used / info.total) * 100 if info.total > 0 else 0
                 result["available"] = True
+                result["source"] = "nvml"
             except Exception as e:
-                logger.debug(f"获取GPU显存信息失败: {e}")
-        
+                if not ResourceManager._nvml_read_warned:
+                    logger.warning(
+                        f"NVML 读取 GPU 显存失败，将用 PyTorch 进程内统计作摘要（Jetson 常见）: {e}"
+                    )
+                    ResourceManager._nvml_read_warned = True
+
+        if not result["available"]:
+            self._fill_gpu_memory_from_torch(result)
+
         return result
-    
+
+    @staticmethod
+    def _jetson_tegrastats_one_line() -> Optional[str]:
+        """
+        读取一行 tegrastats（Jetson 常用），含 RAM、GR3D 等，更接近「整机 + GPU 负载」观感。
+        可能需 root，失败则返回 None。
+        """
+        if not config_loader.get_config().get("resources", {}).get(
+            "show_tegrastats_in_summary", True
+        ):
+            return None
+        tegrastats = shutil.which("tegrastats")
+        if not tegrastats:
+            return None
+        timeout_bin = shutil.which("timeout")
+        try:
+            if timeout_bin:
+                r = subprocess.run(
+                    [timeout_bin, "1.2", tegrastats],
+                    capture_output=True,
+                    text=True,
+                    timeout=3.0,
+                )
+                out = (r.stdout or "").strip()
+                if out:
+                    return out.split("\n")[0].strip()
+            else:
+                proc = subprocess.Popen(
+                    [tegrastats],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.DEVNULL,
+                    text=True,
+                )
+                if proc.stdout:
+                    line = proc.stdout.readline()
+                    proc.terminate()
+                    try:
+                        proc.wait(timeout=1.5)
+                    except subprocess.TimeoutExpired:
+                        proc.kill()
+                    if line:
+                        return line.strip()
+        except Exception as e:
+            logger.debug(f"tegrastats 采样跳过: {e}")
+        return None
+
     def print_gpu_memory(self, stage: str = ""):
         """
         打印GPU显存使用情况
@@ -80,11 +205,22 @@ class ResourceManager:
         gpu_info = self.get_gpu_memory_info()
         if gpu_info["available"]:
             prefix = f"[{stage}] " if stage else ""
-            logger.info(f"{prefix}GPU显存: 总计={gpu_info['total']:.2f}GB, "
-                       f"使用={gpu_info['used']:.2f}GB ({gpu_info['usage_percent']:.1f}%), "
-                       f"可用={gpu_info['free']:.2f}GB")
+            src = gpu_info.get("source") or "?"
+            if src == "torch":
+                res = gpu_info.get("reserved", 0.0)
+                logger.info(
+                    f"{prefix}GPU(PyTorch本进程): allocated={gpu_info['used']:.2f}GB "
+                    f"reserved={res:.2f}GB / device可见总量={gpu_info['total']:.2f}GB "
+                    f"({gpu_info['usage_percent']:.1f}% of device 口径; 不含 Ollama 等其它进程)"
+                )
+            else:
+                logger.info(
+                    f"{prefix}GPU显存(NVML): 总计={gpu_info['total']:.2f}GB, "
+                    f"已用={gpu_info['used']:.2f}GB ({gpu_info['usage_percent']:.1f}%), "
+                    f"空闲={gpu_info['free']:.2f}GB"
+                )
         else:
-            logger.debug("GPU显存监控不可用")
+            logger.warning("GPU显存监控不可用（NVML 与 PyTorch CUDA 均无法读数）")
     
     def get_memory_summary(self) -> str:
         """
@@ -100,15 +236,46 @@ class ResourceManager:
         
         cpu_usage = psutil.cpu_percent(interval=0.1)
         memory = psutil.virtual_memory()
-        lines.append(f"CPU使用率: {cpu_usage:.1f}%")
-        lines.append(f"内存使用: {memory.used/1024**3:.2f}GB / {memory.total/1024**3:.2f}GB ({memory.percent:.1f}%)")
-        
+        lines.append(f"CPU使用率(psutil整机): {cpu_usage:.1f}%")
+        lines.append(
+            f"内存使用(psutil整机): {memory.used/1024**3:.2f}GB / "
+            f"{memory.total/1024**3:.2f}GB ({memory.percent:.1f}%)"
+        )
+
         gpu_info = self.get_gpu_memory_info()
         if gpu_info["available"]:
-            lines.append(f"GPU型号: {self.gpu_name}")
-            lines.append(f"GPU显存: {gpu_info['used']:.2f}GB / {gpu_info['total']:.2f}GB ({gpu_info['usage_percent']:.1f}%)")
+            disp_name = self.gpu_name or "GPU"
+            src = gpu_info.get("source") or "nvml"
+            lines.append(f"GPU型号: {disp_name}")
+            if src == "torch":
+                res = gpu_info.get("reserved", 0.0)
+                lines.append(
+                    "GPU/CUDA(psutil外): 以下为「本 Python 进程」内 PyTorch 的 CUDA 计数，"
+                    "不是整颗 SoC 显存、也不含 ollama 等其它进程（Jetson 统一内存上二者会一起挤占）。"
+                )
+                lines.append(
+                    f"  allocated={gpu_info['used']:.2f}GB, reserved={res:.2f}GB, "
+                    f"device可见总量≈{gpu_info['total']:.2f}GB "
+                    f"(allocated/总量={gpu_info['usage_percent']:.1f}%，口径偏保守)"
+                )
+            else:
+                lines.append(
+                    f"GPU显存(NVML 驱动口径): 已用={gpu_info['used']:.2f}GB / "
+                    f"总量={gpu_info['total']:.2f}GB ({gpu_info['usage_percent']:.1f}%)"
+                )
         else:
-            lines.append("GPU显存: 不可用")
+            lines.append("GPU显存: 不可用（NVML 与 PyTorch CUDA 均无法读数）")
+
+        ts = self._jetson_tegrastats_one_line()
+        if ts:
+            lines.append(f"Jetson tegrastats(单行采样): {ts}")
+        elif config_loader.get_config().get("resources", {}).get(
+            "show_tegrastats_in_summary", True
+        ):
+            lines.append(
+                "Jetson tegrastats: 未采样（无 tegrastats 或需权限）；"
+                "可终端运行 `tegrastats` 或 `jtop` 看 GR3D/RAM 更贴近真实负载"
+            )
         
         lines.append("=" * 50)
         return "\n".join(lines)

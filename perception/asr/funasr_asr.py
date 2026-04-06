@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import torch
 from typing import Dict, Any, Tuple
 from .funAsr import SenseVoiceASR
 
@@ -12,12 +13,15 @@ class FunASRRecognizer:
             config: 配置字典，包含模型路径等参数
         """
         self.config = config
-        self.model_path = config.get('model_path', '/root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall')
-        self.vad_model_path = config.get('vad_model_path', '/root/autodl-tmp/funasr_models/modelscope_cache/iic/speech_fsmn_vad_zh-cn-16k-common-pytorch')
-        self.punc_model_path = config.get('punc_model_path', '/root/autodl-tmp/funasr_models/modelscope_cache/iic/punc_ct-transformer_zh-cn-common-vocab272727-pytorch')
+        _base = "/home/nvidia/models/root/autodl-tmp/funasr_models/modelscope_cache/iic"
+        self.model_path = config.get("model_path", f"{_base}/SenseVoiceSmall")
+        self.vad_model_path = config.get("vad_model_path", f"{_base}/speech_fsmn_vad_zh-cn-16k-common-pytorch")
+        self.punc_model_path = config.get("punc_model_path", f"{_base}/punc_ct-transformer_zh-cn-common-vocab272727-pytorch")
         self.model = None
         self.vad_model = None
         self.punc_model = None
+        self._enable_vad = bool(config.get("enable_vad", True))
+        self._enable_punctuation = bool(config.get("enable_punctuation", True))
         self._load_models()
         # 音频缓冲
         self.audio_buffer = []
@@ -49,44 +53,71 @@ class FunASRRecognizer:
         """
         加载FunASR模型
         """
+        # device：config 可指定 cuda:0 / cpu；默认 auto 与 GPU 可用时走 cuda（Jetson 8GB 上与 YOLO+VDA 并存易 OOM，可设 cpu）
+        device = self.config.get("device", "auto")
+        if device is None or str(device).lower() == "auto":
+            device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        print(f"[ASR] 使用设备: {device}")
+        # 仅使用本机已下载的 ModelScope 缓存（见 config 旁 modelscope_cache；内含 models/iic -> ../iic）
+        os.environ.setdefault(
+            "MODELSCOPE_CACHE",
+            "/home/nvidia/models/root/autodl-tmp/funasr_models/modelscope_cache",
+        )
+        os.environ.setdefault("FUNASR_LOCAL_ONLY", "1")
+
         try:
             # 加载主ASR模型
             self.model = SenseVoiceASR(
                 model_dir=self.model_path,
-                device="cuda:0" if os.environ.get('CUDA_VISIBLE_DEVICES') else "cpu",
+                device=device,
                 verbose=True
             )
             print(f"[ASR] 主模型加载成功: {self.model_path}")
-            
-            # 加载VAD模型 - 使用正确的FunASR API
-            try:
-                from funasr import AutoModel
-                # 直接使用模型ID从modelscope加载，这样会自动下载和使用正确的版本
-                self.vad_model = AutoModel(
-                    model="iic/speech_fsmn_vad_zh-cn-16k-common-pytorch",
-                    device="cuda:0" if os.environ.get('CUDA_VISIBLE_DEVICES') else "cpu"
-                )
-                print(f"[ASR] VAD模型加载成功")
-            except Exception as e:
-                print(f"[ASR] VAD模型加载失败: {e}")
-                import traceback
-                traceback.print_exc()
-                self.vad_model = None
-            
-            # 加载标点模型 - 使用正确的FunASR API
-            try:
-                from funasr import AutoModel
-                # 直接使用模型ID从modelscope加载，这样会自动下载和使用正确的版本
-                self.punc_model = AutoModel(
-                    model="iic/punc_ct-transformer_zh-cn-common-vocab272727-pytorch",
-                    device="cuda:0" if os.environ.get('CUDA_VISIBLE_DEVICES') else "cpu"
-                )
-                print(f"[ASR] 标点模型加载成功")
-            except Exception as e:
-                print(f"[ASR] 标点模型加载失败: {e}")
-                import traceback
-                traceback.print_exc()
-                self.punc_model = None
+
+            # VAD / 标点：可通过 config 关闭以降低 Jetson 统一内存占用
+            if self._enable_vad:
+                try:
+                    from funasr import AutoModel
+
+                    if not os.path.isdir(self.vad_model_path):
+                        raise FileNotFoundError(f"VAD 缓存目录不存在: {self.vad_model_path}")
+                    self.vad_model = AutoModel(
+                        model="iic/speech_fsmn_vad_zh-cn-16k-common-pytorch",
+                        device=device,
+                        disable_update=True,
+                        check_latest=False,
+                    )
+                    print("[ASR] VAD模型加载成功（本地缓存）")
+                except Exception as e:
+                    print(f"[ASR] VAD模型加载失败: {e}")
+                    import traceback
+
+                    traceback.print_exc()
+                    self.vad_model = None
+            else:
+                print("[ASR] 已跳过 VAD 加载（enable_vad=false，使用能量阈值检测语音）")
+
+            if self._enable_punctuation:
+                try:
+                    from funasr import AutoModel
+
+                    if not os.path.isdir(self.punc_model_path):
+                        raise FileNotFoundError(f"标点缓存目录不存在: {self.punc_model_path}")
+                    self.punc_model = AutoModel(
+                        model="iic/punc_ct-transformer_zh-cn-common-vocab272727-pytorch",
+                        device=device,
+                        disable_update=True,
+                        check_latest=False,
+                    )
+                    print("[ASR] 标点模型加载成功（本地缓存）")
+                except Exception as e:
+                    print(f"[ASR] 标点模型加载失败: {e}")
+                    import traceback
+
+                    traceback.print_exc()
+                    self.punc_model = None
+            else:
+                print("[ASR] 已跳过标点模型加载（enable_punctuation=false）")
                 
         except Exception as e:
             print(f"[ASR] 模型加载失败: {e}")
@@ -186,10 +217,10 @@ class FunASRRecognizer:
                     asr_text = self.model.recognize(audio_data, clean_output=True)
                     if verbose:
                         print(f"[ASR] 原始识别结果: '{asr_text}'")
-                    
-                    # 不添加标点（根据要求）
-                    # asr_text = self._add_punctuation(asr_text)
-                    # print(f"[ASR] 带标点结果: '{asr_text}'")
+                    if self._enable_punctuation and self.punc_model and asr_text:
+                        asr_text = self._add_punctuation(asr_text)
+                        if verbose:
+                            print(f"[ASR] 带标点结果: '{asr_text}'")
                 except Exception as e:
                     if verbose:
                         print(f"[ASR] 模型识别失败: {e}")
@@ -228,9 +259,10 @@ class FunASRRecognizer:
                     wake_audio = np.array(self.wake_audio_buffer)
                     try:
                         wake_text = self.model.recognize(wake_audio, clean_output=True)
+                        if self._enable_punctuation and self.punc_model and wake_text:
+                            wake_text = self._add_punctuation(wake_text)
                         if verbose:
                             print(f"[ASR] 唤醒句子识别结果: '{wake_text}'")
-                        # 使用唤醒句子作为最终结果
                         asr_text = wake_text
                     except Exception as e:
                         if verbose:

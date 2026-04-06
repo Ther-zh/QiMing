@@ -1,10 +1,13 @@
 import threading
 import time
-import numpy as np
 from typing import Dict, Tuple, Any
+
+import cv2
+import numpy as np
 
 from utils.logger import logger
 from utils.message_queue import message_queue
+from utils.config_loader import config_loader
 from hardware.input_device_factory import InputDeviceFactory
 
 class InputThread(threading.Thread):
@@ -16,6 +19,10 @@ class InputThread(threading.Thread):
         super().__init__(daemon=True)
         self.running = False
         self.input_device = InputDeviceFactory.create_input_device()
+        cam = config_loader.get_config().get("cameras", {}).get("camera1", {}).get(
+            "resolution", [640, 480]
+        )
+        self._vision_w, self._vision_h = int(cam[0]), int(cam[1])
     
     def run(self):
         """
@@ -33,7 +40,7 @@ class InputThread(threading.Thread):
         # 音频数据处理 - 实时发送短片段音频
         audio_buffer = []  # 音频缓冲区
         sample_rate = 16000  # 采样率为16kHz
-        segment_duration = 5  # 片段长度（秒）
+        segment_duration = 3  # 片段长度（秒），过长时 FunASR 在 8GB 上易顶满内存
         overlap_duration = 1  # 重叠长度（秒）
         segment_samples = sample_rate * segment_duration  # 5秒音频样本数
         overlap_samples = sample_rate * overlap_duration  # 1秒重叠样本数
@@ -64,13 +71,24 @@ class InputThread(threading.Thread):
                 if main_camera in frames:
                     frame, timestamp = frames[main_camera]
                     if frame is not None:
-                        # 发送帧到视觉处理队列
-                        message_queue.send_message("vision", {
-                            "type": "frame",
-                            "frame": frame,
-                            "timestamp": timestamp,
-                            "camera_id": main_camera
-                        })
+                        if (
+                            frame.shape[1] != self._vision_w
+                            or frame.shape[0] != self._vision_h
+                        ):
+                            frame = cv2.resize(
+                                frame,
+                                (self._vision_w, self._vision_h),
+                                interpolation=cv2.INTER_AREA,
+                            )
+                        message_queue.send_message(
+                            "vision",
+                            {
+                                "type": "frame",
+                                "frame": frame,
+                                "timestamp": timestamp,
+                                "camera_id": main_camera,
+                            },
+                        )
                 
                 # 获取音频数据
                 audio_data, audio_timestamp = self.input_device.get_audio(main_camera)

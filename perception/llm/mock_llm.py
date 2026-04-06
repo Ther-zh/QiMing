@@ -24,10 +24,10 @@ class MockQwenMultimodal:
             生成的口语化文本（≤100字）
         """
         image, metadata, prompt = input_data
-        
+        metadata = metadata or {}
+
         print(f"[Mock LLM] 接收到的prompt: {prompt}")
-        
-        # 分析metadata中的目标信息
+
         targets = metadata.get("targets", [])
         target_info = ""
         if targets:

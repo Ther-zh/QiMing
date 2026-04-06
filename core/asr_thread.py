@@ -6,6 +6,7 @@ from typing import Dict, Any
 from utils.logger import logger
 from utils.message_queue import message_queue
 from utils.config_loader import config_loader
+from utils.llm_gate import is_llm_busy
 
 # 导入ASR模块
 from perception.asr.funasr_asr import FunASRRecognizer
@@ -27,7 +28,7 @@ class ASRThread(threading.Thread):
         """
         config = config_loader.get_config()
         asr_config = config.get("models", {}).get("asr", {})
-        if asr_config.get("type", "mock") == "real":
+        if asr_config.get("type", "real") != "mock":
             return FunASRRecognizer(asr_config)
         else:
             return MockFunASRRecognizer(asr_config)
@@ -39,31 +40,50 @@ class ASRThread(threading.Thread):
         self.running = True
         logger.info("ASR线程已启动")
         
+        pause_asr = bool(
+            config_loader.get_config()
+            .get("system", {})
+            .get("pause_asr_during_llm", True)
+        )
+        pending = None
         try:
             while self.running:
-                # 从音频队列接收消息
-                message = message_queue.receive_message("audio", block=False)
+                if pending is None:
+                    message = message_queue.receive_message("audio", block=False)
+                    if message and message.get("type") == "audio_data":
+                        pending = message
+                    else:
+                        message = None
+                else:
+                    message = pending
+
                 if message and message.get("type") == "audio_data":
+                    if pause_asr and is_llm_busy():
+                        # LLM（Ollama）与 FunASR 同抢 Jetson 统一内存时，Ollama 常报需 2.7GiB 而失败
+                        time.sleep(0.06)
+                        continue
+                    pending = None
                     audio_data = message.get("audio_data")
                     timestamp = message.get("timestamp")
-                    
+
                     if audio_data is not None:
-                        # 执行ASR识别
                         is_final = message.get("is_final", False)
-                        wake_detected, asr_text = self.asr.inference(audio_data, is_final)
-                        
+                        wake_detected, asr_text = self.asr.inference(
+                            audio_data, is_final
+                        )
+
                         if asr_text:
-                            # 只在识别到完整句子时输出
                             logger.info(f"[ASR] 识别结果: {asr_text}")
-                            # 发送识别结果到推理决策队列
-                            message_queue.send_message("inference", {
-                                "type": "asr_result",
-                                "text": asr_text,
-                                "wake_detected": wake_detected,
-                                "timestamp": timestamp
-                            })
-                
-                # 短暂休眠，避免占用过多CPU
+                            message_queue.send_message(
+                                "inference",
+                                {
+                                    "type": "asr_result",
+                                    "text": asr_text,
+                                    "wake_detected": wake_detected,
+                                    "timestamp": timestamp,
+                                },
+                            )
+
                 time.sleep(0.01)
         finally:
             # 释放ASR资源

@@ -82,9 +82,19 @@
 
 ### 安装依赖
 
+**Jetson（推荐）**：先按 [JETSON_PYTORCH.md](JETSON_PYTORCH.md) 安装与 JetPack 匹配的 `torch`、`torchvision`、`torchaudio`，再安装其余依赖：
+
+```bash
+pip install -r requirements-jetson.txt
+```
+
+**x86 桌面**：先按 [PyTorch 官网](https://pytorch.org) 安装 CUDA 版 `torch` 三件套，再执行：
+
 ```bash
 pip install -r requirements.txt
 ```
+
+（`requirements.txt` 不含 `torch*` 固定版本，避免在 Jetson 上误装不兼容的 PyPI 轮子。）
 
 ### 配置说明
 

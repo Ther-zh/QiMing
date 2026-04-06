@@ -42,7 +42,7 @@ import torch
 
 class SenseVoiceASR:
     # 默认配置你的本地模型路径
-    DEFAULT_MODEL_DIR = "/root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall"
+    DEFAULT_MODEL_DIR = "/home/nvidia/models/root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall"
     
     def __init__(self, model_dir=None, device=None, verbose=False):
         """

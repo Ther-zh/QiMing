@@ -1,7 +1,6 @@
 import time
 import threading
 import signal
-import sys
 import cv2
 import numpy as np
 from typing import Dict, Any, List
@@ -33,11 +32,11 @@ class BlindGuideSystem:
         # 初始化资源管理器（用于GPU显存监控）
         self.resource_manager = ResourceManager()
         
-        # 初始化线程
+        # 初始化线程（与主系统共享 ResourceManager，避免重复 NVML 与资源状态分裂）
         self.input_thread = InputThread()
         self.asr_thread = ASRThread()
         self.vision_thread = VisionThread()
-        self.inference_thread = InferenceThread()
+        self.inference_thread = InferenceThread(resource_manager=self.resource_manager)
         
         # 初始化调试查看器
         self.debug_viewer = DebugViewer()
@@ -47,7 +46,8 @@ class BlindGuideSystem:
         
         # 视频写入器
         self.video_writer = None
-        
+        self.depth_video_writer = None
+
         # 结果记录文件
         self.result_file = None
     
@@ -68,7 +68,11 @@ class BlindGuideSystem:
         logger.info(f"YOLO模型: {self.config.get('models', {}).get('yolo', {}).get('model_path')}")
         logger.info(f"VDA模型: {self.config.get('models', {}).get('vda', {}).get('model_path')}")
         logger.info(f"ASR模型: {self.config.get('models', {}).get('asr', {}).get('model_path')}")
-        logger.info(f"LLM模型: {self.config.get('models', {}).get('llm', {}).get('model_path')}")
+        _llm = self.config.get("models", {}).get("llm", {}) or {}
+        logger.info(f"LLM模型: {_llm.get('model_path')}")
+        logger.info(
+            f"LLM Ollama: 多模态={_llm.get('model_name')}, 纯文本={_llm.get('model_name_text') or _llm.get('model_name')}"
+        )
         if self.config.get('system', {}).get('input_mode') == 'simulated':
             logger.info(f"视频路径: {self.config.get('simulation', {}).get('video_paths', {}).get('camera1')}")
         
@@ -83,9 +87,11 @@ class BlindGuideSystem:
         
         # 创建消息队列
         message_queue.create_queue("audio")
-        message_queue.create_queue("vision")
-        message_queue.create_queue("inference")
+        # 有界队列：YOLO+VDA 耗时长时阻塞输入线程，避免 vision 队列堆积占满内存
+        message_queue.create_queue("vision", maxsize=2)
+        message_queue.create_queue("inference", maxsize=8)
         message_queue.create_queue("control")
+        message_queue.create_queue("record", maxsize=4)
         
         # 启动调试查看器（如果开启且有图形界面）
         debug_enabled = self.config.get("system", {}).get("debug", False)
@@ -136,8 +142,9 @@ class BlindGuideSystem:
                 self.video_fps = cap.get(cv2.CAP_PROP_FPS)
                 cap.release()
                 
-                # 固定每25帧处理一次
-                self.sample_interval = 25
+                self.sample_interval = int(
+                    self.config.get("system", {}).get("vision_sample_interval", 25)
+                )
                 self.processing_fps = self.video_fps / self.sample_interval
                 
                 logger.info(f"视频帧率: {self.video_fps}, 处理帧率: {self.processing_fps:.2f}, 采样间隔: {self.sample_interval}")
@@ -145,28 +152,88 @@ class BlindGuideSystem:
                 # 初始化视频写入器，使用更兼容的设置
                 output_path = "output/output_video.avi"
                 # 尝试不同的编码器
-                fourcc_options = ['MJPG', 'XVID', 'DIVX']
+                fourcc_options = ["MJPG", "XVID", "DIVX"]
                 self.video_writer = None
-                
+                self.depth_video_writer = None
+
                 # 使用摄像头配置中的分辨率
-                cam_width, cam_height = self.config.get("cameras", {}).get("camera1", {}).get("resolution", [640, 480])
+                cam_width, cam_height = self.config.get("cameras", {}).get("camera1", {}).get(
+                    "resolution", [640, 480]
+                )
                 logger.info(f"使用摄像头分辨率: {cam_width}x{cam_height}")
-                
+
+                import os
+
+                os.makedirs(
+                    os.path.dirname(output_path) if os.path.dirname(output_path) else ".",
+                    exist_ok=True,
+                )
+                exec_cfg = self.config.get("execution", {})
+                save_main = exec_cfg.get("save_video_output", True)
+                save_depth = exec_cfg.get("save_depth_colormap_video", True)
+                depth_path = "output/output_depth_colormap.avi"
+
                 for fourcc_code in fourcc_options:
                     try:
                         fourcc = cv2.VideoWriter_fourcc(*fourcc_code)
-                        # 确保目录存在
-                        import os
-                        os.makedirs(os.path.dirname(output_path) if os.path.dirname(output_path) else '.', exist_ok=True)
-                        self.video_writer = cv2.VideoWriter(output_path, fourcc, self.processing_fps, (cam_width, cam_height))
-                        logger.info(f"视频写入器已初始化，输出路径: {output_path}, 编码器: {fourcc_code}, 帧率: {self.processing_fps:.2f}, 分辨率: {cam_width}x{cam_height}")
-                        break
+                        main_ok = not save_main
+                        depth_ok = not save_depth
+                        if save_main:
+                            vw = cv2.VideoWriter(
+                                output_path,
+                                fourcc,
+                                self.processing_fps,
+                                (cam_width, cam_height),
+                            )
+                            if vw.isOpened():
+                                self.video_writer = vw
+                                main_ok = True
+                                logger.info(
+                                    f"视频写入器已初始化: {output_path}, 编码器: {fourcc_code}, "
+                                    f"帧率: {self.processing_fps:.2f}, 分辨率: {cam_width}x{cam_height}"
+                                )
+                            else:
+                                vw.release()
+                                logger.warning(
+                                    f"主视频 VideoWriter 无法打开: {output_path} ({fourcc_code})"
+                                )
+                        if save_depth and main_ok:
+                            dw = cv2.VideoWriter(
+                                depth_path,
+                                fourcc,
+                                self.processing_fps,
+                                (cam_width, cam_height),
+                            )
+                            if dw.isOpened():
+                                self.depth_video_writer = dw
+                                depth_ok = True
+                                logger.info(
+                                    f"深度伪彩色写入器: {depth_path}, 编码器: {fourcc_code}, "
+                                    f"帧率: {self.processing_fps:.2f}"
+                                )
+                            else:
+                                dw.release()
+                                logger.warning(
+                                    f"深度视频 VideoWriter 无法打开: {depth_path} ({fourcc_code})"
+                                )
+                                if self.video_writer:
+                                    self.video_writer.release()
+                                    self.video_writer = None
+                        if main_ok and depth_ok:
+                            break
+                        if self.video_writer:
+                            self.video_writer.release()
+                            self.video_writer = None
+                        if self.depth_video_writer:
+                            self.depth_video_writer.release()
+                            self.depth_video_writer = None
                     except Exception as e:
                         logger.warning(f"尝试编码器 {fourcc_code} 失败: {e}")
                         continue
         except Exception as e:
             logger.warning(f"初始化视频写入器失败: {e}")
             self.video_writer = None
+            self.depth_video_writer = None
     
     def _init_result_file(self):
         """
@@ -225,14 +292,30 @@ class BlindGuideSystem:
                 self.debug_viewer.stop()
         except Exception as e:
             logger.warning(f"停止调试查看器失败: {e}")
+
+        # 排空录制队列，避免停止前最后一帧未写入
+        while True:
+            rec = message_queue.receive_message("record", block=False)
+            if not rec:
+                break
+            if self.video_writer is not None and rec.get("main") is not None:
+                self.video_writer.write(rec["main"])
+            if self.depth_video_writer is not None and rec.get("depth") is not None:
+                self.depth_video_writer.write(rec["depth"])
         
         # 关闭视频写入器
         if self.video_writer:
             try:
                 self.video_writer.release()
-                logger.info("视频写入器已关闭")
+                logger.info("主视频写入器已关闭")
             except Exception as e:
-                logger.warning(f"关闭视频写入器失败: {e}")
+                logger.warning(f"关闭主视频写入器失败: {e}")
+        if self.depth_video_writer:
+            try:
+                self.depth_video_writer.release()
+                logger.info("深度伪彩色视频写入器已关闭")
+            except Exception as e:
+                logger.warning(f"关闭深度视频写入器失败: {e}")
         
         # 关闭结果文件
         if self.result_file:
@@ -248,16 +331,19 @@ class BlindGuideSystem:
                 logger.info(f"准备写入结果文件，ASR结果数量: {len(asr_results)}, LLM结果数量: {len(llm_results)}")
                 logger.info(f"结果文件对象: {self.result_file}")
                 
-                # 写入ASR和LLM结果
+                def _one_line(val) -> str:
+                    return " ".join(str(val).split())
+
+                # 写入ASR和LLM结果（单行，避免模型输出里的换行被误读成下一条）
                 self.result_file.write("\n# ASR识别结果\n")
                 for i, result in enumerate(asr_results):
                     logger.info(f"写入ASR结果 {i+1}: {result}")
-                    self.result_file.write(f"{i+1}. {result}\n")
-                
+                    self.result_file.write(f"{i+1}. {_one_line(result)}\n")
+
                 self.result_file.write("\n# LLM回复结果\n")
                 for i, result in enumerate(llm_results):
                     logger.info(f"写入LLM结果 {i+1}: {result}")
-                    self.result_file.write(f"{i+1}. {result}\n")
+                    self.result_file.write(f"{i+1}. {_one_line(result)}\n")
                 
                 self.result_file.flush()  # 立即写入
                 self.result_file.close()
@@ -309,12 +395,29 @@ class BlindGuideSystem:
                 if control_message:
                     if control_message.get("type") == "stop" or control_message.get("type") == "video_ended":
                         logger.info("收到停止消息，等待5秒让所有线程处理完所有消息...")
-                        # 等待5秒，让ASR和推理线程有足够时间处理所有消息
-                        # 在这期间不停止线程，让它们继续运行
-                        time.sleep(5)
+                        for _ in range(50):
+                            while True:
+                                rec = message_queue.receive_message("record", block=False)
+                                if not rec:
+                                    break
+                                if self.video_writer is not None and rec.get("main") is not None:
+                                    self.video_writer.write(rec["main"])
+                                if self.depth_video_writer is not None and rec.get("depth") is not None:
+                                    self.depth_video_writer.write(rec["depth"])
+                            time.sleep(0.1)
                         logger.info("等待完毕，现在停止系统")
                         self.stop()
                         break
+
+                # 消费推理线程发来的可视化帧
+                while True:
+                    rec = message_queue.receive_message("record", block=False)
+                    if not rec:
+                        break
+                    if self.video_writer is not None and rec.get("main") is not None:
+                        self.video_writer.write(rec["main"])
+                    if self.depth_video_writer is not None and rec.get("depth") is not None:
+                        self.depth_video_writer.write(rec["depth"])
                 
                 # 短暂休眠，避免占用过多CPU
                 time.sleep(0.1)
@@ -330,12 +433,16 @@ class BlindGuideSystem:
         """
         logger.info("收到停止信号，正在停止系统...")
         self.stop()
-        sys.exit(0)
+        import os
+        os._exit(0)
 
 def main():
     """
     主函数
     """
+    import faulthandler
+    faulthandler.enable(all_threads=True)
+
     # 创建系统实例
     system = BlindGuideSystem()
     
@@ -350,6 +457,9 @@ def main():
         logger.info("用户中断，正在停止系统...")
         system.stop()
     # 不再在finally中调用stop()，因为start()方法内部会在视频结束时调用stop()
+    # Jetson/FunASR/PyTorch 在解释器自然退出时偶发 native abort（EXIT 134）；业务已正常 stop 后直接退出进程。
+    import os
+    os._exit(0)
 
 if __name__ == "__main__":
     main()

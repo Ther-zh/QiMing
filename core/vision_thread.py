@@ -1,10 +1,15 @@
+import gc
 import threading
 import time
 from typing import Dict, Any
 
+import cv2
+import torch
+
 from utils.logger import logger
 from utils.message_queue import message_queue
 from utils.config_loader import config_loader
+from utils.llm_gate import is_llm_busy
 
 # 导入视觉处理模块
 from perception.yolo.yolo_detector import YoloDetector
@@ -23,15 +28,21 @@ class VisionThread(threading.Thread):
         self.yolo = self._init_yolo()
         self.vda = self._init_vda()
         self.frame_count = 0
-        self.sample_interval = 25  # 每25帧采样一次
-    
+        self.sample_interval = int(
+            config_loader.get_config().get("system", {}).get("vision_sample_interval", 25)
+        )
+        cam = config_loader.get_config().get("cameras", {}).get("camera1", {}).get(
+            "resolution", [640, 480]
+        )
+        self._proc_w, self._proc_h = int(cam[0]), int(cam[1])
+
     def _init_yolo(self):
         """
         初始化YOLO模块
         """
         config = config_loader.get_config()
         yolo_config = config.get("models", {}).get("yolo", {})
-        if yolo_config.get("type", "mock") == "real":
+        if yolo_config.get("type", "real") != "mock":
             return YoloDetector(yolo_config)
         else:
             return MockYoloDetector(yolo_config)
@@ -42,7 +53,7 @@ class VisionThread(threading.Thread):
         """
         config = config_loader.get_config()
         vda_config = config.get("models", {}).get("vda", {})
-        if vda_config.get("type", "mock") == "real":
+        if vda_config.get("type", "real") != "mock":
             return VDADepthEstimator(vda_config)
         else:
             return MockVDADepthEstimator(vda_config)
@@ -68,21 +79,33 @@ class VisionThread(threading.Thread):
                         
                         # 帧采样，每25帧处理一次
                         if self.frame_count % self.sample_interval == 0:
-                            # 执行YOLO检测
-                            yolo_results = self.yolo.inference(frame)
-                            
-                            # 执行VDA深度估计
-                            depth_map = self.vda.inference(frame)
-                            
-                            # 发送视觉处理结果到推理决策队列
-                            message_queue.send_message("inference", {
-                                "type": "vision_result",
-                                "frame": frame,
-                                "yolo_results": yolo_results,
-                                "depth_map": depth_map,
-                                "timestamp": timestamp,
-                                "camera_id": camera_id
-                            })
+                            if is_llm_busy():
+                                continue
+                            # 统一到配置分辨率再推理，避免高分辨率整帧在队列中占用大量统一内存
+                            if frame.shape[1] != self._proc_w or frame.shape[0] != self._proc_h:
+                                work = cv2.resize(
+                                    frame,
+                                    (self._proc_w, self._proc_h),
+                                    interpolation=cv2.INTER_AREA,
+                                )
+                            else:
+                                work = frame
+                            yolo_results = self.yolo.inference(work)
+                            depth_map = self.vda.inference(work)
+                            message_queue.send_message(
+                                "inference",
+                                {
+                                    "type": "vision_result",
+                                    "frame": work,
+                                    "yolo_results": yolo_results,
+                                    "depth_map": depth_map,
+                                    "timestamp": timestamp,
+                                    "camera_id": camera_id,
+                                },
+                            )
+                            gc.collect()
+                            if torch.cuda.is_available():
+                                torch.cuda.empty_cache()
                 
                 # 短暂休眠，避免占用过多CPU
                 time.sleep(0.01)

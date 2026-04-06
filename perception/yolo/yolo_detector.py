@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import torch
 from typing import List, Dict, Any
 
 class YoloDetector:
@@ -14,6 +15,7 @@ class YoloDetector:
         self.model_path = config.get('model_path', '/root/MHSEE/MHSEE/model/yolov8l-world.pt')
         self.conf_threshold = config.get('conf_threshold', 0.15)
         self.model = None
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self._load_model()
     
     def _load_model(self):
@@ -27,8 +29,14 @@ class YoloDetector:
             import logging
             logging.getLogger('ultralytics').setLevel(logging.WARNING)
             self.model = YOLO(self.model_path)
+            self.model.to(self.device)
             from utils.logger import logger
-            logger.info(f"[YOLO] 模型加载成功: {self.model_path}")
+            logger.info(f"[YOLO] 模型加载成功: {self.model_path}, 使用设备: {self.device}")
+            if self.device == "cpu":
+                logger.warning(
+                    "[YOLO] 当前为 CPU 推理（较慢）。若在 Jetson 上需要 GPU，请按 JETSON_PYTORCH.md "
+                    "安装与 JetPack 匹配的 PyTorch/torchvision，避免使用 PyPI 默认 torch 覆盖厂商 CUDA 构建。"
+                )
         except Exception as e:
             from utils.logger import logger
             logger.error(f"[YOLO] 模型加载失败: {e}")
@@ -47,8 +55,7 @@ class YoloDetector:
         if self.model is None:
             raise RuntimeError("YOLO模型未加载")
         
-        # 执行检测
-        results = self.model(image, conf=self.conf_threshold)
+        results = self.model(image, conf=self.conf_threshold, device=self.device)
         
         # 处理检测结果
         detections = []

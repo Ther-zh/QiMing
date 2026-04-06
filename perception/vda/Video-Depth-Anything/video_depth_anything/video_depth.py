@@ -14,7 +14,7 @@
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
-from torchvision.transforms import Compose
+from .util.compose_shim import Compose
 import cv2
 from tqdm import tqdm
 import numpy as np

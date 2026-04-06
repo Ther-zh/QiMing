@@ -1,10 +1,15 @@
+import gc
 import threading
 import time
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+
+import cv2
+import torch
 
 from utils.logger import logger
 from utils.message_queue import message_queue
 from utils.config_loader import config_loader
+from utils.llm_gate import set_llm_busy
 
 # 导入核心模块
 from core.resource_manager import ResourceManager
@@ -19,16 +24,17 @@ from fusion.metadata_wrapper import MetadataWrapper
 # 导入执行模块
 from execution.broadcast_scheduler import BroadcastScheduler
 from execution.tts_engine import TTSEngine
+from utils.video_record import depth_to_colormap_bgr, draw_tracked_targets, overlay_depth_on_frame
 
 class InferenceThread(threading.Thread):
     """
     推理决策线程，负责安全调度和复杂场景分析
     """
     
-    def __init__(self):
+    def __init__(self, resource_manager: Optional[ResourceManager] = None):
         super().__init__(daemon=True)
         self.running = False
-        self.resource_manager = ResourceManager()
+        self.resource_manager = resource_manager or ResourceManager()
         self.realtime_scheduler = RealtimeScheduler()
         self.complex_scene_scheduler = ComplexSceneScheduler(self.resource_manager)
         self.depth_fusion = DepthFusion()
@@ -48,6 +54,30 @@ class InferenceThread(threading.Thread):
         self.latest_frame = None
         self.latest_metadata = None
         self.latest_vision_timestamp = 0
+        # 量化资源门控导致的「有帧无融合」占比，便于调 memory_threshold / vision_sample_interval
+        self._fusion_stats = {"ok": 0, "skipped": 0}
+
+    def _log_fusion_stats_if_needed(self, force: bool = False) -> None:
+        sk = self._fusion_stats["skipped"]
+        ok = self._fusion_stats["ok"]
+        total = ok + sk
+        if total == 0:
+            return
+        if force or (sk > 0 and sk % 25 == 0):
+            pct = 100.0 * sk / total
+            logger.info(
+                f"[Inference] fusion 统计 ok={ok} skipped={sk} skipped_ratio={pct:.1f}%"
+            )
+
+    def _trim_cuda_before_llm(self) -> None:
+        """在调用 Ollama 前尽量压低 PyTorch CUDA 峰值，减轻 Jetson 统一内存 OOM。"""
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+            torch.cuda.empty_cache()
+        gc.collect()
+        # 短暂等待，让 FunASR 等 CPU 线程完成当前片段、内核回收部分匿名页
+        time.sleep(0.55)
     
     def run(self):
         """
@@ -90,6 +120,7 @@ class InferenceThread(threading.Thread):
                 if control_message and control_message.get("type") == "video_ended":
                     if not video_ended:
                         logger.info("收到视频结束消息，继续运行15秒处理剩余消息...")
+                        self._log_fusion_stats_if_needed(force=True)
                         video_ended = True
                         video_ended_time = time.time()
                 
@@ -124,7 +155,7 @@ class InferenceThread(threading.Thread):
         asr_text = message.get("text")
         wake_detected = message.get("wake_detected")
         timestamp = message.get("timestamp")
-        
+
         # 记录ASR结果
         if asr_text:
             self.asr_results.append(asr_text)
@@ -151,34 +182,45 @@ class InferenceThread(threading.Thread):
         if wake_detected:
             logger.info(f"[Inference] 检测到唤醒词，准备调用LLM处理...")
             logger.info(f"[Inference] 完整查询文本: '{self.cumulative_asr_text}'")
-            # 中优先级处理唤醒词
-            if self.resource_manager.request_resources("llm", priority=5):
-                try:
-                    # 调用复杂场景调度器处理，使用累积的文本和最近的视觉数据
-                    full_query = self.cumulative_asr_text
-                    response = self.complex_scene_scheduler.handle_wake_word(
-                        full_query,
-                        self.latest_frame,  # 使用最近的图像数据
-                        self.latest_metadata   # 使用最近的元数据
-                    )
-                    if response:
-                        logger.info(f"[LLM] 回复: {response}")
-                        # 添加到语音播报队列
-                        self.broadcast_scheduler.add_message(
-                            response,
-                            priority=3,
-                            alert_type="wake_word"
+            # 尽早置位，使 ASR 在 pause_asr_during_llm 下不再跑 FunASR，腾出统一内存给 Ollama
+            set_llm_busy(True)
+            try:
+                # 首帧视觉可能尚未到达，或推理资源曾拒绝导致未缓存帧；短暂等待以免误落「无图」分支
+                if self.latest_frame is None:
+                    _deadline = time.time() + 2.5
+                    while self.latest_frame is None and self.running and time.time() < _deadline:
+                        time.sleep(0.05)
+                    if self.latest_frame is not None:
+                        logger.info("[Inference] 已等到最近一帧视觉，将结合图像调用 LLM")
+                self._trim_cuda_before_llm()
+                if self.resource_manager.request_resources("llm", priority=5):
+                    try:
+                        full_query = self.cumulative_asr_text
+                        response = self.complex_scene_scheduler.handle_wake_word(
+                            full_query,
+                            self.latest_frame,
+                            self.latest_metadata,
                         )
-                        # 记录LLM结果
-                        self.llm_results.append(response)
-                        # 检测到唤醒词处理后，重置累积文本
-                        self.cumulative_asr_text = ""
-                    else:
-                        logger.warning(f"[LLM] 没有返回回复")
-                finally:
-                    self.resource_manager.release_resources("llm")
-            else:
-                logger.warning(f"[Inference] 无法获取LLM资源")
+                        if response:
+                            logger.info(f"[LLM] 回复: {response}")
+                            self.broadcast_scheduler.add_message(
+                                response,
+                                priority=3,
+                                alert_type="wake_word",
+                            )
+                            self.llm_results.append(response)
+                            self.cumulative_asr_text = ""
+                        else:
+                            logger.warning(f"[LLM] 没有返回回复")
+                    finally:
+                        self.resource_manager.release_resources("llm")
+                        gc.collect()
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+                else:
+                    logger.warning(f"[Inference] 无法获取LLM资源")
+            finally:
+                set_llm_busy(False)
     
     def _handle_vision_result(self, message):
         """
@@ -189,9 +231,15 @@ class InferenceThread(threading.Thread):
         depth_map = message.get("depth_map")
         timestamp = message.get("timestamp")
         camera_id = message.get("camera_id")
-        
-        # 申请资源
-        if self.resource_manager.request_resources("inference", priority=0):
+
+        # 无论推理资源是否申请成功，都缓存最近一帧，避免资源阈值拒绝时唤醒词 LLM 拿不到图
+        if frame is not None:
+            self.latest_frame = frame
+            self.latest_vision_timestamp = timestamp
+
+        # 申请资源（priority>3 时若 CPU/内存瞬时超标仍允许融合，避免 8GB+ASR 峰值下长期 fusion_skipped）
+        if self.resource_manager.request_resources("inference", priority=4):
+            self._fusion_stats["ok"] += 1
             try:
                 # 计算目标距离
                 targets_with_distance = self.depth_fusion.calculate_target_distances(yolo_results, depth_map)
@@ -207,10 +255,8 @@ class InferenceThread(threading.Thread):
                     camera_id
                 )
                 
-                # 更新最近的视觉数据
-                self.latest_frame = frame
+                # 更新最近的视觉数据（完整融合元数据）
                 self.latest_metadata = metadata
-                self.latest_vision_timestamp = timestamp
                 
                 # 处理实时安全调度
                 self.realtime_scheduler.process_metadata(metadata)
@@ -233,31 +279,91 @@ class InferenceThread(threading.Thread):
                 
                 # 检查是否触发复杂场景
                 if self.realtime_scheduler.is_complex_scene_triggered():
-                    # 中优先级处理复杂场景
-                    if self.resource_manager.request_resources("llm", priority=5):
-                        try:
-                            # 处理复杂场景
-                            response = self.complex_scene_scheduler.process_complex_scene(
-                                frame,
-                                metadata,
-                                "请分析当前场景并提供导航建议"
-                            )
-                            if response:
-                                self.broadcast_scheduler.add_message(
-                                    response,
-                                    priority=3,
-                                    alert_type="complex_scene"
+                    self._trim_cuda_before_llm()
+                    set_llm_busy(True)
+                    try:
+                        if self.resource_manager.request_resources("llm", priority=5):
+                            try:
+                                response = self.complex_scene_scheduler.process_complex_scene(
+                                    frame,
+                                    metadata,
+                                    "请分析当前场景并提供导航建议",
+                                    manage_resources=False,
                                 )
-                                # 记录LLM结果
-                                self.llm_results.append(response)
-                        finally:
-                            self.resource_manager.release_resources("llm")
+                                if response:
+                                    self.broadcast_scheduler.add_message(
+                                        response,
+                                        priority=3,
+                                        alert_type="complex_scene",
+                                    )
+                                    self.llm_results.append(response)
+                            finally:
+                                self.resource_manager.release_resources("llm")
+                                gc.collect()
+                                if torch.cuda.is_available():
+                                    torch.cuda.empty_cache()
+                    finally:
+                        set_llm_busy(False)
                     # 重置触发信号
                     self.realtime_scheduler.reset_complex_scene_trigger()
+
+                # 录制可视化帧（主线程写入视频文件）
+                exec_cfg = config_loader.get_config().get("execution", {})
+                if (
+                    exec_cfg.get("save_video_output", True)
+                    and frame is not None
+                    and depth_map is not None
+                ):
+                    cam_wh = (
+                        config_loader.get_config()
+                        .get("cameras", {})
+                        .get("camera1", {})
+                        .get("resolution", [640, 480])
+                    )
+                    cam_w, cam_h = int(cam_wh[0]), int(cam_wh[1])
+                    fr_r = cv2.resize(frame, (cam_w, cam_h), interpolation=cv2.INTER_AREA)
+                    oh, ow = frame.shape[:2]
+                    scaled_targets = []
+                    for t in tracked_targets:
+                        nt = dict(t)
+                        x1, y1, x2, y2 = t.get("bbox", [0, 0, 0, 0])
+                        nt["bbox"] = [
+                            x1 * cam_w / ow,
+                            y1 * cam_h / oh,
+                            x2 * cam_w / ow,
+                            y2 * cam_h / oh,
+                        ]
+                        scaled_targets.append(nt)
+                    main_bgr = overlay_depth_on_frame(
+                        draw_tracked_targets(fr_r.copy(), scaled_targets),
+                        depth_map,
+                        alpha=0.35,
+                    )
+                    payload: Dict[str, Any] = {"main": main_bgr}
+                    if exec_cfg.get("save_depth_colormap_video", True):
+                        dm_r = cv2.resize(
+                            depth_map, (cam_w, cam_h), interpolation=cv2.INTER_LINEAR
+                        )
+                        payload["depth"] = depth_to_colormap_bgr(dm_r)
+                    message_queue.send_message("record", payload)
             finally:
                 # 释放资源
                 self.resource_manager.release_resources("inference")
-    
+        else:
+            # 资源不足未跑融合时，仍提供非 None 元数据，便于带图 prompt（目标列表为空）
+            if frame is not None:
+                self._fusion_stats["skipped"] += 1
+                self._log_fusion_stats_if_needed()
+                self.latest_metadata = {
+                    "targets": [],
+                    "timestamp": timestamp,
+                    "camera_id": camera_id,
+                    "fusion_skipped": True,
+                }
+                logger.debug(
+                    "[Inference] 推理资源未申请成功，已仅缓存图像与空目标元数据（供唤醒词多模态）"
+                )
+
     def get_results(self):
         """
         获取ASR和LLM结果

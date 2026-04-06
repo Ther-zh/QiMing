@@ -1,4 +1,7 @@
 # 导盲系统依赖库
+#
+# Jetson / 厂商 CUDA 版 PyTorch：请勿在本文件中恢复 torch / torchvision / torchaudio 的 PyPI 固定版本。
+# 安装顺序与说明见 JETSON_PYTORCH.md；仅安装其余依赖时使用 requirements-jetson.txt。
 
 # 核心依赖
 numpy==2.2.6
@@ -10,9 +13,9 @@ psutil==7.2.2
 ultralytics==8.4.21
 funasr==1.3.1
 ollama>=0.1.0
-torch==2.10.0
-torchaudio==2.10.0
-torchvision==0.25.0
+easydict>=1.10
+einops>=0.4.1
+# torch / torchvision / torchaudio：Jetson 见 JETSON_PYTORCH.md；x86+CUDA 见 https://pytorch.org 生成安装命令。
 
 # 其他依赖
 Pillow==12.1.1

@@ -1,88 +1,81 @@
 from typing import Dict, Any, Optional
+import re
+import shutil
+import subprocess
 
 from utils.logger import logger
-from utils.config_loader import config_loader
+
+
+def _strip_speakable(text: str) -> str:
+    """去掉特殊 token，避免 TTS 读出乱码。"""
+    if not text:
+        return ""
+    t = re.sub(r"<\|[^|]*\|>", " ", text)
+    t = re.sub(r"<[^>]+>", " ", t)
+    return re.sub(r"\s+", " ", t).strip()
+
 
 class TTSEngine:
     def __init__(self, config: Dict[str, Any]):
-        """
-        初始化TTS引擎
-        
-        Args:
-            config: 配置字典
-        """
         self.config = config
-        self.tts_type = config.get('tts_type', 'mock')
-        self.engine = None
+        self.tts_type = config.get("tts_type", "real")
+        self._espeak: Optional[str] = None
+        self._spd_say: Optional[str] = None
         self._load_engine()
-    
-    def _load_engine(self):
-        """
-        加载TTS引擎
-        """
-        if self.tts_type == 'real':
-            # 这里应该加载真实的TTS引擎
-            # 例如：pyttsx3, gTTS等
-            logger.info("加载真实TTS引擎")
-            # 模拟加载
-            self.engine = True
-        else:
-            # 使用Mock版本
-            logger.info("使用Mock TTS引擎")
-            self.engine = True
-    
-    def speak(self, text: str):
-        """
-        播放文本
-        
-        Args:
-            text: 要播放的文本
-        """
-        if self.engine:
-            if self.tts_type == 'real':
-                # 这里应该调用真实的TTS引擎
-                # 例如：self.engine.say(text)
-                # self.engine.runAndWait()
-                logger.info(f"TTS播放: {text}")
+
+    def _load_engine(self) -> None:
+        if self.tts_type != "real":
+            logger.warning("tts_type 非 real，将仍尝试使用系统语音合成；请在 config 中设 execution.tts_type: real")
+        self._espeak = shutil.which("espeak-ng") or shutil.which("espeak")
+        self._spd_say = shutil.which("spd-say")
+        if not self._espeak and not self._spd_say:
+            raise RuntimeError(
+                "未找到可用的系统 TTS（需要安装 espeak-ng 或 speech-dispatcher 的 spd-say）。"
+                "Jetson/Ubuntu: sudo apt-get install -y espeak-ng"
+            )
+        name = "espeak-ng/espeak" if self._espeak else "spd-say"
+        logger.info(f"真实 TTS 引擎: {name}")
+
+    def speak(self, text: str) -> None:
+        clean = _strip_speakable(text)
+        if not clean:
+            logger.warning("TTS: 空文本，跳过")
+            return
+        try:
+            if self._espeak:
+                # -v zh 使用中文（若系统无中文语音包会回退英文发音）
+                subprocess.run(
+                    [self._espeak, "-v", "zh", "-s", "160", clean],
+                    check=False,
+                    timeout=120,
+                    capture_output=True,
+                )
             else:
-                # Mock版本直接打印
-                logger.info(f"[Mock TTS] 播放: {text}")
-        else:
-            logger.error("TTS引擎未加载")
-    
-    def release(self):
-        """
-        释放TTS引擎资源
-        """
-        if self.engine:
-            if self.tts_type == 'real':
-                # 这里应该释放真实TTS引擎的资源
-                pass
-            self.engine = None
-            logger.info("TTS引擎资源已释放")
+                subprocess.run(
+                    [self._spd_say, "-l", "zh-cn", clean],
+                    check=False,
+                    timeout=120,
+                    capture_output=True,
+                )
+        except subprocess.TimeoutExpired:
+            logger.error("TTS 播放超时")
+        except Exception as e:
+            logger.error(f"TTS 播放失败: {e}")
+
+    def release(self) -> None:
+        self._espeak = None
+        self._spd_say = None
+        logger.info("TTS 引擎资源已释放")
+
 
 class MockTTSEngine:
+    """保留类名以兼容旧 import；行为与 TTSEngine 一致（真实系统 TTS）。"""
+
     def __init__(self, config: Dict[str, Any]):
-        """
-        初始化Mock TTS引擎
-        
-        Args:
-            config: 配置字典
-        """
-        self.config = config
-        logger.info("初始化Mock TTS引擎")
-    
-    def speak(self, text: str):
-        """
-        模拟播放文本
-        
-        Args:
-            text: 要播放的文本
-        """
-        logger.info(f"[Mock TTS] 播放: {text}")
-    
-    def release(self):
-        """
-        释放资源
-        """
-        logger.info("Mock TTS引擎资源已释放")
+        self._impl = TTSEngine({**config, "tts_type": "real"})
+
+    def speak(self, text: str) -> None:
+        self._impl.speak(text)
+
+    def release(self) -> None:
+        self._impl.release()

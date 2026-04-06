@@ -11,28 +11,30 @@ class MessageQueue:
         self.queues = {}
         self.lock = threading.RLock()
     
-    def create_queue(self, name: str):
+    def create_queue(self, name: str, maxsize: int = 0):
         """
         创建一个新的消息队列
-        
+
         Args:
             name: 队列名称
+            maxsize: 最大长度；>0 时满则 put 阻塞，用于对生产者反压（如 vision 避免积压大图）
         """
         with self.lock:
             if name not in self.queues:
-                self.queues[name] = queue.Queue()
-    
+                self.queues[name] = queue.Queue(maxsize=maxsize)
+
     def send_message(self, queue_name: str, message: Any):
         """
         发送消息到指定队列
-        
+
         Args:
             queue_name: 队列名称
             message: 消息内容
         """
         with self.lock:
-            if queue_name in self.queues:
-                self.queues[queue_name].put(message)
+            q = self.queues.get(queue_name)
+        if q is not None:
+            q.put(message)
     
     def receive_message(self, queue_name: str, block: bool = True, timeout: Optional[float] = None) -> Any:
         """

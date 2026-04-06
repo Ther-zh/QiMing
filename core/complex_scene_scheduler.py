@@ -1,12 +1,18 @@
 import threading
 import time
+import os
+import sys
 from typing import Dict, Any, Optional, Tuple
 from PIL import Image
 
 from utils.logger import logger
 from utils.config_loader import config_loader
 from perception.llm.qwen_multimodal import QwenMultimodal
-from perception.llm.mock_llm import MockQwenMultimodal
+
+# 添加项目根目录到路径
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 class ComplexSceneScheduler:
     def __init__(self, resource_manager):
@@ -56,7 +62,14 @@ class ComplexSceneScheduler:
             # 暂时模拟处理
             time.sleep(0.5)
     
-    def process_complex_scene(self, image: Image.Image, metadata: Dict[str, Any], prompt: str, priority: int = 0) -> Optional[str]:
+    def process_complex_scene(
+        self,
+        image: Image.Image,
+        metadata: Dict[str, Any],
+        prompt: str,
+        priority: int = 0,
+        manage_resources: bool = True,
+    ) -> Optional[str]:
         """
         处理复杂场景
         
@@ -65,20 +78,24 @@ class ComplexSceneScheduler:
             metadata: 环境元数据
             prompt: 用户指令或预设prompt
             priority: 优先级，值越高优先级越高
+            manage_resources: 是否在本函数内申请/释放 llm 资源；由 InferenceThread
+                已持有 llm 时应为 False，避免内层提前 release 破坏互斥与内存节奏。
             
         Returns:
             LLM生成的回复
         """
-        # 向资源管理器申请资源
-        if not self.resource_manager.request_resources("llm", priority=priority):
-            logger.warning("资源不足，无法处理复杂场景")
-            return "资源不足，无法处理当前场景"
-        
+        acquired_here = False
+        if manage_resources:
+            if not self.resource_manager.request_resources("llm", priority=priority):
+                logger.warning("资源不足，无法处理复杂场景")
+                return "资源不足，无法处理当前场景"
+            acquired_here = True
+
         try:
             # 执行推理
             input_data = (image, metadata, prompt)
             response = self.llm.inference(input_data)
-            
+
             logger.info(f"LLM回复: {response}")
             return response
         except Exception as e:
@@ -87,10 +104,24 @@ class ComplexSceneScheduler:
             traceback.print_exc()
             # 尝试直接调用模型进行纯文本生成
             try:
-                logger.info("尝试直接调用模型进行纯文本生成...")
+                logger.warning(
+                    "[LLM_META] event=fallback_degraded_stub reason=primary_multimodal_failed "
+                    "— 将使用固定场景描述的纯文本二次调用，非真实感知结果"
+                )
+                logger.info("尝试直接调用模型进行纯文本生成（降级桩）...")
                 from LLM.qwen35 import Qwen35Ollama
-                model_name = self.config.get("models", {}).get("llm", {}).get("model_name", "qwen3.5-4b")
-                model = Qwen35Ollama(model_name=model_name)
+                llm_cfg = self.config.get("models", {}).get("llm", {}) or {}
+                model_name = llm_cfg.get("model_name", "qwen3.5-4b")
+                _opts = dict(llm_cfg.get("ollama_options") or {})
+                _fb = llm_cfg.get("fallback_phrase")
+                _kw = dict(ollama_options=_opts)
+                if _fb:
+                    _kw["fallback_phrase"] = _fb
+                model = Qwen35Ollama(
+                    model_name=model_name,
+                    think=llm_cfg.get("ollama_think", False),
+                    **_kw,
+                )
                 simple_prompt = "你是一个导盲系统助手，需要回答用户的问题。用户问：\"前面有什么东西？\"，当前环境有一些行人、汽车和摩托车。请给出友好的回答。"
                 response = model.generate(simple_prompt)
                 logger.info(f"直接调用模型成功，回复: {response}")
@@ -100,8 +131,8 @@ class ComplexSceneScheduler:
                 # 禁用模拟回复，直接返回错误信息
                 return "系统暂时无法处理您的请求，请稍后再试"
         finally:
-            # 释放资源
-            self.resource_manager.release_resources("llm")
+            if acquired_here:
+                self.resource_manager.release_resources("llm")
     
     def _load_llm(self):
         """
@@ -109,9 +140,14 @@ class ComplexSceneScheduler:
         """
         if self.llm is None:
             llm_config = self.config.get("models", {}).get("llm", {})
-            # 强制使用真实LLM模型，禁用模拟模型
-            self.llm = QwenMultimodal(llm_config)
-            logger.info("LLM模型加载完成")
+            if llm_config.get("type", "real") == "mock":
+                from perception.llm.mock_llm import MockQwenMultimodal
+
+                self.llm = MockQwenMultimodal(llm_config)
+                logger.info("LLM 使用 Mock（无 Ollama 占用，适合 8GB 联调）")
+            else:
+                self.llm = QwenMultimodal(llm_config)
+                logger.info("LLM模型加载完成")
     
     def _release_llm(self):
         """
@@ -134,27 +170,34 @@ class ComplexSceneScheduler:
         Returns:
             LLM生成的回复
         """
-        # 即使没有图像或元数据，也使用真实LLM
-        if image is None or metadata is None:
-            logger.info("没有图像或元数据，使用基础prompt")
-            # 生成基础prompt - 简洁直接
+        if metadata is None:
+            metadata = {}
+
+        # 仅在没有画面时使用纯文本基础 prompt（例如视频未开始或尚未有任何视觉帧）
+        if image is None:
+            logger.info("没有图像，使用基础 prompt（纯文本模型路径）")
             prompt = "你是导盲系统助手，回答要简洁直接，只说关键信息。\n"
             prompt += "根据用户问题，提供简短的导航建议。\n\n"
-            
             prompt += f"## 用户问题\n{wake_word}\n\n"
             prompt += "## 输出要求\n"
             prompt += "1. 直接给出具体建议，不要任何开场白或套话\n"
             prompt += "2. 语言简洁，控制在50字以内\n"
             prompt += "3. 必须用中文回答\n\n"
             prompt += "请直接输出简洁的导航建议："
-            # 使用真实LLM处理，设置高优先级
-            return self.process_complex_scene(image, metadata, prompt, priority=7)
-        
-        # 根据唤醒词生成prompt
+            return self.process_complex_scene(
+                None, metadata, prompt, priority=7, manage_resources=False
+            )
+
+        if metadata.get("fusion_skipped"):
+            logger.info("已有图像；融合因资源阈值跳过，使用环境 prompt（目标列表可能为空）")
+
+        # 根据唤醒词与（可能为空的）元数据生成 prompt，并走多模态模型
         prompt = self._generate_prompt(wake_word, metadata)
         
-        # 处理复杂场景，设置高优先级
-        return self.process_complex_scene(image, metadata, prompt, priority=7)
+        # 处理复杂场景（资源由 InferenceThread 外层已申请）
+        return self.process_complex_scene(
+            image, metadata, prompt, priority=7, manage_resources=False
+        )
     
     def _generate_prompt(self, wake_word: str, metadata: Dict[str, Any]) -> str:
         """
@@ -202,11 +245,11 @@ class ComplexSceneScheduler:
         prompt += "6. 必须用中文回答\n"
         prompt += "7. 将英文类别翻译成中文（person→行人，car→汽车，motorcycle→摩托车）\n\n"
         
-        # 示例
-        prompt += "## 示例\n"
-        prompt += "输入：环境：前方5米有行人，左侧3米有汽车；用户：我想过马路\n"
-        prompt += "输出：前方5米有行人，左侧3米有汽车正在移动。建议稍等车辆通过后，确认安全再过马路。\n\n"
-        
+        # 勿给可逐字复述的「标准答案」，否则小参数文本模型会照抄（尤其 VLM 内存不足走纯文本降级时）
+        prompt += "## 格式说明\n"
+        prompt += "若有目标：写清方位、约略距离、类别（中文）与一条可执行建议；若无目标：结合用户问句给保守、具体的简短提示。\n"
+        prompt += "禁止复述任何虚构示例句，须依据上方「环境信息」与「用户问题」生成。\n\n"
+
         # 开始回复
         prompt += "请直接输出简洁的导航建议："
         

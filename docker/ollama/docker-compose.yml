@@ -1,0 +1,28 @@
+# Ollama 服务（GPU）。与 Python 侧 ollama 库通过 OLLAMA_HOST 通信，不依赖 conda 内 PyTorch。
+# Jetson：需已安装 nvidia-container-toolkit，且 ollama/ollama 镜像支持当前架构（一般为 arm64）。
+#
+# 启动：在本目录执行
+#   docker compose up -d
+# 宿主机使用：
+#   export OLLAMA_HOST=http://127.0.0.1:11434
+# 多模态（与 QiMing config models.llm.model_name 一致，示例）：
+#   docker exec -it qiming-ollama ollama pull moondream:latest
+#
+# 内存：moondream 常驻会占用一份独立进程内存，与宿主机 Python（YOLO/VDA/ASR）叠加。
+# 不在此限制 mem_limit：moondream 首次加载峰值可能超过 3g，cgroup 限死易引发宿主机 OOM 与推理失败。
+# 若需限制，请改为 4g 以上并观察 ollama logs。
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: qiming-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+    gpus: all
+
+volumes:
+  ollama-data:

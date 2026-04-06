@@ -1,122 +1,89 @@
 #!/bin/bash
+#
+# QiMing / MHSEE 导盲系统 — Jetson (aarch64) 依赖安装辅助脚本
+#
+# 重要：请勿在此脚本中从 PyPI 安装 torch / torchvision / torchaudio。
+# 在 JetPack 上错误版本会卸载厂商 CUDA 版 PyTorch，导致 GPU 推理失效。
+# 安装顺序与自检命令见仓库根目录 JETSON_PYTORCH.md 与：
+#   https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html
+#
+# 用法（在已按文档装好 torch 三件套之后）：
+#   bash deploy_jetson.sh
+#
 
-# 导盲系统环境部署脚本
-# 适用于NVIDIA Jetson Nano Super (ARM64架构)
+set -euo pipefail
 
 echo "========================================"
-echo "导盲系统环境部署脚本"
-echo "适用于NVIDIA Jetson Nano Super (ARM64)"
+echo "QiMing 环境部署（Jetson / conda）"
 echo "========================================"
 
-# 检查conda是否安装
 if ! command -v conda &> /dev/null; then
-    echo "错误: 未检测到conda，请先安装Anaconda或Miniconda"
+    echo "错误: 未检测到 conda，请先安装 Miniconda/Miniforge。"
     exit 1
 fi
 
-# 环境名称
-ENV_NAME="mhsee"
+ENV_NAME="${CONDA_DEFAULT_ENV:-mhsee}"
 
-# 检查环境是否存在
-if conda env list | grep -q "^$ENV_NAME"; then
-    echo "环境 $ENV_NAME 已存在，将更新依赖"
-else
-    echo "创建新环境: $ENV_NAME"
-    conda create -n $ENV_NAME python=3.10 -y
+if ! conda env list | grep -qE "^${ENV_NAME}[[:space:]]"; then
+    echo "创建 conda 环境: $ENV_NAME (Python 3.10)"
+    conda create -n "$ENV_NAME" python=3.10 -y
 fi
 
-# 激活环境
-echo "激活环境: $ENV_NAME"
-source activate $ENV_NAME
+# shellcheck disable=SC1091
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate "$ENV_NAME"
 
-# 升级pip并设置国内源
-echo "升级pip并设置国内源"
-pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+echo "当前环境: $ENV_NAME"
+echo "L4T 版本（供对照 NVIDIA 文档）:"
+cat /etc/nv_tegra_release 2>/dev/null || echo "（非 Jetson 或未找到 nv_tegra_release）"
 
-# 设置pip默认源
-echo "设置pip默认源为清华源"
-pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REQ_JETSON="${SCRIPT_DIR}/requirements-jetson.txt"
 
-# 安装核心依赖
-echo "安装核心依赖"
-pip install numpy==2.2.6
-pip install opencv-python==4.11.0.86
-pip install PyYAML==6.0.1
-pip install psutil==7.2.2
+if [[ ! -f "$REQ_JETSON" ]]; then
+    echo "错误: 未找到 $REQ_JETSON"
+    exit 1
+fi
 
-# 安装模型依赖
-echo "安装模型依赖"
-pip install ultralytics==8.4.21
-pip install funasr==1.3.1
+echo ""
+echo ">>> 步骤 1/3：若尚未安装厂商 PyTorch，请先阅读并执行 JETSON_PYTORCH.md（勿跳过）。"
+echo ">>> 步骤 2/3：安装项目其余依赖（不含 torch 三件套）..."
+pip install --upgrade pip
+pip install --no-cache-dir -r "$REQ_JETSON"
 
-# 安装Jetson Nano专用的PyTorch (ARM64架构)
-echo "安装Jetson Nano专用的PyTorch (ARM64)"
-# 下载并安装适合Jetson Nano的PyTorch版本
-echo "正在下载PyTorch for Jetson Nano..."
-wget -q https://nvidia.box.com/shared/static/ssf2v7pf5i245fk4i09j56znk96n5ia1.whl -O torch-1.13.0-cp310-cp310-linux_aarch64.whl
-pip install torch-1.13.0-cp310-cp310-linux_aarch64.whl
+echo ""
+echo ">>> 步骤 3/3：自检（torch 须为文档给出的 CUDA 构建）"
+python - <<'PY'
+import sys
+try:
+    import torch
+    print("torch:", torch.__version__, "cuda_available:", torch.cuda.is_available())
+    if torch.cuda.is_available():
+        print("torch.version.cuda:", torch.version.cuda)
+except Exception as e:
+    print("torch 导入失败:", e)
+    sys.exit(1)
+for name in ("torchvision", "torchaudio"):
+    try:
+        m = __import__(name)
+        print(name + ":", getattr(m, "__version__", "?"))
+    except Exception as e:
+        print(name + ": 未安装或导入失败（Jetson 上可能为预期，见 JETSON_PYTORCH.md）->", e)
+PY
 
-# 安装torchvision
-echo "安装torchvision"
-pip install torchvision==0.14.0
-
-# 安装torchaudio
-echo "安装torchaudio"
-pip install torchaudio==0.13.0
-
-# 清理临时文件
-rm -f torch-1.13.0-cp310-cp310-linux_aarch64.whl
-
-# 安装其他依赖
-echo "安装其他依赖"
-pip install Pillow==12.1.1
-pip install requests==2.32.5
-pip install tqdm==4.67.3
-pip install librosa==0.11.0
-pip install soundfile==0.13.1
-pip install pydub==0.25.1
-pip install protobuf==6.33.5
-pip install sympy==1.14.0
-
-# 安装额外依赖
-echo "安装额外依赖"
-pip install transformers==4.57.6
-pip install huggingface_hub==0.36.2
-pip install safetensors==0.7.0
-pip install scikit-learn==1.7.2
-pip install scipy==1.15.3
-pip install pandas==2.3.3
-pip install matplotlib==3.10.8
-
-# 安装网络和API相关依赖
-echo "安装网络和API相关依赖"
-pip install fastapi==0.134.0
-pip install uvicorn==0.41.0
-pip install httpx==0.28.1
-
-# 安装工具库
-echo "安装工具库"
-pip install loguru==0.7.3
-pip install python-dotenv==1.2.2
-
-# 验证安装
+echo ""
 echo "========================================"
-echo "验证安装情况"
+echo "pip 包检查（torch* 以导入自检为准，不要求 torchvision/torchaudio 必装）"
 echo "========================================"
-
-# 检查核心包是否安装成功
-packages=("numpy" "opencv-python" "PyYAML" "psutil" "ultralytics" "funasr" "Pillow" "torch" "torchvision" "torchaudio" "protobuf" "sympy")
-
-for pkg in "${packages[@]}"; do
-    if pip show $pkg &> /dev/null; then
-        echo "✓ $pkg 已安装"
+for pkg in numpy opencv-python PyYAML psutil ultralytics funasr Pillow protobuf sympy ollama; do
+    if pip show "$pkg" &>/dev/null; then
+        echo "✓ $pkg"
     else
-        echo "✗ $pkg 安装失败"
+        echo "✗ $pkg 未安装"
     fi
 done
 
 echo "========================================"
-echo "环境部署完成！"
-echo "使用以下命令激活环境："
-echo "conda activate $ENV_NAME"
+echo "完成。激活环境: conda activate $ENV_NAME"
+echo "多模态 LLM（Ollama）可用 Docker：见 docker/ollama/README.md"
 echo "========================================"
