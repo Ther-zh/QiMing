@@ -1,23 +1,40 @@
 #!/usr/bin/env python3
 """
 测试 ASR 模型的加载和推理功能
+
+用法（在 QiMing 目录下）:
+  python sing_test/test_asr.py              # 默认 CPU，避免 Jetson 上 CUDA 分配失败
+  ASR_DEVICE=cuda python sing_test/test_asr.py
 """
 
 import os
 import sys
 import numpy as np
 
-# 添加系统路径
-sys.path.append('/root/MHSEE')
+# QiMing 项目根（本机为 /home/nvidia/MHSEE/QiMing，勿写死 /root/MHSEE）
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+
+# 与 config.yaml 中 models.asr 一致的本地缓存路径
+_DEFAULT_MODEL = (
+    "/home/nvidia/models/root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall"
+)
+
 
 # 测试 ASR 模型
 def test_asr():
     print("开始测试 ASR 模型...")
-    
+    device = os.environ.get("ASR_DEVICE", "cpu").strip() or "cpu"
+    print(f"ASR_DEVICE={device!r} (可用: cpu / cuda / cuda:0 / auto)")
+
     try:
         from perception.asr.funasr_asr import FunASRRecognizer
         config = {
-            'model_path': '/root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall'
+            "model_path": os.environ.get("ASR_MODEL_PATH", _DEFAULT_MODEL),
+            "device": device,
+            "enable_vad": False,
+            "enable_punctuation": False,
         }
         
         # 加载模型
@@ -30,7 +47,7 @@ def test_asr():
         
         # 执行推理
         print("正在执行 ASR 推理...")
-        wake_detected, asr_text = asr.inference(test_audio)
+        wake_detected, asr_text, _is_speech = asr.inference(test_audio)
         print(f"ASR 推理结果: {asr_text}")
         print(f"唤醒词检测: {wake_detected}")
         

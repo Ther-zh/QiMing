@@ -1,3 +1,4 @@
 *.pth filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+perception/Wasr/models/ggml-small-q5_1.bin filter=lfs diff=lfs merge=lfs -text

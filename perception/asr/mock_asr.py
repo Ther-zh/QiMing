@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Optional
 import time
 
 class MockFunASRRecognizer:
@@ -14,7 +14,9 @@ class MockFunASRRecognizer:
         self.last_wake_time = 0
         print("[Mock ASR] 初始化成功")
     
-    def inference(self, audio_data: np.ndarray, is_final: bool = False) -> Tuple[bool, str]:
+    def inference(
+        self, audio_data: np.ndarray, is_final: bool = False
+    ) -> Tuple[bool, str, Optional[bool]]:
         """
         模拟语音识别
         
@@ -50,7 +52,8 @@ class MockFunASRRecognizer:
             asr_text = random.choice(mock_responses)
             print(f"[Mock ASR] 语音识别结果: {asr_text}")
         
-        return wake_detected, asr_text
+        # mock：没有真实 VAD，这里用 None 表示未知
+        return wake_detected, asr_text, None
     
     def release(self):
         """

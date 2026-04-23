@@ -4,7 +4,7 @@ import io
 import os
 import re
 import time
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict, Any
 import numpy as np
 from PIL import Image
 import ollama
@@ -14,8 +14,8 @@ try:
 except ImportError:
     _llm_logger = None
 
-# 送入 Ollama VLM 的长边上限，减轻 Jetson 统一内存上视觉编码峰值（需 >32 以满足 Qwen3-VL 预处理）
-_MAX_VL_IMAGE_SIDE = 384
+# 送入 Ollama VLM 的长边上限（默认值；可由 config 覆盖）
+_DEFAULT_MAX_VL_IMAGE_SIDE = 384
 
 
 def _safe_strip_content(val) -> str:
@@ -41,15 +41,31 @@ class Qwen35Ollama:
             **kwargs: 其他参数（兼容旧接口）
         """
         self.model_name = model_name
+        self.config: Dict[str, Any] = kwargs.pop("config", {}) or {}
         # 显式 False：关闭 Qwen3.5 thinking；None 表示不向 API 传 think（由模型默认）
         self.think: Optional[bool] = kwargs.pop("think", False)
+        ollama_cfg = (self.config.get("ollama", {}) or {}) if isinstance(self.config, dict) else {}
+        self.keep_alive = ollama_cfg.get("keep_alive", 0)
+        self.request_timeout_sec = ollama_cfg.get("request_timeout_sec", 120)
+        self.max_image_side = (
+            (self.config.get("vision", {}) or {}).get("max_image_side", _DEFAULT_MAX_VL_IMAGE_SIDE)
+            if isinstance(self.config, dict)
+            else _DEFAULT_MAX_VL_IMAGE_SIDE
+        )
         self.default_params = {
             "temperature": 0.6,
             "top_p": 0.8,
             "top_k": 20,
-            # 全栈 YOLO+VDA+ASR+Ollama 下抬高 num_ctx 易触发 OOM kill；先保持 256，依赖 think=False 与足够 num_predict
             "num_ctx": 256,
         }
+        # 允许从 yml 覆盖 options 默认值
+        opt = ollama_cfg.get("options", {}) if isinstance(ollama_cfg, dict) else {}
+        if isinstance(opt, dict):
+            self.default_params.update({k: v for k, v in opt.items() if v is not None})
+
+        # Ollama client（优先使用 config.ollama.host）
+        host = ollama_cfg.get("host") if isinstance(ollama_cfg, dict) else None
+        self._client = ollama.Client(host=host) if host else ollama
         print(f"[System] Ollama模型已就绪: {model_name}")
 
     @staticmethod
@@ -88,9 +104,9 @@ class Qwen35Ollama:
     def _downscale_for_vlm(self, pil: Image.Image) -> Image.Image:
         w, h = pil.size
         m = max(w, h)
-        if m <= _MAX_VL_IMAGE_SIDE:
+        if m <= int(self.max_image_side):
             return pil
-        scale = _MAX_VL_IMAGE_SIDE / float(m)
+        scale = float(self.max_image_side) / float(m)
         nw, nh = max(32, int(w * scale)), max(32, int(h * scale))
         return pil.resize((nw, nh), getattr(Image, "Resampling", Image).LANCZOS)
 
@@ -158,11 +174,11 @@ class Qwen35Ollama:
                     if image is not None:
                         img_payload = self._prepare_image_for_ollama(image)
                         messages = [{"role": "user", "content": text, "images": [img_payload]}]
-                        response = ollama.chat(
+                        response = self._client.chat(
                             model=self.model_name,
                             messages=messages,
                             options=params,
-                            keep_alive=0,
+                            keep_alive=self.keep_alive,
                             **({"think": self.think} if self.think is not None else {}),
                         )
                         msg = response.get("message")
@@ -173,11 +189,11 @@ class Qwen35Ollama:
                         else:
                             result = _safe_strip_content(getattr(msg, "content", None))
                     else:
-                        response = ollama.generate(
+                        response = self._client.generate(
                             model=self.model_name,
                             prompt=text,
                             options=params,
-                            keep_alive=0,
+                            keep_alive=self.keep_alive,
                             **({"think": self.think} if self.think is not None else {}),
                         )
                         result = _safe_strip_content(response.get("response"))
@@ -259,7 +275,7 @@ class Qwen35Ollama:
                 model=self.model_name,
                 messages=messages,
                 options=params,
-                keep_alive=0,
+                keep_alive=self.keep_alive,
                 **({"think": self.think} if self.think is not None else {}),
             )
             msg = response.get("message")

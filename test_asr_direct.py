@@ -58,14 +58,14 @@ def test_asr():
         if len(audio_data) > 0:
             # 测试整个音频
             print(f"\n测试整个音频，长度: {len(audio_data)} 样本")
-            wake_detected, asr_text = asr.inference(audio_data)
+            wake_detected, asr_text, _is_speech = asr.inference(audio_data)
             print(f"ASR识别结果: {asr_text}")
             print(f"是否检测到唤醒词: {wake_detected}")
             
             # 测试音频的前10秒
             print("\n测试音频的前10秒")
             audio_data_10s = audio_data[:160000]  # 10秒 * 16000Hz
-            wake_detected, asr_text = asr.inference(audio_data_10s)
+            wake_detected, asr_text, _is_speech = asr.inference(audio_data_10s)
             print(f"ASR识别结果: {asr_text}")
             print(f"是否检测到唤醒词: {wake_detected}")
         else:

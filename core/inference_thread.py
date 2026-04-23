@@ -1,7 +1,7 @@
 import gc
 import threading
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 import cv2
 import torch
@@ -46,14 +46,175 @@ class InferenceThread(threading.Thread):
         # 存储ASR和LLM结果
         self.asr_results = []
         self.llm_results = []
-        # 唤醒词列表
-        self.wake_words = ["你好", "导盲", "导航", "小明", "小明同学", "小"]
-        # 累积的ASR文本（用于检测跨片段的唤醒词）
-        self.cumulative_asr_text = ""
+
+        # ===== 唤醒/录句态逻辑（配置化）=====
+        cfg = config_loader.get_config()
+        self._wake_cfg = (cfg.get("models", {}).get("asr", {}) or {}).get("wake_logic", {}) or {}
+        self.endpoint_silence_sec = float(self._wake_cfg.get("endpoint_silence_sec", 1.2))
+        self.max_utterance_sec = float(self._wake_cfg.get("max_utterance_sec", 6.0))
+        self.wake_cooldown_sec = float(self._wake_cfg.get("wake_cooldown_sec", 4.0))
+        self.min_query_chars = int(self._wake_cfg.get("min_query_chars", 2))
+        self.single_xiao_policy = str(self._wake_cfg.get("single_xiao_policy", "medium")).strip().lower()
+
+        # 唤醒词：强唤醒（直接进入录句态）；弱唤醒（需额外条件）
+        self.strong_wake_words = ["你好", "导盲", "导航", "小明同学", "小明"]
+        self.weak_wake_words = ["小"]  # 中等严格：不直接触发
+
+        # 状态机
+        self.asr_state = "idle"  # idle | listening
+        self.wake_phrase: str = ""
+        self.query_buffer: str = ""
+        self.wake_ts: float = 0.0
+        self.last_speech_ts: Optional[float] = None
+        self.last_wake_trigger_ts: float = 0.0
+
+        # 弱唤醒“小”的防误触计数（按片段）
+        self._xiao_hit_streak = 0
+        self._xiao_last_ts: float = 0.0
+
+        # 用于跨片段检测唤醒词的滚动文本（短窗口）
+        self._wake_roll_text: str = ""
         # 存储最近的视觉数据
         self.latest_frame = None
         self.latest_metadata = None
         self.latest_vision_timestamp = 0
+
+    @staticmethod
+    def _clean_text(s: str) -> str:
+        import re
+
+        return re.sub(r"[。，、；：？！,.?!;:\s]", "", s or "")
+
+    def _wake_cooldown_ok(self, now_ts: float) -> bool:
+        return (now_ts - self.last_wake_trigger_ts) >= self.wake_cooldown_sec
+
+    def _match_wake_word(self, text: str, clean_text: str, ts: float) -> Tuple[bool, str]:
+        """
+        返回 (是否唤醒, 命中的唤醒词/短语)。
+        推理侧比 ASR 侧更严格，避免单字/错字导致误触。
+        """
+        # 强唤醒：直接命中
+        for w in self.strong_wake_words:
+            if w in text or w in clean_text:
+                return True, w
+
+        # 弱唤醒：单字“小”中等严格，不直接触发
+        if "小" in text or "小" in clean_text:
+            # 若同段或滚动窗口内出现“小明”，直接按“小明”处理
+            if ("小明" in text) or ("小明" in clean_text) or ("小明" in self._wake_roll_text):
+                return True, "小明"
+
+            if self.single_xiao_policy == "medium":
+                # 连续两段命中“小”才算（降低偶发错字触发）
+                if ts - self._xiao_last_ts <= 8.0:
+                    self._xiao_hit_streak += 1
+                else:
+                    self._xiao_hit_streak = 1
+                self._xiao_last_ts = ts
+                if self._xiao_hit_streak >= 2:
+                    return True, "小"
+
+        # 未命中：长时间无 hit 则衰减
+        if ts - self._xiao_last_ts > 8.0:
+            self._xiao_hit_streak = 0
+        return False, ""
+
+    @staticmethod
+    def _strip_wake_prefix(text: str, wake_phrase: str) -> str:
+        if not text or not wake_phrase:
+            return text or ""
+        t = (text or "").lstrip()
+        if t.startswith(wake_phrase):
+            return t[len(wake_phrase) :].lstrip("，。！？,.?!;:：；、 ")
+        return text
+
+    def _enter_listening(self, ts: float, wake_phrase: str, first_text: str, is_speech: Optional[bool]) -> None:
+        self.asr_state = "listening"
+        self.wake_phrase = wake_phrase
+        self.query_buffer = ""
+        self.wake_ts = ts
+        self.last_speech_ts = ts if (is_speech is None or is_speech) else None
+
+        rest = self._strip_wake_prefix(first_text, wake_phrase)
+        if rest:
+            self.query_buffer += rest
+        logger.info(
+            f"[Inference] 进入录句态 wake_phrase={self.wake_phrase!r} init_query={self.query_buffer!r}"
+        )
+
+    def _should_finalize(self, ts: float) -> bool:
+        if self.max_utterance_sec > 0 and (ts - self.wake_ts) >= self.max_utterance_sec:
+            return True
+        if self.last_speech_ts is None:
+            return False
+        return (ts - self.last_speech_ts) >= self.endpoint_silence_sec
+
+    def _finalize_and_call_llm(self, ts: float) -> None:
+        query = (self.query_buffer or "").strip()
+        clean_query = self._clean_text(query)
+        if len(clean_query) < self.min_query_chars:
+            logger.info("[Inference] 唤醒后内容过短，提示用户继续说问题")
+            self.broadcast_scheduler.add_message(
+                "我在，请说您的问题。",
+                priority=3,
+                alert_type="wake_word",
+            )
+            self.last_wake_trigger_ts = ts
+            self.asr_state = "idle"
+            self.wake_phrase = ""
+            self.query_buffer = ""
+            self._wake_roll_text = ""
+            return
+
+        full_query = f"{self.wake_phrase}{query}"
+        logger.info(f"[Inference] 端点触发，调用LLM full_query={full_query!r}")
+
+        # 是否允许带图多模态（默认可关掉以避免 Ollama 在 Jetson 上因内存紧张崩溃）
+        llm_cfg = config_loader.get_config().get("models", {}).get("llm", {}) or {}
+        enable_vision = bool(llm_cfg.get("enable_vision", True))
+
+        if enable_vision and self.latest_frame is None:
+            _deadline = time.time() + 2.5
+            while self.latest_frame is None and self.running and time.time() < _deadline:
+                time.sleep(0.05)
+            if self.latest_frame is not None:
+                logger.info("[Inference] 已等到最近一帧视觉，将结合图像调用 LLM")
+
+        self._trim_cuda_before_llm()
+        set_llm_busy(True)
+        try:
+            if self.resource_manager.request_resources("llm", priority=5):
+                try:
+                    response = self.complex_scene_scheduler.handle_wake_word(
+                        full_query,
+                        self.latest_frame if enable_vision else None,
+                        self.latest_metadata,
+                    )
+                    if response:
+                        logger.info(f"[LLM] 回复: {response}")
+                        self.broadcast_scheduler.add_message(
+                            response,
+                            priority=3,
+                            alert_type="wake_word",
+                        )
+                        self.llm_results.append(response)
+                    else:
+                        logger.warning("[LLM] 没有返回回复")
+                finally:
+                    self.resource_manager.release_resources("llm")
+                    gc.collect()
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+            else:
+                logger.warning("[Inference] 无法获取LLM资源")
+        finally:
+            set_llm_busy(False)
+
+        self.last_wake_trigger_ts = ts
+        self.asr_state = "idle"
+        self.wake_phrase = ""
+        self.query_buffer = ""
+        self._wake_roll_text = ""
 
     def _trim_cuda_before_llm(self) -> None:
         """在调用 Ollama 前尽量压低 PyTorch CUDA 峰值，减轻 Jetson 统一内存 OOM。"""
@@ -132,75 +293,43 @@ class InferenceThread(threading.Thread):
         """
         处理ASR结果
         """
-        import re
-        asr_text = message.get("text")
-        wake_detected = message.get("wake_detected")
-        timestamp = message.get("timestamp")
+        asr_text = (message.get("text") or "").strip()
+        wake_detected = bool(message.get("wake_detected") or False)
+        is_speech = message.get("is_speech")  # Optional[bool]
+        ts = float(message.get("timestamp") or time.time())
 
-        # 记录ASR结果
-        if asr_text:
-            self.asr_results.append(asr_text)
-            logger.info(f"[Inference] 已记录ASR结果: {asr_text}")
-            
-            # 累积ASR文本，用于跨片段唤醒词检测
-            self.cumulative_asr_text += asr_text
-            logger.info(f"[Inference] 当前累积ASR文本: '{self.cumulative_asr_text}'")
-            
-            # 去除标点符号后的累积文本
-            clean_cumulative_text = re.sub(r'[。，、；：？！,.?!;:\s]', '', self.cumulative_asr_text)
-            logger.info(f"[Inference] 去除标点后的累积文本: '{clean_cumulative_text}'")
-            
-            # 如果ASR端没检测到，但推理端检测到了唤醒词，也触发！
-            if not wake_detected:
-                logger.info(f"[Inference] ASR端未检测到唤醒词，开始跨片段检测...")
-                for word in self.wake_words:
-                    if word in self.cumulative_asr_text or word in clean_cumulative_text:
-                        wake_detected = True
-                        logger.info(f"[Inference] 跨片段检测到唤醒词: '{word}'")
-                        break
-        
-        # 如果检测到唤醒词，调用LLM处理
-        if wake_detected:
-            logger.info(f"[Inference] 检测到唤醒词，准备调用LLM处理...")
-            logger.info(f"[Inference] 完整查询文本: '{self.cumulative_asr_text}'")
-            # 首帧视觉可能尚未到达，或推理资源曾拒绝导致未缓存帧；短暂等待以免误落「无图」分支
-            if self.latest_frame is None:
-                _deadline = time.time() + 2.5
-                while self.latest_frame is None and self.running and time.time() < _deadline:
-                    time.sleep(0.05)
-                if self.latest_frame is not None:
-                    logger.info("[Inference] 已等到最近一帧视觉，将结合图像调用 LLM")
-            self._trim_cuda_before_llm()
-            set_llm_busy(True)
-            try:
-                if self.resource_manager.request_resources("llm", priority=5):
-                    try:
-                        full_query = self.cumulative_asr_text
-                        response = self.complex_scene_scheduler.handle_wake_word(
-                            full_query,
-                            self.latest_frame,
-                            self.latest_metadata,
-                        )
-                        if response:
-                            logger.info(f"[LLM] 回复: {response}")
-                            self.broadcast_scheduler.add_message(
-                                response,
-                                priority=3,
-                                alert_type="wake_word",
-                            )
-                            self.llm_results.append(response)
-                            self.cumulative_asr_text = ""
-                        else:
-                            logger.warning(f"[LLM] 没有返回回复")
-                    finally:
-                        self.resource_manager.release_resources("llm")
-                        gc.collect()
-                        if torch.cuda.is_available():
-                            torch.cuda.empty_cache()
-                else:
-                    logger.warning(f"[Inference] 无法获取LLM资源")
-            finally:
-                set_llm_busy(False)
+        if not asr_text:
+            return
+
+        self.asr_results.append(asr_text)
+        logger.info(f"[Inference] 已记录ASR结果: {asr_text}")
+
+        clean_text = self._clean_text(asr_text)
+        self._wake_roll_text = (self._wake_roll_text + clean_text)[-40:]
+
+        if self.asr_state == "idle":
+            if not self._wake_cooldown_ok(ts):
+                return
+
+            matched, phrase = self._match_wake_word(asr_text, clean_text, ts)
+            if wake_detected and not matched:
+                # ASR侧可能更宽松；推理侧仍允许进入录句态，但用更通用的标识
+                matched, phrase = True, "唤醒"
+
+            if matched:
+                self._enter_listening(ts, phrase or "唤醒", asr_text, is_speech)
+            return
+
+        if self.asr_state == "listening":
+            if is_speech is None or is_speech:
+                self.last_speech_ts = ts
+
+            self.query_buffer += asr_text
+            logger.info(f"[Inference] 录句态累计 query_buffer={self.query_buffer!r}")
+
+            if self._should_finalize(ts):
+                self._finalize_and_call_llm(ts)
+            return
     
     def _handle_vision_result(self, message):
         """

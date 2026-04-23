@@ -5,7 +5,7 @@ system:
   mode: "simulation"  # simulation 或 real
   input_mode: "simulated"  # simulated 或 real
   debug: true
-  verbose: false  # 详细终端调试开关，true为详细输出，false为简洁输出
+  verbose: true  # 详细终端调试开关，true为详细输出，false为简洁输出
   fps: 5  # 主摄推理帧率
   max_frame_buffer: 2  # 环形缓冲区大小（减小可降低视觉路径排队内存）
   # 每 N 帧做一次 YOLO+VDA；增大可降低 8GB 设备上峰值内存与 CPU 占用
@@ -47,13 +47,23 @@ models:
     vda_max_input_side: 320
   asr:
     type: "real"
-    # Jetson 统一内存：cpu 基线更低；cuda:0 与 YOLO/VDA 叠加易 OOM
-    device: "cpu"
+    # ASR 引擎选择：funasr或 whisper_cpp（whisper.cpp + whisper-cli）
+    engine: "whisper_cpp"
+    device: "cuda:0"
     enable_vad: true
     enable_punctuation: true
     model_path: "/home/nvidia/models/root/autodl-tmp/funasr_models/modelscope_cache/iic/SenseVoiceSmall"
     vad_model_path: "/home/nvidia/models/root/autodl-tmp/funasr_models/modelscope_cache/iic/speech_fsmn_vad_zh-cn-16k-common-pytorch"
     punc_model_path: "/home/nvidia/models/root/autodl-tmp/funasr_models/modelscope_cache/iic/punc_ct-transformer_zh-cn-common-vocab272727-pytorch"
+    # whisper_cpp 引擎配置（engine=whisper_cpp 时生效）
+    whisper_binary: "/home/nvidia/MHSEE/QiMing/perception/Wasr/third_party/whisper.cpp/build/bin/whisper-cli"
+    whisper_model: "/home/nvidia/MHSEE/QiMing/perception/Wasr/models/ggml-small-q5_1.bin"
+    language: "zh"
+    threads: 4
+    # Wasr 内部可选使用 FunASR VAD；单模块先关更稳（需要时可改 true）
+    vad_enabled: true
+    # whisper-cli --prompt（可选：领域词/口语偏置）
+    prompt: ""
   llm:
     type: "real"
     # 仅日志展示；实际推理走 Ollama 的 model_name / model_name_text
@@ -63,6 +73,10 @@ models:
     model_name_text: "qwen2.5:0.5b"
     # Qwen3.5：关闭思考须顶层 think（由代码传），勿放 options；默认 false
     ollama_think: false
+    # mock 演示模式：输出更稳定、更像“讲解话术”
+    demo_mode: true
+    # 为 true 时会在回复末尾附带 mock 风险分（仅用于调试）
+    demo_verbose: false
 
 # 目标跟踪配置
 tracking:
@@ -81,17 +95,17 @@ risk:
 # 资源管理配置
 resources:
   # FunASR/VDA 并行时常瞬时 100% CPU，80 会导致 inference 长期拒绝对象融合
-  cpu_threshold: 96
+  cpu_threshold: 100
   # Jetson 上 percent 常偏高；过严会 fusion_skipped，过松易 OOM，需与 vision_sample_interval 配合
-  memory_threshold: 94
+  memory_threshold: 100
   gpu_memory_threshold: 90
 
 # 执行输出配置
 execution:
   tts_type: "mock"  # mock 或 real
   broadcast_queue_size: 10
-  save_video_output: true
-  save_depth_colormap_video: true
+  save_video_output: false
+  save_depth_colormap_video: false
 
 # 模拟配置
 simulation:

@@ -12,6 +12,10 @@ psutil==7.2.2
 # 模型依赖（不含 torch 三件套）
 ultralytics==8.4.21
 funasr==1.3.1
+# 流式关键词唤醒（ONNX Runtime）；与 SenseVoice 解耦，见 JETSON_PYTORCH.md
+sherpa-onnx>=1.10.0
+# 可选：仅用于 scripts/build_kws_keywords.py 调用 sherpa_onnx.text2token 从中文生成 keywords.txt
+pypinyin>=0.50.0
 addict>=2.4.0
 ollama>=0.1.0
 # Video-Depth-Anything（perception/vda）推理依赖

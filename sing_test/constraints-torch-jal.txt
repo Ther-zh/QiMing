@@ -1,0 +1,5 @@
+# 锁定 Jetson AI Lab jp6/cu126 三件套，防止 pip 从 PyPI 拉 cu13 torch
+torch==2.8.0
+torchvision==0.23.0
+torchaudio==2.8.0
+numpy==1.26.4

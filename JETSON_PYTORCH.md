@@ -81,4 +81,28 @@ python sing_test/ensure_yolo_weights.py
 | torchaudio | 未安装或为预期；FunASR 走无 torchaudio 补丁路径（见上文） |
 | YOLO 视频验收 | `python sing_test/module_debug.py --module yolo`：`cuda` 可用时为 GPU；已用 `stream=True` |
 
+## test_env：Jetson AI Lab `jp6/cu126` 成套 torch / torchvision / torchaudio（与 mhsee redist 不同线）
+
+在 **JetPack 6.x / CUDA 12.6** 上，若需要 **同源三件套**（避免 PyPI `torch 2.11+cu13` 桌面栈），可从 [Jetson AI Lab 简单索引](https://pypi.jetson-ai-lab.io/jp6/cu126/) 用 **直链 wheel** 安装（勿使用 `--extra-index-url https://pypi.org/simple` 与 JAL 并列装 `torch`，否则 pip 会解析到 PyPI 的 cu13 包）。
+
+示例（Python 3.10，`cp310` 与当前索引一致；版本以索引为准，可先用下列组合验证）：
+
+```bash
+conda activate test_env   # 或你的环境
+pip install 'numpy<2' --upgrade
+pip install --no-cache-dir \
+  'https://pypi.jetson-ai-lab.io/jp6/cu126/+f/62a/1beee9f2f1470/torch-2.8.0-cp310-cp310-linux_aarch64.whl' \
+  'https://pypi.jetson-ai-lab.io/jp6/cu126/+f/907/c4c1933789645/torchvision-0.23.0-cp310-cp310-linux_aarch64.whl' \
+  'https://pypi.jetson-ai-lab.io/jp6/cu126/+f/81a/775c8af36ac85/torchaudio-2.8.0-cp310-cp310-linux_aarch64.whl'
+```
+
+安装本项目其余依赖时，须 **锁定** trio，避免 `requirements-jetson.txt` 里的 `ultralytics` 等再次安装 PyPI `torch`。可用约束文件 [sing_test/constraints-torch-jal.txt](sing_test/constraints-torch-jal.txt)，并暂时去掉 `requirements-jetson.txt` 中的 `numpy==2.2.6` 行（与 `numpy==1.26.4` 约束并存）：
+
+```bash
+grep -v '^numpy==' requirements-jetson.txt | grep -v '^#' | grep -v '^$' > /tmp/qiming-req-no-numpy.txt
+pip install -r /tmp/qiming-req-no-numpy.txt -c sing_test/constraints-torch-jal.txt
+```
+
+**说明**：本机在 `torch 2.8.0` 下 `torch.cuda.is_available()` 与 **Ultralytics YOLO `device=0` 推理**已验证通过；若 `config` 中 `models.asr.device: cuda:0`，FunASR 加载大模型时仍可能因 **统一内存 / NvMap / PyTorch 分配器与 NVML** 触发 `CUDACachingAllocator` 断言，与「三件套是否同源」无关，可先将 ASR 设为 `cpu` 跑通 `main.py`，再单独做 ASR GPU 与显存调参。
+
 大模型若通过 **Ollama** 运行，其 GPU 路径独立于本环境内的 Python `torch`；若使用 **Transformers + Qwen** 等路径，则与当前 `torch` 强相关。Ollama 容器说明见 [`docker/ollama/README.md`](docker/ollama/README.md)。

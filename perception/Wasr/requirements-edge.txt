@@ -1,0 +1,8 @@
+# Wasr 在边缘设备上的 Python 依赖
+# 安装：conda activate <你的环境> && pip install -r requirements-edge.txt
+
+-r requirements.txt
+
+# 以下仅在 models.asr.vad_enabled: true 且使用 FunASR FSMN VAD 时需要
+funasr>=1.0
+modelscope>=1.9

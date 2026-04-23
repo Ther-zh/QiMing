@@ -7,8 +7,7 @@ from utils.logger import logger
 from utils.message_queue import message_queue
 from utils.config_loader import config_loader
 
-# 导入ASR模块
-from perception.asr.funasr_asr import FunASRRecognizer
+# 导入ASR模块（按配置选择引擎；避免在 import 时就拉起重依赖）
 from perception.asr.mock_asr import MockFunASRRecognizer
 
 class ASRThread(threading.Thread):
@@ -27,10 +26,20 @@ class ASRThread(threading.Thread):
         """
         config = config_loader.get_config()
         asr_config = config.get("models", {}).get("asr", {})
-        if asr_config.get("type", "real") != "mock":
-            return FunASRRecognizer(asr_config)
-        else:
+        if asr_config.get("type", "real") == "mock":
             return MockFunASRRecognizer(asr_config)
+
+        engine = str(asr_config.get("engine", "funasr")).strip().lower()
+        if engine in ("funasr", "sensevoice", "sensevoice_small"):
+            from perception.asr.funasr_asr import FunASRRecognizer
+
+            return FunASRRecognizer(asr_config)
+        if engine in ("whisper", "whisper_cpp", "whispercpp", "wasr"):
+            from perception.Wasr.whisper_recognizer import WhisperCppRecognizer
+
+            return WhisperCppRecognizer(asr_config)
+
+        raise ValueError(f"未知 ASR 引擎: {engine}（期望 funasr / whisper_cpp）")
     
     def run(self):
         """
@@ -50,7 +59,21 @@ class ASRThread(threading.Thread):
                     if audio_data is not None:
                         # 执行ASR识别
                         is_final = message.get("is_final", False)
-                        wake_detected, asr_text = self.asr.inference(audio_data, is_final)
+                        ret = self.asr.inference(audio_data, is_final)
+                        # 兼容旧签名 (wake_detected, asr_text) 与新签名 (wake_detected, asr_text, is_speech)
+                        wake_detected, asr_text = False, ""
+                        is_speech = None
+                        try:
+                            if isinstance(ret, (tuple, list)) and len(ret) >= 2:
+                                wake_detected = bool(ret[0])
+                                asr_text = ret[1] or ""
+                                if len(ret) >= 3:
+                                    is_speech = bool(ret[2])
+                            else:
+                                raise TypeError("ASR inference returned invalid value")
+                        except Exception:
+                            # 保底：不让 ASR 线程崩溃
+                            wake_detected, asr_text, is_speech = False, "", None
                         
                         if asr_text:
                             # 只在识别到完整句子时输出
@@ -60,6 +83,7 @@ class ASRThread(threading.Thread):
                                 "type": "asr_result",
                                 "text": asr_text,
                                 "wake_detected": wake_detected,
+                                "is_speech": is_speech,
                                 "timestamp": timestamp
                             })
                 

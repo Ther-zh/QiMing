@@ -1,0 +1,79 @@
+================================================================================
+Wasr 边缘设备移植 — 需要复制的内容与依赖
+================================================================================
+
+一、Wasr 目录内「必带」文件（Python 包本体）
+--------------------------------------------------------------------------------
+Wasr/
+  __init__.py
+  whisper_recognizer.py
+  whisper_runner.py
+  memory_probe.py
+  requirements.txt              # 最小：numpy
+  requirements-edge.txt         # 含可选 FunASR VAD
+  EDGE_DEPLOY.txt               # 本说明
+  models/
+    README.txt                  # 模型放置说明（ggml-*.bin 放此目录或任意路径并在配置中指定）
+
+二、脚本与自测（可选，建议带上便于现场排障）
+--------------------------------------------------------------------------------
+  scripts/
+    build_whisper.sh
+    download_ggml_model.sh
+    benchmark_whisper_jfk.py
+    verify_peak_probe.py
+  tests/
+    test_wasr_modules.py
+
+三、whisper.cpp 可执行文件（二选一）
+--------------------------------------------------------------------------------
+【方式 A — 在边缘设备上编译】
+  复制整个目录（可删掉 .git 减小体积）：
+    third_party/whisper.cpp/
+  在设备上安装 cmake、g++ 后执行：
+    bash scripts/build_whisper.sh
+  配置中 whisper_binary 指向：
+    third_party/whisper.cpp/build/bin/whisper-cli
+
+【方式 B — 使用预编译二进制】
+  在相同 CPU 架构/系统的构建机上编译出 whisper-cli，复制到边缘机，例如：
+    Wasr/bin/whisper-cli
+  配置中设置：
+    whisper_binary: "/你的路径/Wasr/bin/whisper-cli"
+  （需同时带上 whisper 运行所需的 .so，若静态链接则单文件即可；以实际 ldd 为准。）
+
+四、语音识别权重（必带至少一个）
+--------------------------------------------------------------------------------
+  models/ggml-*.bin
+  例如：ggml-small-q5_1.bin（中文推荐）
+  下载：bash scripts/download_ggml_model.sh small-q5_1 /path/to/Wasr/models
+  或使用镜像：HF_MIRROR=https://hf-mirror.com ...
+
+五、与主工程 MHSEE 集成时（不在 Wasr 目录内，但需同步修改）
+--------------------------------------------------------------------------------
+  core/asr_thread.py   — sys.path 含「Wasr 的父目录」，并 from Wasr.whisper_recognizer import ...
+  config/config.yaml   — models.asr.engine: whisper_cpp 及 whisper_*、vad_* 等
+
+  边缘机上若 Wasr 放在 /opt/mhsee/Wasr，则启动前：
+    export PYTHONPATH=/opt/mhsee
+  或把 Wasr 父目录加入 PYTHONPATH。
+
+六、Python 依赖（conda/venv 中安装，勿在 base 乱装）
+--------------------------------------------------------------------------------
+  见 requirements.txt（numpy 必选）
+  若启用 FunASR VAD（vad_enabled: true）：见 requirements-edge.txt
+
+七、可不必复制的目录（减小包体积）
+--------------------------------------------------------------------------------
+  third_party/whisper.cpp/.git          # 若不需要 git 历史
+  third_party/whisper.cpp/build/        # 若采用方式 B 且不在设备上编译，可不拷 build
+  **/tests 与 **/__pycache__             # 可选
+  models/for-tests-*.bin（whisper.cpp 自带测试空壳模型）# 不要当正式模型使用
+
+八、磁盘占用量级（参考）
+--------------------------------------------------------------------------------
+  whisper.cpp 源码约数十 MB（不含 .git）
+  ggml-small-q5_1 约 180MB
+  FunASR VAD 权重在首次运行后缓存在 ~/.cache/modelscope 或指定路径
+
+================================================================================

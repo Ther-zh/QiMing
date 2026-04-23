@@ -14,6 +14,7 @@ class QwenMultimodal:
         self.config = config
         self.model_name = config.get("model_name", "qwen3.5-4b")
         self.model_name_text = config.get("model_name_text") or self.model_name
+        self.enable_text_model = bool(config.get("enable_text_model", True))
         self.model = None
         self._text_model = None
         self._load_model()
@@ -31,10 +32,10 @@ class QwenMultimodal:
             from LLM.qwen35 import Qwen35Ollama
             # 未配置时默认 False：Qwen3.5 须在 API 顶层 think=False，不能写在 options（ollama#14793）
             _think = self.config["ollama_think"] if "ollama_think" in self.config else False
-            self.model = Qwen35Ollama(model_name=self.model_name, think=_think)
+            self.model = Qwen35Ollama(model_name=self.model_name, think=_think, config=self.config)
             print(f"[LLM] Ollama 多模态模型就绪: {self.model_name}")
-            if self.model_name_text != self.model_name:
-                self._text_model = Qwen35Ollama(model_name=self.model_name_text, think=_think)
+            if self.enable_text_model and self.model_name_text != self.model_name:
+                self._text_model = Qwen35Ollama(model_name=self.model_name_text, think=_think, config=self.config)
                 print(f"[LLM] Ollama 纯文本模型就绪: {self.model_name_text}")
         except Exception as e:
             print(f"[LLM] 模型加载失败: {e}")
@@ -54,14 +55,16 @@ class QwenMultimodal:
             raise RuntimeError("LLM模型未加载")
         
         image, metadata, prompt = input_data
+        gen_cfg = (self.config.get("generation", {}) or {}) if isinstance(self.config, dict) else {}
+        max_tokens = int(gen_cfg.get("max_tokens", 160))
 
         if image is None and self._text_model is not None:
-            response = self._text_model.generate(text=prompt, image=None, max_tokens=160)
+            response = self._text_model.generate(text=prompt, image=None, max_tokens=max_tokens)
         else:
             response = self.model.generate(
                 text=prompt,
                 image=image if image is not None else None,
-                max_tokens=160,
+                max_tokens=max_tokens,
             )
 
         return response[:100]

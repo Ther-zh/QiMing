@@ -1,0 +1,2 @@
+# conda activate vda && pip install -r /root/Wasr/requirements.txt
+numpy>=1.20

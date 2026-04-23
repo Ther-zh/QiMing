@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Optional
 from .funAsr import SenseVoiceASR
 
 class FunASRRecognizer:
@@ -173,7 +173,7 @@ class FunASRRecognizer:
             print(f"[ASR] 标点添加失败: {e}")
             return text
     
-    def inference(self, audio_data: np.ndarray, is_final: bool = False) -> Tuple[bool, str]:
+    def inference(self, audio_data: np.ndarray, is_final: bool = False) -> Tuple[bool, str, Optional[bool]]:
         """
         执行语音识别 - 实时处理短片段音频
         
@@ -182,7 +182,7 @@ class FunASRRecognizer:
             is_final: 是否为最终片段
             
         Returns:
-            Tuple[bool, str]: (是否检测到唤醒词, 语音转文本结果)
+            Tuple[bool, str, Optional[bool]]: (是否检测到唤醒词, 语音转文本结果, 是否为语音活动)
         """
         from utils.logger import logger
         from utils.config_loader import config_loader
@@ -208,7 +208,7 @@ class FunASRRecognizer:
                     print(f"[ASR] 处理音频，长度: {len(audio_data)} 样本")
                 
                 # 检测语音活动
-                is_speech = self._detect_voice_activity(audio_data)
+                is_speech: Optional[bool] = self._detect_voice_activity(audio_data)
                 if verbose:
                     print(f"[ASR] 语音活动检测: {is_speech}")
                 
@@ -233,6 +233,7 @@ class FunASRRecognizer:
                 import traceback
                 traceback.print_exc()
             asr_text = ""
+            is_speech = None
         
         # 检查是否已经处于唤醒状态
         if self.wake_state:
@@ -316,7 +317,7 @@ class FunASRRecognizer:
                                 print(f"[ASR] 检测到唤醒词，立即返回wake_detected=True")
                     return True, asr_text
         
-        return wake_detected, asr_text
+        return wake_detected, asr_text, is_speech
     
     def release(self):
         """
